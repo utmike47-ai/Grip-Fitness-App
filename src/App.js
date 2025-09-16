@@ -287,24 +287,33 @@ function App() {
 
   const updateEvent = async (eventData) => {
     try {
-      const { error } = await supabase
-        .from('events')
-        .update({
-          title: eventData.title,
-          details: eventData.details || '',
-          date: eventData.date,
-          time: eventData.times[0], // Get first time from array
-          type: eventData.type
-        })
-        .eq('id', editingEvent.id);  // Use editingEvent.id instead of parameter
+      // Find all events with the same title and date (they're the same workout, different times)
+      const relatedEvents = events.filter(e => 
+        e.title === editingEvent.title && 
+        e.date === editingEvent.date
+      );
       
-      if (error) throw error;
+      // Update each related event
+      for (const event of relatedEvents) {
+        const { error } = await supabase
+          .from('events')
+          .update({
+            title: eventData.title,
+            details: eventData.details || '',
+            type: eventData.type
+            // Note: we don't update date or time here to preserve the original schedule
+          })
+          .eq('id', event.id);
+        
+        if (error) throw error;
+      }
       
       await fetchEvents();
       alert('Event updated successfully!');
       setCurrentView('dashboard');
       setEditingEvent(null);
     } catch (error) {
+      console.error('Update error:', error);
       alert('Failed to update event: ' + error.message);
     }
   };
