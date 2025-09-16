@@ -2,15 +2,29 @@ import React, { useState } from 'react';
 import Logo from '../Logo';
 import { TIME_SLOTS } from '../../utils/constants';
 
-const CreateEvent = ({ user, onBack, onCreateEvent }) => {
-  const [eventData, setEventData] = useState({
-    title: '',
-    type: 'workout',
-    date: '',
-    times: [],
-    details: '',
-    maxCapacity: 25
-  });
+const CreateEvent = ({ user, onBack, onCreateEvent, editMode = false, existingEvent = null }) => {
+    const [eventData, setEventData] = useState(() => {
+      // If editing, populate with existing data
+      if (editMode && existingEvent) {
+        return {
+          title: existingEvent.title,
+          type: existingEvent.type,
+          date: existingEvent.date,
+          times: [existingEvent.time],
+          details: existingEvent.details || '',
+          maxCapacity: 25
+        };
+      }
+      // Otherwise, start with empty form
+      return {
+        title: '',
+        type: 'workout',
+        date: '',
+        times: [],
+        details: '',
+        maxCapacity: 25
+      };
+    });
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -45,7 +59,7 @@ const CreateEvent = ({ user, onBack, onCreateEvent }) => {
               </svg>
             </button>
             <h1 className="text-2xl font-montserrat font-bold text-grip-primary">
-              Create Event
+            {editMode ? 'Edit Event' : 'Create Event'}
             </h1>
           </div>
         </div>
@@ -181,7 +195,7 @@ const CreateEvent = ({ user, onBack, onCreateEvent }) => {
               type="submit"
               className="flex-1 bg-grip-primary text-white py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all"
             >
-              Create Event
+              {editMode ? 'Update Event' : 'Create Event'}
             </button>
           </div>
         </form>
