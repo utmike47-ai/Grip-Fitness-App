@@ -11,7 +11,7 @@ const DayView = ({
   onRegister,
   onCancelRegistration,
   onToggleAttendance,
-  onSelectEvent
+  onSelectEvent,
   onEditEvent 
 }) => {
   const dateStr = selectedDate?.toISOString().split('T')[0];

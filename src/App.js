@@ -19,7 +19,7 @@ function App() {
   const [userNotes, setUserNotes] = useState([]);
   const [attendance, setAttendance] = useState([]);
   const [loading, setLoading] = useState(false);
-
+  const [editingEvent, setEditingEvent] = useState(null);
   // Check session on mount
   useEffect(() => {
     checkSession();
@@ -308,6 +308,14 @@ function App() {
     }
   };
 
+  const handleEditEvent = (eventId) => {
+    const event = events.find(e => e.id === eventId);
+    if (event) {
+      setEditingEvent(event);
+      setCurrentView('editEvent');
+    }
+  };
+
   const toggleAttendance = async (eventId, userId) => {
     try {
       const existingAttendance = attendance.find(a => a.event_id === eventId && a.user_id === userId);
@@ -408,6 +416,7 @@ function App() {
             setSelectedEvent(event);
             setCurrentView('notes');
           }}
+          onEditEvent={handleEditEvent}
         />;
       
       case 'createEvent':
@@ -416,7 +425,16 @@ function App() {
           onBack={() => setCurrentView('dashboard')}
           onCreateEvent={createEvent}
         />;
-      
+
+        case 'editEvent':
+          return <CreateEvent 
+            user={user}
+            onBack={() => setCurrentView('dashboard')}
+            onCreateEvent={updateEvent}
+            editMode={true}
+            existingEvent={editingEvent}
+          />;
+        
       case 'myClasses':
         return <MyClasses 
           user={user}
