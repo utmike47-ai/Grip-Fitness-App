@@ -149,6 +149,27 @@ const MyClasses = ({ user, events, registrations, onBack, onSelectEvent, onCance
           </div>
         )}
       </div>
+      {/* Bottom Navigation */}
+<div className="fixed bottom-0 left-0 right-0 bg-white border-t border-grip-secondary">
+  <div className="max-w-md mx-auto px-4 py-2">
+    <div className="flex justify-around">
+      <button
+        onClick={onBack}
+        className="flex flex-col items-center py-2 px-4 text-gray-600 hover:text-grip-primary"
+      >
+        <span className="text-xl mb-1">🏠</span>
+        <span className="text-xs font-semibold">Home</span>
+      </button>
+      
+      <button
+        className="flex flex-col items-center py-2 px-4 text-grip-primary"
+      >
+        <span className="text-xl mb-1">💪</span>
+        <span className="text-xs font-semibold">My Classes</span>
+      </button>
+    </div>
+  </div>
+</div>
     </div>
   );
 };
