@@ -91,18 +91,28 @@ const DayView = ({
             {Object.values(groupedEvents).map((eventGroup, index) => (
               <div key={index} className="bg-white rounded-2xl shadow-lg p-6">
                 <div className="mb-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <h2 className="text-2xl font-montserrat font-bold text-grip-primary">
-                      {eventGroup.title}
-                    </h2>
-                    <span className={`px-4 py-2 rounded-full text-sm font-semibold
-                      ${eventGroup.type === 'workout' 
-                        ? 'bg-grip-primary text-white' 
-                        : 'bg-green-100 text-green-800'}`}
-                    >
-                      {eventGroup.type === 'workout' ? 'WORKOUT' : 'SOCIAL EVENT'}
-                    </span>
-                  </div>
+                <div className="flex items-center justify-between mb-2">
+  <h2 className="text-2xl font-montserrat font-bold text-grip-primary">
+    {eventGroup.title}
+  </h2>
+  <div className="flex gap-2">
+    <span className={`px-4 py-2 rounded-full text-sm font-semibold
+      ${eventGroup.type === 'workout' 
+        ? 'bg-grip-primary text-white' 
+        : 'bg-green-100 text-green-800'}`}
+    >
+      {eventGroup.type === 'workout' ? 'WORKOUT' : 'SOCIAL EVENT'}
+    </span>
+    {user?.user_metadata?.role === 'coach' && (
+      <button
+        onClick={() => onEditEvent(eventGroup.times[0].id)}
+        className="bg-yellow-500 text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-yellow-600 transition-all"
+      >
+        Edit
+      </button>
+    )}
+  </div>
+</div>
                   {eventGroup.details && (
                     <p className="text-gray-700 leading-relaxed">{eventGroup.details}</p>
                   )}
@@ -151,14 +161,7 @@ const DayView = ({
                                   {isFull ? 'FULL' : 'Register'}
                                 </button>
                               )}
-                              {user?.user_metadata?.role === 'coach' && (
-                                <button
-                                    onClick={() => onEditEvent(timeSlot.id)}
-                                    className="bg-yellow-500 text-white px-4 py-2 rounded-full text-sm hover:bg-yellow-600 transition-all"
-                                  >
-                                     Edit
-                                  </button>
-                                  )}
+                             
                             </div>
                           </div>
 
