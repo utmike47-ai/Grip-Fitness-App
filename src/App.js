@@ -318,37 +318,62 @@ function App() {
     }
   };
 
-  const deleteEvent = async (eventId) => {
-    if (!window.confirm('Are you sure you want to delete this event? This will also remove all registrations.')) {
+  cconst deleteEvent = async (eventId) => {
+    if (!window.confirm('Are you sure you want to delete this event? This will also remove all registrations, notes, and attendance records.')) {
       return;
     }
     
     try {
       // Find all events with same title and date (all time slots)
       const eventToDelete = events.find(e => e.id === eventId);
+      if (!eventToDelete) {
+        alert('Event not found');
+        return;
+      }
+      
       const relatedEvents = events.filter(e => 
         e.title === eventToDelete.title && 
         e.date === eventToDelete.date
       );
       
-      // First, delete all registrations for these events
+      console.log('Deleting events:', relatedEvents);
+      
+      // Delete in order: attendance -> notes -> registrations -> events
       for (const event of relatedEvents) {
+        // Delete attendance records
+        const { error: attError } = await supabase
+          .from('attendance')
+          .delete()
+          .eq('event_id', event.id);
+        
+        if (attError) console.error('Error deleting attendance:', attError);
+        
+        // Delete notes
+        const { error: notesError } = await supabase
+          .from('notes')
+          .delete()
+          .eq('event_id', event.id);
+        
+        if (notesError) console.error('Error deleting notes:', notesError);
+        
+        // Delete registrations
         const { error: regError } = await supabase
           .from('registrations')
           .delete()
           .eq('event_id', event.id);
         
         if (regError) console.error('Error deleting registrations:', regError);
-      }
-      
-      // Then delete the events
-      for (const event of relatedEvents) {
-        const { error } = await supabase
+        
+        // Finally delete the event
+        const { error: eventError } = await supabase
           .from('events')
           .delete()
           .eq('id', event.id);
         
-        if (error) throw error;
+        if (eventError) {
+          console.error('Error deleting event:', eventError);
+          throw eventError;
+        }
       }
       
       await fetchEvents();
@@ -356,7 +381,7 @@ function App() {
       alert('Event deleted successfully!');
       setCurrentView('dashboard');
     } catch (error) {
-      console.error('Delete error:', error);
+      console.error('Delete failed:', error);
       alert('Failed to delete event: ' + error.message);
     }
   };
