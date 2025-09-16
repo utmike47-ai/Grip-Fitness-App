@@ -318,7 +318,7 @@ function App() {
     }
   };
 
-  cconst deleteEvent = async (eventId) => {
+  const deleteEvent = async (eventId) => {
     if (!window.confirm('Are you sure you want to delete this event? This will also remove all registrations, notes, and attendance records.')) {
       return;
     }

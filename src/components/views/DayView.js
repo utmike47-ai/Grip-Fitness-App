@@ -98,7 +98,8 @@ const DayView = ({
   <h2 className="text-2xl font-montserrat font-bold text-grip-primary">
     {eventGroup.title}
   </h2>
-  <div className="flex gap-2">
+  
+  <div className="flex flex-col gap-3">
     <span className={`px-4 py-2 rounded-full text-sm font-semibold
       ${eventGroup.type === 'workout' 
         ? 'bg-grip-primary text-white' 
@@ -148,32 +149,26 @@ const DayView = ({
                             </div>
                             
                             <div className="flex gap-2">
-                              {timeSlot.userRegistered ? (
-                                <>
-                                  <span className="bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-semibold">
-                                    ✓ Registered
-                                  </span>
-                                  <button
-                                    onClick={() => onCancelRegistration(timeSlot.id)}
-                                    className="bg-grip-accent text-white px-4 py-2 rounded-full text-sm hover:shadow-lg transition-all"
-                                  >
-                                    Cancel
-                                  </button>
-                                </>
-                              ) : (
-                                <button
-                                  onClick={() => onRegister(timeSlot.id)}
-                                  disabled={isFull}
-                                  className={`px-6 py-2 rounded-full text-sm font-semibold transition-all
-                                    ${isFull 
-                                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
-                                      : 'bg-grip-primary text-white hover:shadow-lg'}`}
-                                >
-                                  {isFull ? 'FULL' : 'Register'}
-                                </button>
-                              )}
-                             
-                            </div>
+  {timeSlot.userRegistered ? (
+    <button
+      onClick={() => onCancelRegistration(timeSlot.id)}
+      className="bg-grip-accent text-white px-6 py-2 rounded-full text-sm font-semibold hover:shadow-lg transition-all"
+    >
+      Cancel
+    </button>
+  ) : (
+    <button
+      onClick={() => onRegister(timeSlot.id)}
+      disabled={isFull}
+      className={`px-6 py-2 rounded-full text-sm font-semibold transition-all
+        ${isFull 
+          ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+          : 'bg-grip-primary text-white hover:shadow-lg'}`}
+    >
+      {isFull ? 'FULL' : 'Register'}
+    </button>
+  )}
+</div>
                           </div>
 
                           {/* Coach view - attendance */}
