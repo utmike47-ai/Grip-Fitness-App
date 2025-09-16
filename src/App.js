@@ -331,7 +331,17 @@ function App() {
         e.date === eventToDelete.date
       );
       
-      // Delete all related events
+      // First, delete all registrations for these events
+      for (const event of relatedEvents) {
+        const { error: regError } = await supabase
+          .from('registrations')
+          .delete()
+          .eq('event_id', event.id);
+        
+        if (regError) console.error('Error deleting registrations:', regError);
+      }
+      
+      // Then delete the events
       for (const event of relatedEvents) {
         const { error } = await supabase
           .from('events')
@@ -346,6 +356,7 @@ function App() {
       alert('Event deleted successfully!');
       setCurrentView('dashboard');
     } catch (error) {
+      console.error('Delete error:', error);
       alert('Failed to delete event: ' + error.message);
     }
   };

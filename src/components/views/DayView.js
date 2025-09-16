@@ -27,7 +27,9 @@ const DayView = ({
   };
 
   const formatTimeDisplay = (time24) => {
-    const timeSlot = TIME_SLOTS.find(slot => slot.value === time24);
+    // Remove seconds if present (e.g., "16:30:00" becomes "16:30")
+    const timeWithoutSeconds = time24.split(':').slice(0, 2).join(':');
+    const timeSlot = TIME_SLOTS.find(slot => slot.value === timeWithoutSeconds);
     return timeSlot ? timeSlot.display : time24;
   };
 
