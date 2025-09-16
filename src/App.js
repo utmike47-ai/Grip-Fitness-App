@@ -285,6 +285,29 @@ function App() {
     }
   };
 
+  const updateEvent = async (eventId, eventData) => {
+    try {
+      const { error } = await supabase
+        .from('events')
+        .update({
+          title: eventData.title,
+          details: eventData.details,
+          date: eventData.date,
+          time: eventData.time,
+          type: eventData.type
+        })
+        .eq('id', eventId);
+      
+      if (error) throw error;
+      
+      await fetchEvents();
+      alert('Event updated successfully!');
+      setCurrentView('dashboard');
+    } catch (error) {
+      alert('Failed to update event: ' + error.message);
+    }
+  };
+
   const toggleAttendance = async (eventId, userId) => {
     try {
       const existingAttendance = attendance.find(a => a.event_id === eventId && a.user_id === userId);
