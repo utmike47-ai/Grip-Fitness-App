@@ -285,24 +285,25 @@ function App() {
     }
   };
 
-  const updateEvent = async (eventId, eventData) => {
+  const updateEvent = async (eventData) => {
     try {
       const { error } = await supabase
         .from('events')
         .update({
           title: eventData.title,
-          details: eventData.details,
+          details: eventData.details || '',
           date: eventData.date,
-          time: eventData.time,
+          time: eventData.times[0], // Get first time from array
           type: eventData.type
         })
-        .eq('id', eventId);
+        .eq('id', editingEvent.id);  // Use editingEvent.id instead of parameter
       
       if (error) throw error;
       
       await fetchEvents();
       alert('Event updated successfully!');
       setCurrentView('dashboard');
+      setEditingEvent(null);
     } catch (error) {
       alert('Failed to update event: ' + error.message);
     }
