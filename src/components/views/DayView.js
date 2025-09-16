@@ -12,7 +12,8 @@ const DayView = ({
   onCancelRegistration,
   onToggleAttendance,
   onSelectEvent,
-  onEditEvent 
+  onEditEvent,
+  onDeleteEvent
 }) => {
   const dateStr = selectedDate?.toISOString().split('T')[0];
   const dayEvents = events.filter(event => event.date === dateStr);
@@ -104,12 +105,20 @@ const DayView = ({
       {eventGroup.type === 'workout' ? 'WORKOUT' : 'SOCIAL EVENT'}
     </span>
     {user?.user_metadata?.role === 'coach' && (
+        <>
       <button
         onClick={() => onEditEvent(eventGroup.times[0].id)}
         className="bg-yellow-500 text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-yellow-600 transition-all"
       >
         Edit
       </button>
+      <button
+      onClick={() => onDeleteEvent(eventGroup.times[0].id)}
+      className="bg-red-500 text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-red-600 transition-all"
+    >
+      Delete
+    </button>
+    </>
     )}
   </div>
 </div>

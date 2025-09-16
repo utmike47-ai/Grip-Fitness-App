@@ -318,6 +318,38 @@ function App() {
     }
   };
 
+  const deleteEvent = async (eventId) => {
+    if (!window.confirm('Are you sure you want to delete this event? This will also remove all registrations.')) {
+      return;
+    }
+    
+    try {
+      // Find all events with same title and date (all time slots)
+      const eventToDelete = events.find(e => e.id === eventId);
+      const relatedEvents = events.filter(e => 
+        e.title === eventToDelete.title && 
+        e.date === eventToDelete.date
+      );
+      
+      // Delete all related events
+      for (const event of relatedEvents) {
+        const { error } = await supabase
+          .from('events')
+          .delete()
+          .eq('id', event.id);
+        
+        if (error) throw error;
+      }
+      
+      await fetchEvents();
+      await fetchRegistrations();
+      alert('Event deleted successfully!');
+      setCurrentView('dashboard');
+    } catch (error) {
+      alert('Failed to delete event: ' + error.message);
+    }
+  };
+
   const handleEditEvent = (eventId) => {
     const event = events.find(e => e.id === eventId);
     if (event) {
@@ -427,6 +459,7 @@ function App() {
             setCurrentView('notes');
           }}
           onEditEvent={handleEditEvent}
+          onDeleteEvent={deleteEvent} 
         />;
       
       case 'createEvent':
