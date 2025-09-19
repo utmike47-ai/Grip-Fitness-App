@@ -2,7 +2,7 @@ import React from 'react';
 import Logo from '../Logo';
 import Calendar from '../common/Calendar';
 
-const Dashboard = ({ user, events, registrations, onSignOut, onViewChange, onDateSelect }) => {   
+const Dashboard = ({ user, events, registrations, onSignOut, onViewChange, onDateSelect, onEventSelect }) => {   
     const getUserRegistrations = () => {
     if (!user) return [];
     return registrations
@@ -80,7 +80,11 @@ const Dashboard = ({ user, events, registrations, onSignOut, onViewChange, onDat
                 ) : (
                   <div className="space-y-3">
                     {userRegs.slice(0, 3).map(reg => (
-                      <div key={reg.id} className="border border-grip-secondary rounded-lg p-4 hover:shadow-md transition-all">
+                      <div 
+                      key={reg.id} 
+                      className="border border-grip-secondary rounded-lg p-4 hover:shadow-md transition-all cursor-pointer"
+                      onClick={() => onEventSelect?.(reg.event)} 
+                      >
                         <h3 className="font-semibold text-grip-primary">{reg.event.title}</h3>
                         <p className="text-sm text-gray-600 mt-1">
                           {new Date(reg.event.date).toLocaleDateString('en-US', { 
@@ -97,14 +101,9 @@ const Dashboard = ({ user, events, registrations, onSignOut, onViewChange, onDat
                           >
                             {reg.event.type.toUpperCase()}
                           </span>
-                          <button
-                            onClick={() => {
-                              // Handle notes
-                            }}
-                            className="text-grip-accent hover:text-grip-primary text-sm font-semibold"
-                          >
-                            Notes →
-                          </button>
+                          <span className="text-grip-accent text-sm font-semibold">
+  View →
+</span>
                         </div>
                       </div>
                     ))}

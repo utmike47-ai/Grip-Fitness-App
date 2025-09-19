@@ -3,7 +3,14 @@ import Logo from '../Logo';
 import { TIME_SLOTS } from '../../utils/constants';
 
 const MyClasses = ({ user, events, registrations, onBack, onSelectEvent, onCancelRegistration }) => {
-  const getUserRegistrations = () => {
+    const formatTimeDisplay = (time24) => {
+        // Remove seconds if present
+        const timeWithoutSeconds = time24?.split(':').slice(0, 2).join(':');
+        const timeSlot = TIME_SLOTS.find(slot => slot.value === timeWithoutSeconds);
+        return timeSlot ? timeSlot.display : time24;
+      };
+      
+      const getUserRegistrations = () => {
     if (!user) return [];
     return registrations
       .filter(reg => reg.user_id === user.id)
@@ -15,10 +22,7 @@ const MyClasses = ({ user, events, registrations, onBack, onSelectEvent, onCance
       .sort((a, b) => new Date(a.event.date + ' ' + a.event.time) - new Date(b.event.date + ' ' + b.event.time));
   };
 
-  const formatTimeDisplay = (time24) => {
-    const timeSlot = TIME_SLOTS.find(slot => slot.value === time24);
-    return timeSlot ? timeSlot.display : time24;
-  };
+  
 
   const userRegs = getUserRegistrations();
   const upcomingRegs = userRegs.filter(reg => new Date(reg.event.date) >= new Date());

@@ -7,6 +7,7 @@ import DayView from './components/views/DayView';
 import CreateEvent from './components/views/CreateEvent';
 import MyClasses from './components/views/MyClasses';
 import NotesView from './components/views/NotesView';
+import WorkoutDetails from './components/views/WorkoutDetails';
 
 function App() {
   // State management
@@ -467,18 +468,22 @@ function App() {
       case 'login':
         return <LoginScreen onLogin={signIn} loading={loading} />;
       
-      case 'dashboard':
-        return <Dashboard 
-          user={user}
-          events={events}
-          registrations={registrations}
-          onSignOut={signOut}
-          onViewChange={setCurrentView}
-          onDateSelect={(date) => {
-            setSelectedDate(date);
-            setCurrentView('dayView');
-          }}
-        />;
+        case 'dashboard':
+          return <Dashboard 
+            user={user}
+            events={events}
+            registrations={registrations}
+            onSignOut={signOut}
+            onViewChange={setCurrentView}
+            onDateSelect={(date) => {
+              setSelectedDate(date);
+              setCurrentView('dayView');
+            }}
+            onEventSelect={(event) => {
+              setSelectedEvent(event);
+              setCurrentView('workoutDetails');
+            }}
+          />;
       
       case 'dayView':
         return <DayView 
@@ -534,6 +539,17 @@ function App() {
           onBack={() => setCurrentView('dashboard')}
           onSaveNote={saveNote}
         />;
+
+        case 'workoutDetails':
+  return <WorkoutDetails 
+    event={selectedEvent}
+    events={events}
+    registrations={registrations}
+    user={user}
+    onBack={() => setCurrentView('dashboard')}
+    onRegister={registerForEvent}
+    onCancelRegistration={cancelRegistration}
+  />;
       
       default:
         return <Dashboard 
