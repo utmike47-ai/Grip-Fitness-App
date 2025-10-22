@@ -67,7 +67,24 @@ const WorkoutDetails = ({
                 })}
               </h2>
               {event.details && (
-                <p className="text-gray-700">{event.details}</p>
+                <div className="text-gray-700 leading-relaxed">
+                  {event.details
+                    .split(/(?=\d+\s)|(?=Go\s)|(?=go\s)|\n|,/)
+                    .filter(line => line.trim())
+                    .map((line, index) => (
+                      <div 
+                        key={index} 
+                        style={{ 
+                          display: 'block', 
+                          width: '100%',
+                          marginBottom: '8px',
+                          lineHeight: '1.5'
+                        }}
+                      >
+                        {line.trim()}
+                      </div>
+                    ))}
+                </div>
               )}
             </div>
             <span className={`px-4 py-2 rounded-full text-sm font-semibold
@@ -126,9 +143,9 @@ const WorkoutDetails = ({
                 {regs.length > 0 && (
                   <div className="pt-4 border-t border-grip-secondary">
                     <p className="font-semibold text-grip-primary mb-2">
-                      Registered Participants:
+                      Registered Participants ({regs.length}):
                     </p>
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="space-y-2">
                       {regs.map(reg => (
                         <div key={reg.id} className="text-sm text-gray-700">
                           • {reg.user_name}

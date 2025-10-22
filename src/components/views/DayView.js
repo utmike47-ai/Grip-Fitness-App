@@ -94,13 +94,13 @@ const DayView = ({
             {Object.values(groupedEvents).map((eventGroup, index) => (
               <div key={index} className="bg-white rounded-2xl shadow-lg p-6">
                 <div className="mb-4">
-                <div className="flex items-center justify-between mb-2">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 gap-3">
   <h2 className="text-2xl font-montserrat font-bold text-grip-primary">
     {eventGroup.title}
   </h2>
   
   <div className="flex flex-col gap-3">
-    <span className={`px-4 py-2 rounded-full text-sm font-semibold
+    <span className={`px-4 py-2 rounded-full text-sm font-semibold text-center
       ${eventGroup.type === 'workout' 
         ? 'bg-grip-primary text-white' 
         : 'bg-green-100 text-green-800'}`}
@@ -125,9 +125,26 @@ const DayView = ({
     )}
   </div>
 </div>
-                  {eventGroup.details && (
-                    <p className="text-gray-700 leading-relaxed">{eventGroup.details}</p>
-                  )}
+{eventGroup.details && (
+  <div className="text-gray-700 leading-relaxed">
+    {eventGroup.details
+      .split(/(?=\d+\s)|(?=Go\s)|(?=go\s)|\n|,/)
+      .filter(line => line.trim())
+      .map((line, index) => (
+        <div 
+          key={index} 
+          style={{ 
+            display: 'block', 
+            width: '100%',
+            marginBottom: '8px',
+            lineHeight: '1.5'
+          }}
+        >
+          {line.trim()}
+        </div>
+      ))}
+  </div>
+)}
                 </div>
 
                 <div className="border-t border-grip-secondary pt-4">
@@ -148,7 +165,7 @@ const DayView = ({
                               </span>
                             </div>
                             
-                            <div className="flex gap-2">
+                            <div className="flex flex-col gap-2">
   {timeSlot.userRegistered ? (
     <button
       onClick={() => onCancelRegistration(timeSlot.id)}
@@ -171,22 +188,24 @@ const DayView = ({
 </div>
                           </div>
 
-                          {/* Coach view - attendance */}
-                          {user?.user_metadata?.role === 'coach' && timeSlot.registeredUsers.length > 0 && (
+                          {/* Show registered participants to everyone */}
+                          {timeSlot.registeredUsers.length > 0 && (
                             <div className="mt-4 pt-4 border-t border-grip-secondary">
                               <p className="font-semibold text-grip-primary mb-2">
-                                Registered Students:
+                                Registered Participants ({timeSlot.registeredUsers.length}):
                               </p>
                               <div className="space-y-2">
                                 {timeSlot.registeredUsers.map(reg => (
                                   <div key={reg.id} className="flex items-center justify-between">
                                     <span className="text-sm">{reg.user_name}</span>
-                                    <button
-                                      onClick={() => onToggleAttendance?.(timeSlot.id, reg.user_id)}
-                                      className="text-xs px-3 py-1 rounded-full bg-grip-secondary text-grip-primary"
-                                    >
-                                      Mark Present
-                                    </button>
+                                    {user?.user_metadata?.role === 'coach' && (
+                                      <button
+                                        onClick={() => onToggleAttendance?.(timeSlot.id, reg.user_id)}
+                                        className="text-xs px-3 py-1 rounded-full bg-grip-secondary text-grip-primary"
+                                      >
+                                        Mark Present
+                                      </button>
+                                    )}
                                   </div>
                                 ))}
                               </div>

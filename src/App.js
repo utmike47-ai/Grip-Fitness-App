@@ -8,6 +8,7 @@ import CreateEvent from './components/views/CreateEvent';
 import MyClasses from './components/views/MyClasses';
 import NotesView from './components/views/NotesView';
 import WorkoutDetails from './components/views/WorkoutDetails';
+import Toast from './components/common/Toast';
 
 function App() {
   // State management
@@ -21,6 +22,7 @@ function App() {
   const [attendance, setAttendance] = useState([]);
   const [loading, setLoading] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
+  const [toast, setToast] = useState(null); 
   // Check session on mount
   useEffect(() => {
     checkSession();
@@ -62,7 +64,7 @@ function App() {
           
             if (profileError) {
               console.error('Profile creation error:', profileError);
-              alert(`Account created but profile setup failed: ${profileError.message}. Please contact support.`);
+              showToast(`Account created but profile setup failed: ${profileError.message}. Please contact support.`);
               // Don't throw here, let them continue to the app
             }
           
@@ -77,7 +79,7 @@ function App() {
           });
           
           setCurrentView('dashboard');
-          alert('Account created successfully! Welcome to Grip Fitness!');
+          showToast('Account created successfully! Welcome to Grip Fitness!');
         }
       } else {
         // Regular login
@@ -93,7 +95,7 @@ function App() {
         setCurrentView('dashboard');
       }
     } catch (error) {
-      alert('Error: ' + error.message);
+      showToast('Error: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -139,6 +141,10 @@ function App() {
     } catch (error) {
       console.error('Profile fetch error:', error);
     }
+  };
+
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type });
   };
 
   // Data fetching functions
@@ -234,12 +240,12 @@ function App() {
       
       if (error) throw error;
       await fetchRegistrations();
-      alert('Successfully registered!');
+      showToast('Successfully registered!');
     } catch (error) {
       if (error.code === '23505') {
-        alert('You are already registered for this event!');
+        showToast('You are already registered for this event!');
       } else {
-        alert('Registration failed: ' + error.message);
+        showToast('Registration failed: ' + error.message);
       }
     }
   };
@@ -254,9 +260,9 @@ function App() {
       
       if (error) throw error;
       await fetchRegistrations();
-      alert('Registration cancelled');
+      showToast('Registration cancelled');
     } catch (error) {
-      alert('Failed to cancel registration: ' + error.message);
+      showToast('Failed to cancel registration: ' + error.message);
     }
   };
 
@@ -267,7 +273,7 @@ function App() {
         date: eventData.date,
         time: time,
         type: eventData.type,
-        details: eventData.details || '',
+        details: eventData.details ? eventData.details.replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim() : '',
         created_by: user.id,
       }));
   
@@ -279,10 +285,10 @@ function App() {
       
       await fetchEvents();
       setCurrentView('dashboard');
-      alert('Event created successfully!');
+      showToast('Event created successfully!');
     } catch (error) {
       console.error('Failed to create event:', error);
-      alert('Failed to create event: ' + error.message);
+      showToast('Failed to create event: ' + error.message);
     }
   };
 
@@ -300,7 +306,7 @@ function App() {
           .from('events')
           .update({
             title: eventData.title,
-            details: eventData.details || '',
+            details: eventData.details ? eventData.details.replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim() : '',
             type: eventData.type
             // Note: we don't update date or time here to preserve the original schedule
           })
@@ -310,12 +316,12 @@ function App() {
       }
       
       await fetchEvents();
-      alert('Event updated successfully!');
+      showToast('Event updated successfully!');
       setCurrentView('dashboard');
       setEditingEvent(null);
     } catch (error) {
       console.error('Update error:', error);
-      alert('Failed to update event: ' + error.message);
+      showToast('Failed to update event: ' + error.message);
     }
   };
 
@@ -328,7 +334,7 @@ function App() {
       // Find all events with same title and date (all time slots)
       const eventToDelete = events.find(e => e.id === eventId);
       if (!eventToDelete) {
-        alert('Event not found');
+        showToast('Event not found');
         return;
       }
       
@@ -379,11 +385,11 @@ function App() {
       
       await fetchEvents();
       await fetchRegistrations();
-      alert('Event deleted successfully!');
+      showToast('Event deleted successfully!');
       setCurrentView('dashboard');
     } catch (error) {
       console.error('Delete failed:', error);
-      alert('Failed to delete event: ' + error.message);
+      showToast('Failed to delete event: ' + error.message);
     }
   };
 
@@ -425,7 +431,7 @@ function App() {
       
       await fetchAttendance();
     } catch (error) {
-      alert('Failed to update attendance: ' + error.message);
+      showToast('Failed to update attendance: ' + error.message);
     }
   };
 
@@ -454,10 +460,10 @@ function App() {
       }
       
       await fetchUserNotes();
-      alert('Note saved successfully!');
+      showToast('Note saved successfully!');
       return true;
     } catch (error) {
-      alert('Failed to save note: ' + error.message);
+      showToast('Failed to save note: ' + error.message);
       return false;
     }
   };
@@ -566,7 +572,18 @@ function App() {
     }
   };
 
-  return renderView();
+  return (
+    <>
+      {renderView()}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
+    </>
+  );
 }
 
 export default App;

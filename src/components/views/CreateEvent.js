@@ -156,7 +156,12 @@ const CreateEvent = ({ user, onBack, onCreateEvent, editMode = false, existingEv
             <textarea
               value={eventData.details}
               onChange={(e) => setEventData(prev => ({ ...prev, details: e.target.value }))}
-              placeholder="Describe the workout, equipment needed, difficulty level..."
+              placeholder="Enter workout details (one exercise per line):
+20 min EMOM
+12-15 Heel Raised Goblet Squats
+12 Bike Cals
+12-15 DB Bench press
+20 Sit ups"
               rows="4"
               className="w-full px-4 py-3 border border-grip-secondary rounded-lg focus:outline-none focus:border-grip-primary transition-colors resize-none"
             />
