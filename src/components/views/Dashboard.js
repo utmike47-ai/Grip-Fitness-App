@@ -1,9 +1,13 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Logo from '../Logo';
 import Calendar from '../common/Calendar';
 
 const Dashboard = ({ user, events, registrations, onSignOut, onViewChange, onDateSelect, onEventSelect }) => {   
-    const getUserRegistrations = () => {
+    useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
+  const getUserRegistrations = () => {
     if (!user) return [];
     return registrations
       .filter(reg => reg.user_id === user.id)
