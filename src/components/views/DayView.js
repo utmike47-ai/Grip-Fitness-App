@@ -184,16 +184,8 @@ const DayView = ({
                               </p>
                               <div className="space-y-2">
                                 {timeSlot.registeredUsers.map(reg => (
-                                  <div key={reg.id} className="flex items-center justify-between">
-                                    <span className="text-sm">{reg.user_name}</span>
-                                    {user?.user_metadata?.role === 'coach' && (
-                                      <button
-                                        onClick={() => onToggleAttendance?.(timeSlot.id, reg.user_id)}
-                                        className="text-xs px-3 py-1 rounded-full bg-grip-secondary text-grip-primary"
-                                      >
-                                        Mark Present
-                                      </button>
-                                    )}
+                                  <div key={reg.id} className="text-sm">
+                                    {reg.user_name}
                                   </div>
                                 ))}
                               </div>
