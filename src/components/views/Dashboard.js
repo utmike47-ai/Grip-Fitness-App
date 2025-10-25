@@ -28,6 +28,35 @@ const Dashboard = ({ user, events, registrations, onSignOut, onViewChange, onDat
   const userRegs = getUserRegistrations();
   const userRole = user?.user_metadata?.role || 'student';
 
+  const getWeekStats = () => {
+    const today = new Date();
+    const currentWeekStart = new Date(today);
+    currentWeekStart.setDate(today.getDate() - today.getDay()); // Start of week (Sunday)
+    currentWeekStart.setHours(0, 0, 0, 0);
+    
+    const currentWeekEnd = new Date(currentWeekStart);
+    currentWeekEnd.setDate(currentWeekStart.getDate() + 6); // End of week (Saturday)
+    currentWeekEnd.setHours(23, 59, 59, 999);
+    
+    // Get all classes this week
+    const classesThisWeek = events.filter(event => {
+      const eventDate = new Date(event.date);
+      return eventDate >= currentWeekStart && eventDate <= currentWeekEnd;
+    });
+    
+    // Get user's registered classes this week
+    const myClassesThisWeek = classesThisWeek.filter(event => 
+      registrations.some(reg => 
+        reg.event_id === event.id && reg.user_id === user.id
+      )
+    );
+    
+    return {
+      totalThisWeek: classesThisWeek.length,
+      registeredThisWeek: myClassesThisWeek.length
+    };
+  };
+
   return (
     <div className="min-h-screen bg-grip-light pb-20">
       {/* Header */}
@@ -136,21 +165,28 @@ const Dashboard = ({ user, events, registrations, onSignOut, onViewChange, onDat
                 Quick Stats
               </h2>
               <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Total Events</span>
-                  <span className="font-bold text-grip-primary">{events.length}</span>
-                </div>
-                {userRole === 'student' && (
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">My Registrations</span>
-                    <span className="font-bold text-grip-primary">{userRegs.length}</span>
-                  </div>
-                )}
-                {userRole === 'coach' && (
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Total Registrations</span>
-                    <span className="font-bold text-grip-primary">{registrations.length}</span>
-                  </div>
+                {userRole === 'coach' ? (
+                  <>
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600">Total Events</span>
+                      <span className="text-2xl font-bold text-grip-primary">{events.length}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600">Total Registrations</span>
+                      <span className="text-2xl font-bold text-grip-primary">{registrations.length}</span>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600">Classes This Week</span>
+                      <span className="text-2xl font-bold text-grip-primary">{getWeekStats().totalThisWeek}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600">My Classes This Week</span>
+                      <span className="text-2xl font-bold text-grip-primary">{getWeekStats().registeredThisWeek}</span>
+                    </div>
+                  </>
                 )}
               </div>
             </div>
