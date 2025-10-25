@@ -69,7 +69,7 @@ const Dashboard = ({ user, events, registrations, onSignOut, onViewChange, onDat
           {/* Side Panel */}
           <div className="space-y-6">
             {userRole === 'student' && (
-              <div className="bg-white rounded-2xl shadow-lg p-6">
+              <div id="my-classes-section" className="bg-white rounded-2xl shadow-lg p-6">
                 <h2 className="text-xl font-montserrat font-bold text-grip-primary mb-4">
                   My Upcoming Classes
                 </h2>

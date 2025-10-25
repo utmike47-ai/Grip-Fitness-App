@@ -55,7 +55,7 @@ const DayView = ({
   }, {});
 
   return (
-    <div className="min-h-screen bg-grip-light">
+    <div className="min-h-screen bg-grip-light pb-20">
       {/* Header */}
       <div className="bg-white shadow-sm border-b border-grip-secondary">
         <div className="max-w-7xl mx-auto px-4 py-4">

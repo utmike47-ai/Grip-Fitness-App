@@ -10,7 +10,7 @@ import NotesView from './components/views/NotesView';
 import WorkoutDetails from './components/views/WorkoutDetails';
 import Toast from './components/common/Toast';
 import BookingModal from './components/common/BookingModal';
-import HomeButton from './components/common/HomeButton';
+import BottomNav from './components/common/BottomNav';
 
 function App() {
   // State management
@@ -114,11 +114,6 @@ function App() {
     setRegistrations([]);
     setUserNotes([]);
     setAttendance([]);
-  };
-
-  const goToHome = () => {
-    setCurrentView('dashboard');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // Fetch user profile
@@ -613,7 +608,11 @@ function App() {
         }}
       />
       {currentView !== 'login' && (
-        <HomeButton onGoHome={goToHome} />
+        <BottomNav 
+          userRole={user?.user_metadata?.role}
+          currentView={currentView}
+          onNavigate={setCurrentView}
+        />
       )}
     </>
   );
