@@ -24,7 +24,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
   const [toast, setToast] = useState(null);
-  const [bookingModal, setBookingModal] = useState({ isOpen: false, eventDetails: null }); 
+  const [bookingModal, setBookingModal] = useState({ isOpen: false, details: null }); 
   // Check session on mount
   useEffect(() => {
     checkSession();
@@ -243,16 +243,20 @@ function App() {
       if (error) throw error;
       await fetchRegistrations();
       
-      // Find the event details to show in the modal
-      const registeredEvent = events.find(e => e.id === eventId);
-      if (registeredEvent) {
-        setBookingModal({
-          isOpen: true,
-          eventDetails: registeredEvent
-        });
-      } else {
-        showToast('Successfully registered!');
-      }
+      // Get event details for modal
+      const event = events.find(e => e.id === eventId);
+      const timeSlot = TIME_SLOTS.find(slot => slot.value === event.time?.split(':').slice(0, 2).join(':'));
+      
+      setBookingModal({
+        isOpen: true,
+        details: {
+          title: event.title,
+          date: event.date,
+          time: timeSlot?.display || event.time
+        }
+      });
+      
+      showToast('Successfully registered!');
     } catch (error) {
       if (error.code === '23505') {
         showToast('You are already registered for this event!');
@@ -594,10 +598,13 @@ function App() {
           onClose={() => setToast(null)}
         />
       )}
-      <BookingModal
+      <BookingModal 
         isOpen={bookingModal.isOpen}
-        eventDetails={bookingModal.eventDetails}
-        onClose={() => setBookingModal({ isOpen: false, eventDetails: null })}
+        eventDetails={bookingModal.details}
+        onClose={() => {
+          setBookingModal({ isOpen: false, details: null });
+          setCurrentView('dashboard');
+        }}
       />
     </>
   );
