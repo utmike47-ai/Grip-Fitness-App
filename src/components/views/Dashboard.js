@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react';
 import Logo from '../Logo';
 import Calendar from '../common/Calendar';
+import WorkoutStats from '../common/WorkoutStats';
 
-const Dashboard = ({ user, events, registrations, onSignOut, onViewChange, onDateSelect, onEventSelect }) => {   
+const Dashboard = ({ user, events, registrations, attendance, onSignOut, onViewChange, onDateSelect, onEventSelect }) => {   
     useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
@@ -94,6 +95,16 @@ const Dashboard = ({ user, events, registrations, onSignOut, onViewChange, onDat
             {userRole === 'coach' ? '👨‍🏫 Coach' : '🏋️‍♂️ Student'} Account
           </span>
         </div>
+
+        {/* Workout Stats for Students */}
+        {userRole === 'student' && (
+          <WorkoutStats 
+            attendance={attendance}
+            registrations={registrations}
+            events={events}
+            user={user}
+          />
+        )}
 
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Calendar Section */}

@@ -504,6 +504,7 @@ function App() {
             user={user}
             events={events}
             registrations={registrations}
+            attendance={attendance}
             onSignOut={signOut}
             onViewChange={setCurrentView}
             onDateSelect={(date) => {
