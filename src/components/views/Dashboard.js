@@ -9,13 +9,19 @@ const Dashboard = ({ user, events, registrations, onSignOut, onViewChange, onDat
 
   const getUserRegistrations = () => {
     if (!user) return [];
+    const now = new Date();
     return registrations
       .filter(reg => reg.user_id === user.id)
       .map(reg => {
         const event = events.find(e => e.id === reg.event_id);
         return { ...reg, event };
       })
-      .filter(reg => reg.event)
+      .filter(reg => {
+        if (!reg.event) return false;
+        // Filter out past classes - only show upcoming
+        const eventDateTime = new Date(reg.event.date + ' ' + reg.event.time);
+        return eventDateTime >= now;
+      })
       .sort((a, b) => new Date(a.event.date + ' ' + a.event.time) - new Date(b.event.date + ' ' + b.event.time));
   };
 
