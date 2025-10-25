@@ -78,10 +78,10 @@ const Calendar = ({ events, onDateSelect }) => {
               {dayEvents.length > 0 && (
                 <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 flex gap-1">
                   {dayEvents.some(e => e.type === 'workout') && (
-                    <div className="w-1.5 h-1.5 bg-grip-primary rounded-full"></div>
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                   )}
                   {dayEvents.some(e => e.type === 'social') && (
-                    <div className="w-1.5 h-1.5 bg-green-600 rounded-full"></div>
+                    <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
                   )}
                 </div>
               )}
