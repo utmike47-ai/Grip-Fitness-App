@@ -128,7 +128,7 @@ const DayView = ({
 {eventGroup.details && (
   <div className="text-gray-700 leading-relaxed">
     {eventGroup.details
-      .split(/(?=\d+\s+[a-zA-Z])|(?=Go\s)|(?=go\s)|\n/)
+      .split('\n')
       .filter(line => line.trim())
       .map((line, index) => (
         <div 
