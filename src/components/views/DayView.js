@@ -59,25 +59,13 @@ const DayView = ({
       {/* Header */}
       <div className="bg-white shadow-sm border-b border-grip-secondary">
         <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center">
-            <button
-              onClick={onBack}
-              className="mr-4 text-grip-accent hover:text-grip-primary transition-colors"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-            <div>
-              <h1 className="text-2xl font-montserrat font-bold text-grip-primary">
-                {selectedDate?.toLocaleDateString('en-US', { 
-                  weekday: 'long', 
-                  month: 'long', 
-                  day: 'numeric' 
-                })}
-              </h1>
-            </div>
-          </div>
+          <h1 className="text-2xl font-montserrat font-bold text-grip-primary">
+            {selectedDate?.toLocaleDateString('en-US', { 
+              weekday: 'long', 
+              month: 'long', 
+              day: 'numeric' 
+            })}
+          </h1>
         </div>
       </div>
 
