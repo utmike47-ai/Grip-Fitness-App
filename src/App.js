@@ -311,12 +311,20 @@ function App() {
 
   const updateEvent = async (eventData) => {
     try {
+      if (!editingEvent) {
+        throw new Error('No event selected for editing');
+      }
+
       // Find all events with the same title and date (they're the same workout, different times)
       const relatedEvents = events.filter(e => 
         e.title === editingEvent.title && 
         e.date === editingEvent.date
       );
       
+      if (relatedEvents.length === 0) {
+        throw new Error('Could not find related events to update');
+      }
+
       // Update each related event
       for (const event of relatedEvents) {
         const { error } = await supabase
