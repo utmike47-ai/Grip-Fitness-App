@@ -1,6 +1,11 @@
 import React from 'react';
 
 const WorkoutStats = ({ attendance, registrations, events, user }) => {
+  // Safety checks
+  if (!attendance || !registrations || !events || !user) {
+    return null;
+  }
+
   // Calculate workout streak
   const calculateStreak = () => {
     if (!attendance || attendance.length === 0) return 0;
@@ -47,6 +52,8 @@ const WorkoutStats = ({ attendance, registrations, events, user }) => {
 
   // Calculate workouts this month
   const getMonthlyWorkouts = () => {
+    if (!attendance || !events) return 0;
+    
     const now = new Date();
     const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     
@@ -61,6 +68,8 @@ const WorkoutStats = ({ attendance, registrations, events, user }) => {
 
   // Get this week's workout pattern
   const getWeekPattern = () => {
+    if (!attendance || !events) return [];
+    
     const today = new Date();
     const startOfWeek = new Date(today);
     startOfWeek.setDate(today.getDate() - today.getDay());

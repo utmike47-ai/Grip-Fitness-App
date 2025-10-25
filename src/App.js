@@ -562,6 +562,7 @@ function App() {
             setSelectedEvent(event);
             setCurrentView('notes');
           }}
+          onCancelRegistration={cancelRegistration}
         />;
       
       case 'notes':
