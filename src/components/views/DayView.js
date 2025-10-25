@@ -1,6 +1,7 @@
 import React from 'react';
 import Logo from '../Logo';
 import { TIME_SLOTS } from '../../utils/constants';
+import { useSwipeable } from 'react-swipeable';
 
 const DayView = ({ 
   selectedDate, 
@@ -13,7 +14,8 @@ const DayView = ({
   onToggleAttendance,
   onSelectEvent,
   onEditEvent,
-  onDeleteEvent
+  onDeleteEvent,
+  onDateChange
 }) => {
   const dateStr = selectedDate?.toISOString().split('T')[0];
   const dayEvents = events.filter(event => event.date === dateStr);
@@ -54,18 +56,42 @@ const DayView = ({
     return groups;
   }, {});
 
+  // Swipe handlers for date navigation
+  const handlers = useSwipeable({
+    onSwipedLeft: () => {
+      // Swipe left = next day
+      const nextDate = new Date(selectedDate);
+      nextDate.setDate(nextDate.getDate() + 1);
+      onDateChange(nextDate);
+    },
+    onSwipedRight: () => {
+      // Swipe right = previous day
+      const prevDate = new Date(selectedDate);
+      prevDate.setDate(prevDate.getDate() - 1);
+      onDateChange(prevDate);
+    },
+    preventScrollOnSwipe: true,
+    trackMouse: false,
+    trackTouch: true,
+    delta: 50, // Min distance for swipe
+  });
+
   return (
-    <div className="min-h-screen bg-grip-light pb-20">
+    <div {...handlers} className="min-h-screen bg-grip-light pb-20">
       {/* Header */}
       <div className="bg-white shadow-sm border-b border-grip-secondary">
         <div className="max-w-7xl mx-auto px-4 py-4">
-          <h1 className="text-2xl font-montserrat font-bold text-grip-primary">
-            {selectedDate?.toLocaleDateString('en-US', { 
-              weekday: 'long', 
-              month: 'long', 
-              day: 'numeric' 
-            })}
-          </h1>
+          <div className="flex items-center justify-center gap-2">
+            <span className="text-gray-400 text-sm">←</span>
+            <h1 className="text-2xl font-montserrat font-bold text-grip-primary">
+              {selectedDate?.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                month: 'long', 
+                day: 'numeric' 
+              })}
+            </h1>
+            <span className="text-gray-400 text-sm">→</span>
+          </div>
         </div>
       </div>
 

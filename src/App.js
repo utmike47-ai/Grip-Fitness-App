@@ -523,7 +523,8 @@ function App() {
             setCurrentView('notes');
           }}
           onEditEvent={handleEditEvent}
-          onDeleteEvent={deleteEvent} 
+          onDeleteEvent={deleteEvent}
+          onDateChange={setSelectedDate}
         />;
       
       case 'createEvent':
