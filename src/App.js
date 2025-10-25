@@ -9,6 +9,7 @@ import MyClasses from './components/views/MyClasses';
 import NotesView from './components/views/NotesView';
 import WorkoutDetails from './components/views/WorkoutDetails';
 import Toast from './components/common/Toast';
+import BookingModal from './components/common/BookingModal';
 
 function App() {
   // State management
@@ -22,7 +23,8 @@ function App() {
   const [attendance, setAttendance] = useState([]);
   const [loading, setLoading] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
-  const [toast, setToast] = useState(null); 
+  const [toast, setToast] = useState(null);
+  const [bookingModal, setBookingModal] = useState({ isOpen: false, eventDetails: null }); 
   // Check session on mount
   useEffect(() => {
     checkSession();
@@ -240,7 +242,17 @@ function App() {
       
       if (error) throw error;
       await fetchRegistrations();
-      showToast('Successfully registered!');
+      
+      // Find the event details to show in the modal
+      const registeredEvent = events.find(e => e.id === eventId);
+      if (registeredEvent) {
+        setBookingModal({
+          isOpen: true,
+          eventDetails: registeredEvent
+        });
+      } else {
+        showToast('Successfully registered!');
+      }
     } catch (error) {
       if (error.code === '23505') {
         showToast('You are already registered for this event!');
@@ -582,6 +594,11 @@ function App() {
           onClose={() => setToast(null)}
         />
       )}
+      <BookingModal
+        isOpen={bookingModal.isOpen}
+        eventDetails={bookingModal.eventDetails}
+        onClose={() => setBookingModal({ isOpen: false, eventDetails: null })}
+      />
     </>
   );
 }
