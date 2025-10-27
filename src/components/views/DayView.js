@@ -87,7 +87,8 @@ const DayView = ({
               {selectedDate?.toLocaleDateString('en-US', { 
                 weekday: 'long', 
                 month: 'long', 
-                day: 'numeric' 
+                day: 'numeric',
+                timeZone: 'UTC'
               })}
             </h1>
             <span className="text-gray-400 text-sm">→</span>
