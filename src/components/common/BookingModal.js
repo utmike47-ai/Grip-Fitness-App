@@ -4,7 +4,8 @@ const BookingModal = ({ isOpen, onClose, eventDetails }) => {
   if (!isOpen || !eventDetails) return null;
 
   const formatDate = (dateStr) => {
-    const date = new Date(dateStr);
+    // Add timezone offset to prevent day shift
+    const date = new Date(dateStr + 'T12:00:00');
     return date.toLocaleDateString('en-US', { 
       weekday: 'long', 
       month: 'long', 

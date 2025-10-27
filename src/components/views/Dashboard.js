@@ -137,7 +137,7 @@ const Dashboard = ({ user, events, registrations, attendance, onSignOut, onViewC
                       >
                         <h3 className="font-semibold text-grip-primary">{reg.event.title}</h3>
                         <p className="text-sm text-gray-600 mt-1">
-                          {new Date(reg.event.date).toLocaleDateString('en-US', { 
+                          {new Date(reg.event.date + 'T12:00:00').toLocaleDateString('en-US', { 
                             weekday: 'short', 
                             month: 'short', 
                             day: 'numeric' 

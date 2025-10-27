@@ -61,7 +61,7 @@ const NotesView = ({ selectedEvent, userNotes, user, onBack, onSaveNote }) => {
             {selectedEvent?.title}
           </h2>
           <p className="text-gray-600">
-            {selectedEvent?.date && new Date(selectedEvent.date).toLocaleDateString('en-US', {
+            {selectedEvent?.date && new Date(selectedEvent.date + 'T12:00:00').toLocaleDateString('en-US', {
               weekday: 'long',
               month: 'long',
               day: 'numeric',

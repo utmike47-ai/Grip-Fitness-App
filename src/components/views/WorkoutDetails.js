@@ -50,7 +50,7 @@ const WorkoutDetails = ({
           <div className="flex justify-between items-start mb-4">
             <div>
               <h2 className="text-xl font-bold text-grip-primary mb-2">
-                {new Date(event.date).toLocaleDateString('en-US', { 
+                {new Date(event.date + 'T12:00:00').toLocaleDateString('en-US', { 
                   weekday: 'long', 
                   month: 'long', 
                   day: 'numeric' 

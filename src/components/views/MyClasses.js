@@ -89,7 +89,7 @@ const MyClasses = ({ user, events, registrations, onBack, onSelectEvent, onCance
                       
                       <div className="space-y-2 mb-4">
                         <p className="text-sm text-gray-600">
-                          📅 {new Date(reg.event.date).toLocaleDateString('en-US', { 
+                          📅 {new Date(reg.event.date + 'T12:00:00').toLocaleDateString('en-US', { 
                             weekday: 'short', 
                             month: 'short', 
                             day: 'numeric' 
@@ -133,7 +133,7 @@ const MyClasses = ({ user, events, registrations, onBack, onSelectEvent, onCance
                         {reg.event.title}
                       </h3>
                       <p className="text-sm text-gray-500">
-                        {new Date(reg.event.date).toLocaleDateString('en-US', { 
+                        {new Date(reg.event.date + 'T12:00:00').toLocaleDateString('en-US', { 
                           month: 'short', 
                           day: 'numeric',
                           year: 'numeric'
