@@ -46,16 +46,25 @@ function App() {
       setLoading(true);
       
       if (signupData?.isSignUp) {
-        // Sign up new user
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
         });
         
-        if (error) throw error;
+        if (error) {
+          if (error.message.includes('already registered')) {
+            throw new Error('An account with this email already exists. Please sign in instead.');
+          }
+          throw error;
+        }
         
-        if (data.user) {
-          // Create profile
+        // Check if user already exists (Supabase returns user even if email exists)
+        if (data.user && !data.session) {
+          throw new Error('An account with this email already exists. Please check your email for confirmation or sign in.');
+        }
+        
+        if (data.user && data.session) {
+          // Only create profile if we have a new session
           const { error: profileError } = await supabase
             .from('profiles')
             .insert([{
@@ -65,13 +74,10 @@ function App() {
               role: signupData.role
             }]);
           
-            if (profileError) {
-              console.error('Profile creation error:', profileError);
-              showToast(`Account created but profile setup failed: ${profileError.message}. Please contact support.`);
-              // Don't throw here, let them continue to the app
-            }
+          if (profileError && profileError.code !== '23505') { // Ignore duplicate profile errors
+            console.error('Profile creation error:', profileError);
+          }
           
-          // Set user with metadata immediately
           setUser({
             ...data.user,
             user_metadata: {
@@ -82,7 +88,7 @@ function App() {
           });
           
           setCurrentView('dashboard');
-          showToast('Account created successfully! Welcome to Grip Fitness!');
+          showToast('Account created! Please check your email to confirm your account.');
         }
       } else {
         // Regular login
@@ -98,7 +104,8 @@ function App() {
         setCurrentView('dashboard');
       }
     } catch (error) {
-      showToast('Error: ' + error.message);
+      showToast(error.message, 'error');
+      // Don't set any user or change view on error
     } finally {
       setLoading(false);
     }
