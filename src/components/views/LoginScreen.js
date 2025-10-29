@@ -8,10 +8,26 @@ const LoginScreen = ({ onLogin, loading }) => {
   const [lastName, setLastName] = useState('');
   const [role, setRole] = useState('student');
   const [isSignUp, setIsSignUp] = useState(false);
+  const [accessCode, setAccessCode] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    
     if (isSignUp) {
+      // Define your codes here - change these!
+      const STUDENT_CODE = 'GRIPMEMBER2024';
+      const COACH_CODE = 'GRIPCOACH2024';
+      
+      if (role === 'coach' && accessCode !== COACH_CODE) {
+        alert('Invalid coach access code');
+        return;
+      }
+      
+      if (role === 'student' && accessCode !== STUDENT_CODE) {
+        alert('Invalid member access code');
+        return;
+      }
+      
       onLogin(email, password, { firstName, lastName, role, isSignUp: true });
     } else {
       onLogin(email, password);
@@ -102,6 +118,25 @@ const LoginScreen = ({ onLogin, loading }) => {
                 </div>
               </div>
             </>
+          )}
+
+          {isSignUp && (
+            <div>
+              <label className="block text-sm font-semibold text-grip-primary mb-2">
+                Access Code *
+              </label>
+              <input
+                type="password"
+                placeholder="Enter your access code from Grip Fitness"
+                value={accessCode}
+                onChange={(e) => setAccessCode(e.target.value)}
+                className="w-full px-4 py-3 border border-grip-secondary rounded-lg focus:outline-none focus:border-grip-primary transition-colors"
+                required
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                {role === 'coach' ? 'Enter coach access code' : 'Enter member access code'}
+              </p>
+            </div>
           )}
 
           <div>
