@@ -58,32 +58,54 @@ function App() {
           throw error;
         }
         
-        // Check if user already exists (Supabase returns user even if email exists)
+        // Check if user already exists
         if (data.user && !data.session) {
           throw new Error('An account with this email already exists. Please check your email for confirmation or sign in.');
         }
         
-        if (data.user && data.session) {
-          // Only create profile if we have a new session
-          const { error: profileError } = await supabase
-            .from('profiles')
-            .insert([{
-              id: data.user.id,
-              first_name: signupData.firstName,
-              last_name: signupData.lastName,
-              role: signupData.role
-            }]);
+        if (data.user) {
+          // Ensure profile gets created - retry if needed
+          let profileCreated = false;
+          let retries = 0;
           
-          if (profileError && profileError.code !== '23505') { // Ignore duplicate profile errors
-            console.error('Profile creation error:', profileError);
+          while (!profileCreated && retries < 3) {
+            try {
+              const { error: profileError } = await supabase
+                .from('profiles')
+                .insert([{
+                  id: data.user.id,
+                  first_name: signupData.firstName || 'New',
+                  last_name: signupData.lastName || 'User',
+                  role: signupData.role || 'student'
+                }]);
+              
+              if (!profileError || profileError.code === '23505') {
+                profileCreated = true;
+              } else {
+                retries++;
+                if (retries < 3) {
+                  await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second before retry
+                }
+              }
+            } catch (err) {
+              console.error(`Profile creation attempt ${retries + 1} failed:`, err);
+              retries++;
+            }
           }
           
+          if (!profileCreated) {
+            // Log the issue but don't block the user
+            console.error('Failed to create profile after 3 attempts');
+            showToast('Account created but profile setup incomplete. Please contact support if issues persist.');
+          }
+          
+          // Set user data regardless of profile creation status
           setUser({
             ...data.user,
             user_metadata: {
-              first_name: signupData.firstName,
-              last_name: signupData.lastName,
-              role: signupData.role
+              first_name: signupData.firstName || 'New',
+              last_name: signupData.lastName || 'User',
+              role: signupData.role || 'student'
             }
           });
           
@@ -105,7 +127,6 @@ function App() {
       }
     } catch (error) {
       showToast(error.message, 'error');
-      // Don't set any user or change view on error
     } finally {
       setLoading(false);
     }
@@ -132,8 +153,42 @@ function App() {
         .eq('id', userId)
         .single();
       
-      if (error && error.code !== 'PGRST116') {
-        console.error('Error fetching profile:', error);
+      if (error && error.code === 'PGRST116') {
+        // Profile doesn't exist - create it now
+        console.log('Profile missing, creating default profile');
+        
+        const { data: userData } = await supabase.auth.getUser();
+        const email = userData?.user?.email || '';
+        
+        const { error: createError } = await supabase
+          .from('profiles')
+          .insert([{
+            id: userId,
+            first_name: email.split('@')[0],
+            last_name: 'User',
+            role: 'student'
+          }]);
+        
+        if (!createError) {
+          // Try fetching again
+          const { data: newProfile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', userId)
+            .single();
+          
+          if (newProfile) {
+            setUser(prev => ({
+              ...prev,
+              user_metadata: {
+                ...prev.user_metadata,
+                role: newProfile.role,
+                first_name: newProfile.first_name,
+                last_name: newProfile.last_name
+              }
+            }));
+          }
+        }
         return;
       }
   
