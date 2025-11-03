@@ -46,25 +46,36 @@ function App() {
       setLoading(true);
       
       if (signupData?.isSignUp) {
+        // Add a small delay to prevent rate limiting
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
+          options: {
+            data: {
+              first_name: signupData.firstName,
+              last_name: signupData.lastName,
+              role: signupData.role  // Store role in user metadata
+            }
+          }
         });
         
         if (error) {
+          if (error.message.includes('rate limit') || error.message.includes('security purposes')) {
+            throw new Error('Please wait a moment before trying again');
+          }
           if (error.message.includes('already registered')) {
             throw new Error('An account with this email already exists. Please sign in instead.');
           }
           throw error;
         }
         
-        // Check if user already exists
-        if (data.user && !data.session) {
-          throw new Error('An account with this email already exists. Please check your email for confirmation or sign in.');
-        }
-        
         if (data.user) {
-          // Ensure profile gets created - retry if needed
+          // Always use the role from signupData, not default
+          const userRole = signupData.role || 'student';
+          
+          // Create profile with correct role
           let profileCreated = false;
           let retries = 0;
           
@@ -76,7 +87,7 @@ function App() {
                   id: data.user.id,
                   first_name: signupData.firstName || 'New',
                   last_name: signupData.lastName || 'User',
-                  role: signupData.role || 'student'
+                  role: userRole  // Use the actual selected role
                 }]);
               
               if (!profileError || profileError.code === '23505') {
@@ -84,7 +95,7 @@ function App() {
               } else {
                 retries++;
                 if (retries < 3) {
-                  await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second before retry
+                  await new Promise(resolve => setTimeout(resolve, 1000));
                 }
               }
             } catch (err) {
@@ -93,24 +104,18 @@ function App() {
             }
           }
           
-          if (!profileCreated) {
-            // Log the issue but don't block the user
-            console.error('Failed to create profile after 3 attempts');
-            showToast('Account created but profile setup incomplete. Please contact support if issues persist.');
-          }
-          
-          // Set user data regardless of profile creation status
+          // Set user data with correct role
           setUser({
             ...data.user,
             user_metadata: {
               first_name: signupData.firstName || 'New',
               last_name: signupData.lastName || 'User',
-              role: signupData.role || 'student'
+              role: userRole
             }
           });
           
           setCurrentView('dashboard');
-          showToast('Account created! Please check your email to confirm your account.');
+          showToast(`Account created as ${userRole}! Please check your email to confirm.`);
         }
       } else {
         // Regular login
@@ -154,23 +159,22 @@ function App() {
         .single();
       
       if (error && error.code === 'PGRST116') {
-        // Profile doesn't exist - create it now
-        console.log('Profile missing, creating default profile');
-        
+        // Profile doesn't exist - get role from auth metadata
         const { data: userData } = await supabase.auth.getUser();
-        const email = userData?.user?.email || '';
+        const userRole = userData?.user?.user_metadata?.role || 'student';
         
+        // Create profile with correct role from metadata
         const { error: createError } = await supabase
           .from('profiles')
           .insert([{
             id: userId,
-            first_name: email.split('@')[0],
-            last_name: 'User',
-            role: 'student'
+            first_name: userData?.user?.user_metadata?.first_name || userData?.user?.email?.split('@')[0] || 'User',
+            last_name: userData?.user?.user_metadata?.last_name || 'User',
+            role: userRole
           }]);
         
         if (!createError) {
-          // Try fetching again
+          // Fetch the newly created profile
           const { data: newProfile } = await supabase
             .from('profiles')
             .select('*')
