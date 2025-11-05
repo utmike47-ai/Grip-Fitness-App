@@ -8,6 +8,7 @@ import CreateEvent from './components/views/CreateEvent';
 import MyClasses from './components/views/MyClasses';
 import NotesView from './components/views/NotesView';
 import WorkoutDetails from './components/views/WorkoutDetails';
+import ProfileEdit from './components/views/ProfileEdit';
 import Toast from './components/common/Toast';
 import BookingModal from './components/common/BookingModal';
 import BottomNav from './components/common/BottomNav';
@@ -650,6 +651,22 @@ function App() {
     onRegister={registerForEvent}
     onCancelRegistration={cancelRegistration}
   />;
+
+        case 'profileEdit':
+          return <ProfileEdit 
+            user={user}
+            onBack={() => setCurrentView('dashboard')}
+            onProfileUpdate={(updatedData) => {
+              setUser(prev => ({
+                ...prev,
+                user_metadata: {
+                  ...prev.user_metadata,
+                  ...updatedData
+                }
+              }));
+              fetchUserProfile(user.id); // Refresh profile data
+            }}
+          />;
       
       default:
         return <Dashboard 

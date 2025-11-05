@@ -94,6 +94,32 @@ const Dashboard = ({ user, events, registrations, attendance, onSignOut, onViewC
           <span className="inline-block bg-grip-secondary text-grip-primary px-4 py-2 rounded-full text-sm font-semibold">
             {userRole === 'coach' ? '👨‍🏫 Coach' : '🏋️‍♂️ Student'} Account
           </span>
+          
+          {/* Profile Update Alert for users with broken names */}
+          {(user?.user_metadata?.first_name === 'User' || 
+            user?.user_metadata?.first_name?.length === 8 ||
+            user?.user_metadata?.last_name?.length === 8) && (
+            <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mt-4 rounded-lg">
+              <p className="font-bold mb-1">⚠️ Please Update Your Name</p>
+              <p className="text-sm mb-2">We need you to update your profile information.</p>
+              <button
+                onClick={() => onViewChange('profileEdit')}
+                className="bg-yellow-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:shadow-md transition-all"
+              >
+                Update Profile Now
+              </button>
+            </div>
+          )}
+
+          {/* Regular Edit Profile Link - for all users */}
+          <div className="mt-4">
+            <button
+              onClick={() => onViewChange('profileEdit')}
+              className="text-sm text-grip-primary underline hover:text-grip-accent transition-colors"
+            >
+              Edit Profile
+            </button>
+          </div>
         </div>
 
         {/* Workout Stats for Students */}
