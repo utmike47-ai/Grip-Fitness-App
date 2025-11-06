@@ -28,6 +28,8 @@ const LoginScreen = ({ onLogin, loading }) => {
   const [showRequirements, setShowRequirements] = useState(false);
   const [showReset, setShowReset] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
+  const [resendEmail, setResendEmail] = useState('');
+  const [showResend, setShowResend] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -80,6 +82,28 @@ const LoginScreen = ({ onLogin, loading }) => {
       setResetEmail('');
     } catch (error) {
       alert('Error sending reset email: ' + error.message);
+    }
+  };
+
+  const handleResendVerification = async () => {
+    if (!resendEmail) {
+      alert('Please enter your email address');
+      return;
+    }
+    
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: resendEmail,
+      });
+      
+      if (error) throw error;
+      
+      alert('Verification email sent! Please check your inbox.');
+      setShowResend(false);
+      setResendEmail('');
+    } catch (error) {
+      alert('Error: ' + error.message);
     }
   };
 
@@ -275,6 +299,18 @@ const LoginScreen = ({ onLogin, loading }) => {
           >
             {loading ? (isSignUp ? 'Creating Account...' : 'Signing in...') : (isSignUp ? 'Create Account' : 'Sign In')}
           </button>
+          
+          {!isSignUp && (
+            <>
+              <button
+                type="button"
+                onClick={() => setShowResend(true)}
+                className="mt-3 text-sm text-grip-primary hover:underline"
+              >
+                Didn't receive verification email?
+              </button>
+            </>
+          )}
         </form>
       </div>
       
@@ -316,6 +352,36 @@ const LoginScreen = ({ onLogin, loading }) => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Resend Verification Modal */}
+      {showResend && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-8 max-w-md w-full">
+            <h3 className="text-xl font-bold text-grip-primary mb-4">Resend Verification Email</h3>
+            <input
+              type="email"
+              placeholder="Enter your email address"
+              value={resendEmail}
+              onChange={(e) => setResendEmail(e.target.value)}
+              className="w-full px-4 py-3 border border-grip-secondary rounded-lg mb-4"
+            />
+            <div className="flex gap-4">
+              <button
+                onClick={() => setShowResend(false)}
+                className="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg font-semibold"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleResendVerification}
+                className="flex-1 bg-grip-primary text-white py-3 rounded-lg font-semibold"
+              >
+                Resend Email
+              </button>
+            </div>
           </div>
         </div>
       )}
