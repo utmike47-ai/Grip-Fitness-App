@@ -234,29 +234,42 @@ function App() {
 
   const fetchRegistrations = async () => {
     try {
-      const { data, error } = await supabase
+      // Fetch registrations first
+      const { data: regData, error: regError } = await supabase
         .from('registrations')
         .select('*');
       
-      if (error) throw error;
-      
-      const registrationsWithProfiles = [];
-      for (const reg of data || []) {
-        const { data: profileData } = await supabase
-          .from('profiles')
-          .select('first_name, last_name')
-          .eq('id', reg.user_id)
-          .single();
-        
-        registrationsWithProfiles.push({
-          ...reg,
-          user_name: profileData ? `${profileData.first_name} ${profileData.last_name}` : 'Unknown User'
-        });
+      if (regError) {
+        console.error('Error fetching registrations:', regError);
+        setRegistrations([]);
+        return;
       }
       
-      setRegistrations(registrationsWithProfiles);
+      // Get all unique user IDs from registrations
+      const userIds = [...new Set(regData?.map(r => r.user_id) || [])];
+      
+      // Fetch profile names for those users
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name')
+        .in('id', userIds);
+      
+      // Create a map of user ID to full name
+      const userMap = {};
+      profileData?.forEach(p => {
+        userMap[p.id] = `${p.first_name || 'User'} ${p.last_name || ''}`.trim();
+      });
+      
+      // Add names to registrations
+      const registrationsWithNames = regData?.map(reg => ({
+        ...reg,
+        user_name: userMap[reg.user_id] || 'Loading...'
+      })) || [];
+      
+      setRegistrations(registrationsWithNames);
     } catch (error) {
-      console.error('Error fetching registrations:', error);
+      console.error('Unexpected error in fetchRegistrations:', error);
+      setRegistrations([]);
     }
   };
 
@@ -297,6 +310,16 @@ function App() {
       fetchAttendance();
     }
   }, [user]);
+
+  // Backup refresh to ensure registrations display
+  useEffect(() => {
+    if (currentView === 'dashboard' || currentView === 'dayView') {
+      const timer = setTimeout(() => {
+        fetchRegistrations();
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [currentView]);
 
   // Event management functions
   const registerForEvent = async (eventId) => {
