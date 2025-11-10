@@ -31,13 +31,13 @@ const DayView = ({
   const [noteFeedback, setNoteFeedback] = useState(null);
   const [activeContext, setActiveContext] = useState(null); // { group, event }
 
-  const getRegistrationCount = (eventId) => {
-    return registrations.filter(reg => reg.event_id === eventId).length;
-  };
+  const getRegistrationCount = useCallback((eventId) => (
+    registrations.filter(reg => reg.event_id === eventId).length
+  ), [registrations]);
 
-  const isUserRegistered = (eventId) => {
-    return registrations.some(reg => reg.event_id === eventId && reg.user_id === user.id);
-  };
+  const isUserRegistered = useCallback((eventId) => (
+    registrations.some(reg => reg.event_id === eventId && reg.user_id === user.id)
+  ), [registrations, user?.id]);
 
   const formatTimeDisplay = (time24) => {
     // Remove seconds if present (e.g., "16:30:00" becomes "16:30")

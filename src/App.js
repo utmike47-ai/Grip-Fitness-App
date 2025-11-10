@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { supabase } from './utils/supabaseClient';
 import { TIME_SLOTS } from './utils/constants';
 import LoginScreen from './components/views/LoginScreen';
@@ -26,19 +26,81 @@ function App() {
   const [editingEvent, setEditingEvent] = useState(null);
   const [toast, setToast] = useState(null);
   const [bookingModal, setBookingModal] = useState({ isOpen: false, details: null }); 
-  // Check session on mount
-  useEffect(() => {
-    checkSession();
-  }, [checkSession]);
+  const fetchUserProfile = useCallback(async (userId) => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+      
+      if (error && error.code === 'PGRST116') {
+        // Profile doesn't exist - get role from auth metadata
+        const { data: userData } = await supabase.auth.getUser();
+        const userRole = userData?.user?.user_metadata?.role || 'student';
+        
+        // Create profile with correct role from metadata
+        const { error: createError } = await supabase
+          .from('profiles')
+          .insert([{ 
+            id: userId,
+            first_name: userData?.user?.user_metadata?.first_name || userData?.user?.email?.split('@')[0] || 'User',
+            last_name: userData?.user?.user_metadata?.last_name || 'User',
+            role: userRole
+          }]);
+        
+        if (!createError) {
+          // Fetch the newly created profile
+          const { data: newProfile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', userId)
+            .single();
+          
+          if (newProfile) {
+            setUser(prev => ({
+              ...prev,
+              user_metadata: {
+                ...prev.user_metadata,
+                role: newProfile.role,
+                first_name: newProfile.first_name,
+                last_name: newProfile.last_name
+              }
+            }));
+          }
+        }
+        return;
+      }
 
-  const checkSession = async () => {
+      if (data) {
+        setUser(prev => ({
+          ...prev,
+          user_metadata: {
+            ...prev.user_metadata,
+            role: data.role,
+            first_name: data.first_name,
+            last_name: data.last_name
+          }
+        }));
+      }
+    } catch (error) {
+      console.error('Profile fetch error:', error);
+    }
+  }, []);
+
+  const checkSession = useCallback(async () => {
     const { data: { session } } = await supabase.auth.getSession();
     if (session) {
       setUser(session.user);
       setCurrentView('dashboard');
       await fetchUserProfile(session.user.id);
     }
-  };
+  }, [fetchUserProfile]);
+
+  // Check session on mount
+  useEffect(() => {
+    checkSession();
+  }, [checkSession]);
 
   // Auth functions
   const signIn = async (email, password, signupData = null) => {
@@ -149,75 +211,12 @@ function App() {
     setAttendance([]);
   };
 
-  // Fetch user profile
-  const fetchUserProfile = async (userId) => {
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
-      
-      if (error && error.code === 'PGRST116') {
-        // Profile doesn't exist - get role from auth metadata
-        const { data: userData } = await supabase.auth.getUser();
-        const userRole = userData?.user?.user_metadata?.role || 'student';
-        
-        // Create profile with correct role from metadata
-        const { error: createError } = await supabase
-          .from('profiles')
-          .insert([{
-            id: userId,
-            first_name: userData?.user?.user_metadata?.first_name || userData?.user?.email?.split('@')[0] || 'User',
-            last_name: userData?.user?.user_metadata?.last_name || 'User',
-            role: userRole
-          }]);
-        
-        if (!createError) {
-          // Fetch the newly created profile
-          const { data: newProfile } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', userId)
-            .single();
-          
-          if (newProfile) {
-            setUser(prev => ({
-              ...prev,
-              user_metadata: {
-                ...prev.user_metadata,
-                role: newProfile.role,
-                first_name: newProfile.first_name,
-                last_name: newProfile.last_name
-              }
-            }));
-          }
-        }
-        return;
-      }
-  
-      if (data) {
-        setUser(prev => ({
-          ...prev,
-          user_metadata: {
-            ...prev.user_metadata,
-            role: data.role,
-            first_name: data.first_name,
-            last_name: data.last_name
-          }
-        }));
-      }
-    } catch (error) {
-      console.error('Profile fetch error:', error);
-    }
-  };
-
   const showToast = (message, type = 'success') => {
     setToast({ message, type });
   };
 
   // Data fetching functions
-  const fetchEvents = async () => {
+  const fetchEvents = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from('events')
@@ -229,9 +228,9 @@ function App() {
     } catch (error) {
       console.error('Error fetching events:', error);
     }
-  };
+  }, []);
 
-  const fetchRegistrations = async () => {
+  const fetchRegistrations = useCallback(async () => {
     try {
       // Fetch registrations first
       const { data: regData, error: regError } = await supabase
@@ -270,9 +269,9 @@ function App() {
       console.error('Unexpected error in fetchRegistrations:', error);
       setRegistrations([]);
     }
-  };
+  }, []);
 
-  const fetchUserNotes = async () => {
+  const fetchUserNotes = useCallback(async () => {
     if (!user) return;
     try {
       const { data, error } = await supabase
@@ -285,9 +284,9 @@ function App() {
     } catch (error) {
       console.error('Error fetching notes:', error);
     }
-  };
+  }, [user]);
 
-  const fetchAttendance = async () => {
+  const fetchAttendance = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from('attendance')
@@ -298,7 +297,7 @@ function App() {
     } catch (error) {
       console.error('Error fetching attendance:', error);
     }
-  };
+  }, []);
 
   // Load data when user logs in
   useEffect(() => {
@@ -318,7 +317,7 @@ function App() {
       }, 2000);
       return () => clearTimeout(timer);
     }
-  }, [currentView]);
+  }, [currentView, fetchRegistrations]);
 
   // Event management functions
   const registerForEvent = async (eventId) => {

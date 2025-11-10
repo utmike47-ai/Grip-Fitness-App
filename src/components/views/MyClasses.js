@@ -1,5 +1,4 @@
 import React from 'react';
-import Logo from '../Logo';
 import { TIME_SLOTS } from '../../utils/constants';
 
 const MyClasses = ({ user, events, registrations, onBack, onSelectEvent, onCancelRegistration }) => {
