@@ -1,5 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import { fetchNoteForEvent, saveNote, deleteNote } from '../../utils/notesService';
 import { TIME_SLOTS } from '../../utils/constants';
+
+const NOTE_MAX_LENGTH = 500;
+const MODAL_CLOSE_DELAY = 1200;
 
 const WorkoutDetails = ({ 
   event, 
@@ -10,36 +14,227 @@ const WorkoutDetails = ({
   onRegister,
   onCancelRegistration 
 }) => {
-  // Get all time slots for this workout on this date
-  const relatedEvents = events.filter(e => 
-    e.title === event.title && 
-    e.date === event.date
-  );
+  const [noteMap, setNoteMap] = useState({});
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalActive, setModalActive] = useState(false);
+  const [activeEvent, setActiveEvent] = useState(null);
+  const [noteContent, setNoteContent] = useState('');
+  const [noteId, setNoteId] = useState(null);
+  const [noteLoading, setNoteLoading] = useState(false);
+  const [noteSaving, setNoteSaving] = useState(false);
+  const [feedback, setFeedback] = useState(null);
+  const textareaRef = useRef(null);
+  const modalContainerRef = useRef(null);
 
-  const formatTimeDisplay = (time24) => {
-    const timeWithoutSeconds = time24?.split(':').slice(0, 2).join(':');
-    const timeSlot = TIME_SLOTS.find(slot => slot.value === timeWithoutSeconds);
-    return timeSlot ? timeSlot.display : time24;
+  const today = useMemo(() => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }, []);
+
+  const relatedEvents = useMemo(() => (
+    events.filter(e => e.title === event.title && e.date === event.date)
+  ), [events, event]);
+
+  useEffect(() => {
+    if (!user) {
+      setNoteMap({});
+      return;
+    }
+
+    let cancelled = false;
+
+    const preload = async () => {
+      const entries = await Promise.all(relatedEvents.map(async (slot) => {
+        const { note } = await fetchNoteForEvent(user.id, slot.id);
+        const hasNote = Boolean(note && (note.content || '').trim());
+        return [slot.id, { hasNote, note }];
+      }));
+
+      if (!cancelled) {
+        setNoteMap(Object.fromEntries(entries));
+      }
+    };
+
+    preload();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user, relatedEvents]);
+
+  const isUserRegistered = useCallback((eventId) => (
+    registrations.some(reg => reg.event_id === eventId && reg.user_id === user?.id)
+  ), [registrations, user]);
+
+  const getRegistrationsForEvent = useCallback((eventId) => (
+    registrations.filter(reg => reg.event_id === eventId)
+  ), [registrations]);
+
+  const formatTime = useCallback((time24) => {
+    const base = time24?.split(':').slice(0, 2).join(':');
+    const match = TIME_SLOTS.find(slot => slot.value === base);
+    return match ? match.display : time24;
+  }, []);
+
+  const closeModal = useCallback(() => {
+    setModalActive(false);
+    setTimeout(() => {
+      setModalVisible(false);
+      setActiveEvent(null);
+      setNoteContent('');
+      setNoteId(null);
+      setFeedback(null);
+      setNoteLoading(false);
+      setNoteSaving(false);
+    }, 200);
+  }, []);
+
+  const openModal = useCallback(async (slot) => {
+    if (!user) return;
+
+    setActiveEvent(slot);
+    setModalVisible(true);
+    setNoteLoading(true);
+    setFeedback(null);
+    setNoteContent('');
+    setNoteId(null);
+
+    requestAnimationFrame(() => setModalActive(true));
+
+    const { note, error } = await fetchNoteForEvent(user.id, slot.id);
+
+    if (error) {
+      setFeedback({ type: 'error', message: error });
+    }
+
+    if (note) {
+      setNoteContent(note.content || '');
+      setNoteId(note.id);
+      setNoteMap(prev => ({
+        ...prev,
+        [slot.id]: { hasNote: Boolean((note.content || '').trim()), note },
+      }));
+    } else {
+      setNoteContent('');
+      setNoteId(null);
+      setNoteMap(prev => ({
+        ...prev,
+        [slot.id]: { hasNote: false, note: null },
+      }));
+    }
+
+    setNoteLoading(false);
+  }, [user]);
+
+  useEffect(() => {
+    if (modalActive && !noteLoading) {
+      textareaRef.current?.focus();
+    }
+  }, [modalActive, noteLoading]);
+
+  useEffect(() => {
+    if (!modalActive) return;
+
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        closeModal();
+      }
+    };
+
+    const handleClickOutside = (event) => {
+      if (modalContainerRef.current && event.target === modalContainerRef.current) {
+        closeModal();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('mousedown', handleClickOutside);
+    window.addEventListener('touchstart', handleClickOutside);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('mousedown', handleClickOutside);
+      window.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, [modalActive, closeModal]);
+
+  const handleSave = async () => {
+    if (!user || !activeEvent) return;
+
+    const cleaned = noteContent.trim();
+    if (!cleaned && !noteId) {
+      setFeedback({ type: 'error', message: 'Please add a note before saving.' });
+      return;
+    }
+
+    setNoteSaving(true);
+    setFeedback(null);
+
+    let response;
+    if (!cleaned && noteId) {
+      response = await deleteNote(noteId);
+      if (response.error) {
+        setFeedback({ type: 'error', message: response.error });
+      } else {
+        setNoteId(null);
+        setNoteMap(prev => ({
+          ...prev,
+          [activeEvent.id]: { hasNote: false, note: null },
+        }));
+        setFeedback({ type: 'success', message: 'Note removed.' });
+        setTimeout(closeModal, MODAL_CLOSE_DELAY);
+      }
+      setNoteSaving(false);
+      return;
+    }
+
+    const { note, error } = await saveNote(user.id, activeEvent.id, cleaned);
+
+    if (error) {
+      setFeedback({ type: 'error', message: error });
+      setNoteSaving(false);
+      return;
+    }
+
+    if (note) {
+      setNoteId(note.id);
+    }
+
+    setNoteMap(prev => ({
+      ...prev,
+      [activeEvent.id]: { hasNote: Boolean(cleaned), note },
+    }));
+
+    setFeedback({ type: 'success', message: 'Note saved successfully!' });
+    setNoteSaving(false);
+    setTimeout(closeModal, MODAL_CLOSE_DELAY);
   };
 
-  const getEventRegistrations = (eventId) => {
-    return registrations.filter(reg => reg.event_id === eventId);
-  };
+  const modalTitleId = useMemo(() => (
+    activeEvent ? `notes-modal-title-${activeEvent.id}` : 'notes-modal-title'
+  ), [activeEvent]);
 
-  const isUserRegistered = (eventId) => {
-    return registrations.some(reg => 
-      reg.event_id === eventId && reg.user_id === user.id
-    );
-  };
+  const hasWorkoutNote = noteMap[event.id]?.hasNote;
+  const noteButtonLabel = hasWorkoutNote ? 'VIEW/EDIT NOTES' : 'WORKOUT NOTES';
 
   return (
     <div className="min-h-screen bg-grip-light pb-20">
       {/* Header */}
       <div className="bg-white shadow-sm border-b border-grip-secondary">
-        <div className="max-w-7xl mx-auto px-4 py-4">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+          <button
+            type="button"
+            onClick={onBack}
+            className="text-grip-primary hover:text-grip-accent font-semibold"
+            style={{ minWidth: 44, minHeight: 44 }}
+          >
+            ← Back
+          </button>
           <h1 className="text-2xl font-montserrat font-bold text-grip-primary">
             {event.title}
           </h1>
+          <span className="w-16" />
         </div>
       </div>
 
@@ -48,7 +243,7 @@ const WorkoutDetails = ({
         {/* Workout Info */}
         <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
           <div className="flex justify-between items-start mb-4">
-            <div>
+            <div className="flex-1 pr-6">
               <h2 className="text-xl font-bold text-grip-primary mb-2">
                 {new Date(event.date + 'T12:00:00').toLocaleDateString('en-US', { 
                   weekday: 'long', 
@@ -77,51 +272,188 @@ const WorkoutDetails = ({
                 </div>
               )}
             </div>
-            <span className={`px-4 py-2 rounded-full text-sm font-semibold
-              ${event.type === 'workout' 
-                ? 'bg-grip-primary text-white' 
-                : 'bg-green-100 text-green-800'}`}
-            >
-              {event.type === 'workout' ? 'WORKOUT' : 'SOCIAL EVENT'}
-            </span>
+            <div className="w-full max-w-xs">
+              <div className="flex flex-col gap-2">
+                <span
+                  className={`w-full inline-flex items-center justify-center px-4 py-3 rounded-full text-sm font-semibold ${
+                    event.type === 'workout'
+                      ? 'bg-grip-primary text-white'
+                      : 'bg-green-100 text-green-800'
+                  }`}
+                  style={{ minHeight: 48 }}
+                >
+                  {event.type === 'workout' ? 'WORKOUT' : 'SOCIAL EVENT'}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => openModal(event)}
+                  className="w-full px-4 py-3 rounded-full font-semibold text-white transition-all shadow-sm bg-[#C67158] hover:bg-[#b2604b]"
+                  style={{ minHeight: 48 }}
+                >
+                  {noteButtonLabel}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
+
+        {/* Modal */}
+        {modalVisible && (
+          <div
+            ref={modalContainerRef}
+            className={`fixed inset-0 z-50 flex items-center justify-center px-4 py-6 transition-opacity duration-200 ${
+              modalActive ? 'opacity-100' : 'opacity-0 pointer-events-none'
+            } bg-black/60`}
+          >
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby={modalTitleId}
+              className={`bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 sm:p-8 transition-all duration-200 transform ${
+                modalActive ? 'scale-100 translate-y-0' : 'scale-95 -translate-y-4'
+              } max-h-[90vh] overflow-y-auto flex flex-col`}
+            >
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <p className="text-xs uppercase tracking-wide text-grip-secondary font-semibold">Workout</p>
+                  <h2 id={modalTitleId} className="text-2xl font-montserrat font-bold text-grip-primary">
+                    {event.title}
+                  </h2>
+                  {activeEvent && (
+                    <p className="text-sm text-gray-600 mt-1">
+                      {formatTime(activeEvent.time)} on {new Date(activeEvent.date + 'T12:00:00').toLocaleDateString('en-US', {
+                        weekday: 'short',
+                        month: 'short',
+                        day: 'numeric'
+                      })}
+                    </p>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={closeModal}
+                  className="text-gray-500 hover:text-grip-primary text-sm font-semibold"
+                  aria-label="Close notes modal"
+                  style={{ minWidth: 44, minHeight: 44 }}
+                >
+                  Close
+                </button>
+              </div>
+
+              {feedback && (
+                <div
+                  role="status"
+                  aria-live="polite"
+                  className={`mb-4 rounded-xl px-4 py-3 text-sm font-semibold text-center ${
+                    feedback.type === 'success'
+                      ? 'bg-green-100 text-green-700'
+                      : 'bg-red-100 text-red-700'
+                  }`}
+                >
+                  {feedback.message}
+                </div>
+              )}
+
+              <label className="block text-sm font-semibold text-grip-primary mb-2" htmlFor="workout-note">
+                Your Notes
+              </label>
+
+              {noteLoading ? (
+                <div className="flex justify-center items-center h-40">
+                  <div className="w-8 h-8 border-4 border-grip-secondary border-t-grip-primary rounded-full animate-spin" aria-label="Loading note" />
+                </div>
+              ) : (
+                <textarea
+                  id="workout-note"
+                  ref={textareaRef}
+                  rows={6}
+                  value={noteContent}
+                  onChange={(e) => setNoteContent(e.target.value.slice(0, NOTE_MAX_LENGTH))}
+                  maxLength={NOTE_MAX_LENGTH}
+                  disabled={noteSaving}
+                  placeholder="Add notes about this workout..."
+                  className="w-full min-h-[200px] border border-grip-secondary rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-grip-primary text-gray-800 resize-none overflow-y-auto"
+                  aria-busy={noteSaving}
+                />
+              )}
+
+              <div className="flex items-center justify-between mt-2 text-xs text-gray-500">
+                <span>{noteContent.length}/{NOTE_MAX_LENGTH} characters</span>
+                <span>
+                  {noteSaving ? 'Saving...' : noteLoading ? 'Loading note...' : 'Tap save to keep your note'}
+                </span>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3 mt-6">
+                <button
+                  type="button"
+                  onClick={handleSave}
+                  disabled={noteSaving || noteLoading}
+                  className={`flex-1 px-4 py-3 rounded-xl font-semibold text-white transition-colors ${
+                    noteSaving || noteLoading
+                      ? 'bg-grip-primary/60 cursor-not-allowed'
+                      : 'bg-grip-primary hover:bg-grip-accent'
+                  }`}
+                  style={{ minHeight: 48 }}
+                >
+                  {noteSaving ? 'Saving...' : (noteId ? 'Update Note' : 'Save Note')}
+                </button>
+                <button
+                  type="button"
+                  onClick={closeModal}
+                  className="flex-1 px-4 py-3 rounded-xl font-semibold border border-grip-secondary text-grip-primary hover:bg-grip-secondary/30 transition-colors"
+                  style={{ minHeight: 48 }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Time Slots */}
         <div className="space-y-4">
           <h3 className="text-lg font-semibold text-grip-primary">Available Times</h3>
-          {relatedEvents.map(timeEvent => {
-            const regs = getEventRegistrations(timeEvent.id);
-            const userRegistered = isUserRegistered(timeEvent.id);
+          {relatedEvents.map((slot) => {
+            const regs = getRegistrationsForEvent(slot.id);
+            const userRegistered = isUserRegistered(slot.id);
             const isFull = regs.length >= 15;
+            const slotDate = new Date(slot.date + 'T00:00:00');
+            const isPastWorkout = slotDate < today;
 
             return (
-              <div key={timeEvent.id} className="bg-white rounded-xl shadow-lg p-6">
+              <div key={slot.id} className="bg-white rounded-xl shadow-lg p-6">
                 <div className="flex justify-between items-center mb-4">
                   <div>
                     <p className="text-xl font-bold text-grip-primary">
-                      {formatTimeDisplay(timeEvent.time)}
+                      {formatTime(slot.time)}
                     </p>
                     <p className="text-sm text-gray-600">
                       {regs.length}/15 registered
                     </p>
                   </div>
                   <div>
-                    {userRegistered ? (
+                    {isPastWorkout ? (
+                      <span className="inline-flex items-center px-4 py-2 rounded-full text-xs font-semibold bg-gray-100 text-gray-600 border border-gray-200">
+                        Past Workout
+                      </span>
+                    ) : userRegistered ? (
                       <button
-                        onClick={() => onCancelRegistration(timeEvent.id)}
+                        onClick={() => onCancelRegistration(slot.id)}
                         className="bg-grip-accent text-white px-6 py-2 rounded-full font-semibold hover:shadow-lg transition-all"
+                        style={{ minHeight: 44, minWidth: 120 }}
                       >
                         Cancel
                       </button>
                     ) : (
                       <button
-                        onClick={() => onRegister(timeEvent.id)}
+                        onClick={() => onRegister(slot.id)}
                         disabled={isFull}
                         className={`px-6 py-2 rounded-full font-semibold transition-all
                           ${isFull 
                             ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
                             : 'bg-grip-primary text-white hover:shadow-lg'}`}
+                        style={{ minHeight: 44, minWidth: 120 }}
                       >
                         {isFull ? 'FULL' : 'Register'}
                       </button>

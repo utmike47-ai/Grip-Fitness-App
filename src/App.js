@@ -7,7 +7,6 @@ import DayView from './components/views/DayView';
 import CreateEvent from './components/views/CreateEvent';
 import MyClasses from './components/views/MyClasses';
 import NotesView from './components/views/NotesView';
-import WorkoutDetails from './components/views/WorkoutDetails';
 import ProfileEdit from './components/views/ProfileEdit';
 import Toast from './components/common/Toast';
 import BookingModal from './components/common/BookingModal';
@@ -30,7 +29,7 @@ function App() {
   // Check session on mount
   useEffect(() => {
     checkSession();
-  }, []);
+  }, [checkSession]);
 
   const checkSession = async () => {
     const { data: { session } } = await supabase.auth.getSession();
@@ -309,7 +308,7 @@ function App() {
       fetchUserNotes();
       fetchAttendance();
     }
-  }, [user]);
+  }, [user, fetchEvents, fetchRegistrations, fetchUserNotes, fetchAttendance]);
 
   // Backup refresh to ensure registrations display
   useEffect(() => {
@@ -384,7 +383,7 @@ function App() {
         created_by: user.id,
       }));
   
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('events')
         .insert(eventsToCreate);
       
@@ -602,8 +601,10 @@ function App() {
               setCurrentView('dayView');
             }}
             onEventSelect={(event) => {
-              setSelectedEvent(event);
-              setCurrentView('workoutDetails');
+              if (!event?.date) return;
+              const eventDate = new Date(event.date + 'T00:00:00');
+              setSelectedDate(eventDate);
+              setCurrentView('dayView');
             }}
           />;
       
@@ -617,10 +618,6 @@ function App() {
           onRegister={registerForEvent}
           onCancelRegistration={cancelRegistration}
           onToggleAttendance={toggleAttendance}
-          onSelectEvent={(event) => {
-            setSelectedEvent(event);
-            setCurrentView('notes');
-          }}
           onEditEvent={handleEditEvent}
           onDeleteEvent={deleteEvent}
           onDateChange={setSelectedDate}
@@ -663,17 +660,6 @@ function App() {
           onBack={() => setCurrentView('dashboard')}
           onSaveNote={saveNote}
         />;
-
-        case 'workoutDetails':
-  return <WorkoutDetails 
-    event={selectedEvent}
-    events={events}
-    registrations={registrations}
-    user={user}
-    onBack={() => setCurrentView('dashboard')}
-    onRegister={registerForEvent}
-    onCancelRegistration={cancelRegistration}
-  />;
 
         case 'profileEdit':
           return <ProfileEdit 
