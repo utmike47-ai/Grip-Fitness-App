@@ -359,7 +359,14 @@ const DayView = ({
                 <div className="border-t border-grip-secondary pt-4">
                   <h3 className="font-semibold text-grip-primary mb-4">Available Times:</h3>
                   <div className="flex flex-col gap-3">
-                    {eventGroup.times.map(timeSlot => {
+                    {eventGroup.times
+                      .slice()
+                      .sort((a, b) => {
+                        const dateA = new Date(`${selectedDate?.toISOString().split('T')[0]}T${a.time}`);
+                        const dateB = new Date(`${selectedDate?.toISOString().split('T')[0]}T${b.time}`);
+                        return dateA - dateB;
+                      })
+                      .map(timeSlot => {
                       const isFull = timeSlot.registrationCount >= 15;
                       
                       return (
