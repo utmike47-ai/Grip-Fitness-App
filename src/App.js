@@ -581,6 +581,47 @@ function App() {
     }
   };
 
+  const removeStudentFromClass = useCallback(async (registrationId) => {
+    try {
+      const { error } = await supabase
+        .from('registrations')
+        .delete()
+        .eq('id', registrationId);
+
+      if (error) throw error;
+
+      await fetchRegistrations();
+      showToast('Student removed from class');
+    } catch (error) {
+      console.error('Failed to remove student:', error);
+      showToast('Failed to remove student: ' + error.message);
+    }
+  }, [fetchRegistrations]);
+
+  const addStudentToClass = useCallback(async (eventId, studentId) => {
+    try {
+      const { error } = await supabase
+        .from('registrations')
+        .insert([{ user_id: studentId, event_id: eventId }]);
+
+      if (error) {
+        if (error.code === '23505') {
+          showToast('Student already registered for this time', 'error');
+          return { success: false, error };
+        }
+        throw error;
+      }
+
+      await fetchRegistrations();
+      showToast('Student added to class!');
+      return { success: true };
+    } catch (error) {
+      console.error('Failed to add student:', error);
+      showToast('Failed to add student: ' + error.message, 'error');
+      return { success: false, error };
+    }
+  }, [fetchRegistrations]);
+
   // Render based on currentView
   const renderView = () => {
     switch(currentView) {
@@ -620,6 +661,8 @@ function App() {
           onEditEvent={handleEditEvent}
           onDeleteEvent={deleteEvent}
           onDateChange={setSelectedDate}
+          onRemoveStudent={removeStudentFromClass}
+          onAddStudent={addStudentToClass}
         />;
       
       case 'createEvent':

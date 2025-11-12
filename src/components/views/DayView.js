@@ -2,6 +2,7 @@ import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import { TIME_SLOTS } from '../../utils/constants';
 import { useSwipeable } from 'react-swipeable';
 import { fetchNoteForEvent, saveNote, deleteNote } from '../../utils/notesService';
+import { supabase } from '../../utils/supabaseClient';
 
 const DayView = ({ 
   selectedDate, 
@@ -14,7 +15,9 @@ const DayView = ({
   onToggleAttendance,
   onEditEvent,
   onDeleteEvent,
-  onDateChange
+  onDateChange,
+  onRemoveStudent,
+  onAddStudent
 }) => {
   const NOTE_MAX_LENGTH = 500;
   const dateStr = selectedDate?.toISOString().split('T')[0];
@@ -30,7 +33,22 @@ const DayView = ({
   const [noteSaving, setNoteSaving] = useState(false);
   const [noteFeedback, setNoteFeedback] = useState(null);
   const [activeContext, setActiveContext] = useState(null); // { group, event }
-
+  const [removeModal, setRemoveModal] = useState({
+    isOpen: false,
+    studentName: '',
+    registrationId: null,
+  });
+  const [addStudentModal, setAddStudentModal] = useState({
+    isOpen: false,
+    group: null,
+    selectedTimeId: null,
+  });
+  const addModalContainerRef = useRef(null);
+  const [allStudents, setAllStudents] = useState([]);
+  const [studentSearch, setStudentSearch] = useState('');
+  const [selectedStudentId, setSelectedStudentId] = useState(null);
+  const [studentsLoading, setStudentsLoading] = useState(false);
+ 
   const getRegistrationCount = useCallback((eventId) => (
     registrations.filter(reg => reg.event_id === eventId).length
   ), [registrations]);
@@ -38,6 +56,8 @@ const DayView = ({
   const isUserRegistered = useCallback((eventId) => (
     registrations.some(reg => reg.event_id === eventId && reg.user_id === user.id)
   ), [registrations, user?.id]);
+
+  const isCoach = user?.user_metadata?.role === 'coach';
 
   const formatTimeDisplay = (time24) => {
     // Remove seconds if present (e.g., "16:30:00" becomes "16:30")
@@ -236,6 +256,113 @@ const DayView = ({
     setTimeout(closeModal, 1200);
   }, [user, activeContext, noteContent, noteId, closeModal]);
 
+  const openRemoveModal = useCallback((registration) => {
+    if (!registration) return;
+    setRemoveModal({
+      isOpen: true,
+      studentName: registration.user_name || 'this student',
+      registrationId: registration.id,
+    });
+  }, []);
+
+  const closeRemoveModal = useCallback(() => {
+    setRemoveModal({ isOpen: false, studentName: '', registrationId: null });
+  }, []);
+
+  const handleConfirmRemove = useCallback(async () => {
+    if (!removeModal.registrationId) return;
+    await onRemoveStudent?.(removeModal.registrationId);
+    closeRemoveModal();
+  }, [removeModal.registrationId, onRemoveStudent, closeRemoveModal]);
+
+  const openAddStudentModal = useCallback((group) => {
+    if (!group) return;
+    // Sort times chronologically and select the first one
+    const sortedTimes = (group.times || []).slice().sort((a, b) => {
+      const dateA = new Date(`${selectedDate?.toISOString().split('T')[0]}T${a.time}`);
+      const dateB = new Date(`${selectedDate?.toISOString().split('T')[0]}T${b.time}`);
+      return dateA - dateB;
+    });
+    const firstTime = sortedTimes[0];
+    setAddStudentModal({
+      isOpen: true,
+      group,
+      selectedTimeId: firstTime?.id || null,
+    });
+    setStudentSearch('');
+    setSelectedStudentId(null);
+  }, [selectedDate]);
+
+  useEffect(() => {
+    const fetchStudents = async () => {
+      try {
+        setStudentsLoading(true);
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('id, first_name, last_name')
+          .eq('role', 'student');
+
+        if (error) {
+          console.error('Failed to load students:', error);
+          return;
+        }
+
+        setAllStudents(data || []);
+      } catch (error) {
+        console.error('Unexpected error fetching students:', error);
+      } finally {
+        setStudentsLoading(false);
+      }
+    };
+
+    if (isCoach && addStudentModal.isOpen && allStudents.length === 0) {
+      fetchStudents();
+    }
+  }, [isCoach, addStudentModal.isOpen, allStudents.length]);
+
+  const filteredStudents = useMemo(() => {
+    const query = studentSearch.trim().toLowerCase();
+    if (!query) {
+      return allStudents.slice(0, 10);
+    }
+    return allStudents
+      .filter((student) => {
+        const name = `${student.first_name || ''} ${student.last_name || ''}`.trim().toLowerCase();
+        return name.includes(query);
+      })
+      .slice(0, 10);
+  }, [allStudents, studentSearch]);
+
+  const closeAddStudentModal = useCallback(() => {
+    setAddStudentModal({ isOpen: false, group: null, selectedTimeId: null });
+  }, []);
+
+  useEffect(() => {
+    if (addStudentModal.isOpen) {
+      const handleKeyDown = (event) => {
+        if (event.key === 'Escape') {
+          closeAddStudentModal();
+        }
+      };
+
+      const handleClickOutside = (event) => {
+        if (addModalContainerRef.current && event.target === addModalContainerRef.current) {
+          closeAddStudentModal();
+        }
+      };
+
+      window.addEventListener('keydown', handleKeyDown);
+      window.addEventListener('mousedown', handleClickOutside);
+      window.addEventListener('touchstart', handleClickOutside);
+
+      return () => {
+        window.removeEventListener('keydown', handleKeyDown);
+        window.removeEventListener('mousedown', handleClickOutside);
+        window.removeEventListener('touchstart', handleClickOutside);
+      };
+    }
+  }, [addStudentModal.isOpen, closeAddStudentModal]);
+
   // Swipe handlers for date navigation
   const handlers = useSwipeable({
     onSwipedLeft: () => {
@@ -358,6 +485,16 @@ const DayView = ({
 
                 <div className="border-t border-grip-secondary pt-4">
                   <h3 className="font-semibold text-grip-primary mb-4">Available Times:</h3>
+                  {isCoach && (
+                    <button
+                      type="button"
+                      onClick={() => openAddStudentModal(eventGroup)}
+                      className="w-full px-4 py-3 mb-4 rounded-full font-semibold text-white transition-all shadow-sm bg-[#C67158] hover:bg-[#b2604b]"
+                      style={{ minHeight: 48 }}
+                    >
+                      + Add Student to Class
+                    </button>
+                  )}
                   <div className="flex flex-col gap-3">
                     {eventGroup.times
                       .slice()
@@ -412,8 +549,18 @@ const DayView = ({
                               </p>
                               <div className="space-y-2">
                                 {timeSlot.registeredUsers.map(reg => (
-                                  <div key={reg.id} className="text-sm">
-                                    {reg.user_name}
+                                  <div key={reg.id} className="text-sm flex items-center justify-between gap-3">
+                                    <span>{reg.user_name}</span>
+                                    {isCoach && (
+                                      <button
+                                        type="button"
+                                        onClick={() => openRemoveModal(reg)}
+                                        className="text-xs font-semibold text-red-600 hover:text-red-700"
+                                        style={{ minWidth: 44, minHeight: 32 }}
+                                      >
+                                        × Cancel
+                                      </button>
+                                    )}
                                   </div>
                                 ))}
                               </div>
@@ -530,6 +677,159 @@ const DayView = ({
               <button
                 type="button"
                 onClick={closeModal}
+                className="flex-1 px-4 py-3 rounded-xl font-semibold border border-grip-secondary text-grip-primary hover:bg-grip-secondary/30 transition-colors"
+                style={{ minHeight: 48 }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {removeModal.isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6 bg-black/60">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 transition-all">
+            <h2 className="text-xl font-montserrat font-bold text-grip-primary mb-2">
+              Remove Student
+            </h2>
+            <p className="text-gray-700 mb-6">
+              Remove {removeModal.studentName} from this class?
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                type="button"
+                onClick={closeRemoveModal}
+                className="flex-1 px-4 py-3 rounded-xl font-semibold border border-grip-secondary text-grip-primary hover:bg-grip-secondary/30 transition-colors"
+                style={{ minHeight: 48 }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmRemove}
+                className="flex-1 px-4 py-3 rounded-xl font-semibold text-white transition-colors bg-red-500 hover:bg-red-600"
+                style={{ minHeight: 48 }}
+              >
+                Remove
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {addStudentModal.isOpen && (
+        <div
+          ref={addModalContainerRef}
+          className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6 bg-black/60"
+        >
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 sm:p-8 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-start justify-between mb-4">
+              <h2 className="text-2xl font-montserrat font-bold text-grip-primary">Add Student to Class</h2>
+              <button
+                type="button"
+                onClick={closeAddStudentModal}
+                className="text-gray-500 hover:text-grip-primary text-sm font-semibold"
+                aria-label="Close add student modal"
+                style={{ minWidth: 44, minHeight: 44 }}
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="mb-6">
+              <label className="block text-sm font-semibold text-grip-primary mb-2" htmlFor="add-student-time">
+                Select Time:
+              </label>
+              <select
+                id="add-student-time"
+                value={addStudentModal.selectedTimeId || ''}
+                onChange={(e) => setAddStudentModal(prev => ({ ...prev, selectedTimeId: e.target.value }))}
+                className="w-full border border-grip-secondary rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-grip-primary text-gray-800"
+              >
+                {(addStudentModal.group?.times || [])
+                  .slice()
+                  .sort((a, b) => {
+                    const dateA = new Date(`${selectedDate?.toISOString().split('T')[0]}T${a.time}`);
+                    const dateB = new Date(`${selectedDate?.toISOString().split('T')[0]}T${b.time}`);
+                    return dateA - dateB;
+                  })
+                  .map((timeSlot) => (
+                    <option key={timeSlot.id} value={timeSlot.id}>
+                      {formatTimeDisplay(timeSlot.time)} ({timeSlot.registrationCount}/15)
+                    </option>
+                  ))}
+              </select>
+            </div>
+
+            <div className="mb-6">
+              <label className="block text-sm font-semibold text-grip-primary mb-2" htmlFor="add-student-search">
+                Search Student:
+              </label>
+              <input
+                id="add-student-search"
+                type="text"
+                placeholder="Type student name..."
+                className="w-full border border-grip-secondary rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-grip-primary text-gray-800"
+                value={studentSearch}
+                onChange={(e) => {
+                  setStudentSearch(e.target.value);
+                  setSelectedStudentId(null);
+                }}
+              />
+              <div className="mt-3 border border-grip-secondary rounded-xl max-h-64 overflow-y-auto">
+                {studentsLoading ? (
+                  <div className="py-6 text-center text-sm text-gray-500">Loading students...</div>
+                ) : filteredStudents.length === 0 ? (
+                  <div className="py-6 text-center text-sm text-gray-500">No students found</div>
+                ) : (
+                  <ul className="divide-y divide-grip-secondary/40">
+                    {filteredStudents.map((student) => {
+                      const studentId = student.id;
+                      const name = `${student.first_name || ''} ${student.last_name || ''}`.trim();
+                      const isSelected = selectedStudentId === studentId;
+                      return (
+                        <li key={studentId}>
+                          <button
+                            type="button"
+                            onClick={() => setSelectedStudentId(studentId)}
+                            className={`w-full text-left px-4 py-3 text-sm ${
+                              isSelected ? 'bg-grip-primary text-white' : 'hover:bg-grip-secondary/20'
+                            }`}
+                          >
+                            {name || 'Unnamed Student'}
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                type="button"
+                onClick={async () => {
+                  if (!addStudentModal.selectedTimeId || !selectedStudentId) return;
+                  const result = await onAddStudent?.(addStudentModal.selectedTimeId, selectedStudentId);
+                  if (result?.success) {
+                    closeAddStudentModal();
+                  }
+                }}
+                disabled={!addStudentModal.selectedTimeId || !selectedStudentId}
+                className={`flex-1 px-4 py-3 rounded-xl font-semibold text-white transition-colors ${
+                  !addStudentModal.selectedTimeId || !selectedStudentId
+                    ? 'bg-[#C67158]/60 cursor-not-allowed'
+                    : 'bg-[#C67158] hover:bg-[#b2604b]'
+                }`}
+                style={{ minHeight: 48 }}
+              >
+                Add Student
+              </button>
+              <button
+                type="button"
+                onClick={closeAddStudentModal}
                 className="flex-1 px-4 py-3 rounded-xl font-semibold border border-grip-secondary text-grip-primary hover:bg-grip-secondary/30 transition-colors"
                 style={{ minHeight: 48 }}
               >
