@@ -595,7 +595,7 @@ const DayView = ({
       style={{ minHeight: 44 }}
       aria-label="Cancel this class time slot"
     >
-      🗑️ Cancel
+      Cancel
     </button>
   )}
 </div>
