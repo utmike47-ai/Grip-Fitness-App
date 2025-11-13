@@ -569,7 +569,8 @@ const DayView = ({
   {timeSlot.userRegistered ? (
     <button
       onClick={() => onCancelRegistration(timeSlot.id)}
-      className="bg-grip-accent text-white px-6 py-2 rounded-full text-sm font-semibold hover:shadow-lg transition-all"
+      className="px-6 py-2.5 rounded-full text-sm font-semibold text-white bg-grip-accent hover:shadow-lg transition-all"
+      style={{ minHeight: 44 }}
     >
       Cancel
     </button>
@@ -577,10 +578,11 @@ const DayView = ({
     <button
       onClick={() => onRegister(timeSlot.id)}
       disabled={isFull}
-      className={`px-6 py-2 rounded-full text-sm font-semibold transition-all
+      className={`px-6 py-2.5 rounded-full text-sm font-semibold text-white transition-all
         ${isFull 
           ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
-          : 'bg-grip-primary text-white hover:shadow-lg'}`}
+          : 'bg-grip-primary hover:shadow-lg'}`}
+      style={{ minHeight: 44 }}
     >
       {isFull ? 'FULL' : 'Register'}
     </button>
@@ -589,11 +591,11 @@ const DayView = ({
     <button
       type="button"
       onClick={() => openCancelClassModal(timeSlot)}
-      className="px-6 py-2 rounded-full text-sm font-semibold text-white bg-red-600 hover:bg-red-700 active:bg-red-800 transition-all shadow-sm border border-red-700"
+      className="px-6 py-2.5 rounded-full text-sm font-semibold text-white bg-red-600 hover:bg-red-700 active:bg-red-800 transition-all hover:shadow-lg"
       style={{ minHeight: 44 }}
       aria-label="Cancel this class time slot"
     >
-      🗑️ Cancel Class
+      🗑️ Cancel
     </button>
   )}
 </div>
