@@ -506,6 +506,61 @@ function App() {
     }
   };
 
+  const cancelTimeSlot = useCallback(async (eventId) => {
+    // Verify user is a coach
+    if (user?.user_metadata?.role !== 'coach') {
+      showToast('Only coaches can cancel classes', 'error');
+      return { success: false };
+    }
+
+    try {
+      // Delete attendance records for this event
+      const { error: attError } = await supabase
+        .from('attendance')
+        .delete()
+        .eq('event_id', eventId);
+      
+      if (attError) console.error('Error deleting attendance:', attError);
+
+      // Delete notes for this event
+      const { error: notesError } = await supabase
+        .from('notes')
+        .delete()
+        .eq('event_id', eventId);
+      
+      if (notesError) console.error('Error deleting notes:', notesError);
+
+      // Delete registrations for this event (cascade should handle this, but doing it explicitly)
+      const { error: regError } = await supabase
+        .from('registrations')
+        .delete()
+        .eq('event_id', eventId);
+      
+      if (regError) console.error('Error deleting registrations:', regError);
+
+      // Delete the event itself
+      const { error: eventError } = await supabase
+        .from('events')
+        .delete()
+        .eq('id', eventId);
+
+      if (eventError) {
+        console.error('Error deleting event:', eventError);
+        throw eventError;
+      }
+
+      // Refresh data to update UI
+      await fetchEvents();
+      await fetchRegistrations();
+      showToast('Class canceled');
+      return { success: true };
+    } catch (error) {
+      console.error('Failed to cancel class:', error);
+      showToast('Failed to cancel class. Please try again.', 'error');
+      return { success: false, error };
+    }
+  }, [user, fetchEvents, fetchRegistrations]);
+
   const handleEditEvent = (eventId) => {
     const event = events.find(e => e.id === eventId);
     if (event) {
@@ -663,6 +718,7 @@ function App() {
           onDateChange={setSelectedDate}
           onRemoveStudent={removeStudentFromClass}
           onAddStudent={addStudentToClass}
+          onCancelTimeSlot={cancelTimeSlot}
         />;
       
       case 'createEvent':

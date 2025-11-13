@@ -17,7 +17,8 @@ const DayView = ({
   onDeleteEvent,
   onDateChange,
   onRemoveStudent,
-  onAddStudent
+  onAddStudent,
+  onCancelTimeSlot
 }) => {
   const NOTE_MAX_LENGTH = 500;
   const dateStr = selectedDate?.toISOString().split('T')[0];
@@ -44,6 +45,12 @@ const DayView = ({
     selectedTimeId: null,
   });
   const addModalContainerRef = useRef(null);
+  const [cancelClassModal, setCancelClassModal] = useState({
+    isOpen: false,
+    timeSlot: null,
+  });
+  const cancelClassModalRef = useRef(null);
+  const [isCancelingClass, setIsCancelingClass] = useState(false);
   const [allStudents, setAllStudents] = useState([]);
   const [studentSearch, setStudentSearch] = useState('');
   const [selectedStudentId, setSelectedStudentId] = useState(null);
@@ -337,6 +344,20 @@ const DayView = ({
     setAddStudentModal({ isOpen: false, group: null, selectedTimeId: null });
   }, []);
 
+  const openCancelClassModal = useCallback((timeSlot) => {
+    if (!timeSlot) return;
+    setIsCancelingClass(false);
+    setCancelClassModal({
+      isOpen: true,
+      timeSlot,
+    });
+  }, []);
+
+  const closeCancelClassModal = useCallback(() => {
+    setCancelClassModal({ isOpen: false, timeSlot: null });
+    setIsCancelingClass(false);
+  }, []);
+
   useEffect(() => {
     if (addStudentModal.isOpen) {
       const handleKeyDown = (event) => {
@@ -362,6 +383,32 @@ const DayView = ({
       };
     }
   }, [addStudentModal.isOpen, closeAddStudentModal]);
+
+  useEffect(() => {
+    if (cancelClassModal.isOpen) {
+      const handleKeyDown = (event) => {
+        if (event.key === 'Escape' && !isCancelingClass) {
+          closeCancelClassModal();
+        }
+      };
+
+      const handleClickOutside = (event) => {
+        if (cancelClassModalRef.current && event.target === cancelClassModalRef.current && !isCancelingClass) {
+          closeCancelClassModal();
+        }
+      };
+
+      window.addEventListener('keydown', handleKeyDown);
+      window.addEventListener('mousedown', handleClickOutside);
+      window.addEventListener('touchstart', handleClickOutside);
+
+      return () => {
+        window.removeEventListener('keydown', handleKeyDown);
+        window.removeEventListener('mousedown', handleClickOutside);
+        window.removeEventListener('touchstart', handleClickOutside);
+      };
+    }
+  }, [cancelClassModal.isOpen, isCancelingClass, closeCancelClassModal]);
 
   // Swipe handlers for date navigation
   const handlers = useSwipeable({
@@ -536,6 +583,17 @@ const DayView = ({
           : 'bg-grip-primary text-white hover:shadow-lg'}`}
     >
       {isFull ? 'FULL' : 'Register'}
+    </button>
+  )}
+  {isCoach && (
+    <button
+      type="button"
+      onClick={() => openCancelClassModal(timeSlot)}
+      className="px-6 py-2 rounded-full text-sm font-semibold text-white bg-red-600 hover:bg-red-700 active:bg-red-800 transition-all shadow-sm border border-red-700"
+      style={{ minHeight: 44 }}
+      aria-label="Cancel this class time slot"
+    >
+      🗑️ Cancel Class
     </button>
   )}
 </div>
@@ -834,6 +892,79 @@ const DayView = ({
                 style={{ minHeight: 48 }}
               >
                 Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {cancelClassModal.isOpen && cancelClassModal.timeSlot && (
+        <div
+          ref={cancelClassModalRef}
+          className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6 bg-black/60"
+        >
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 sm:p-8">
+            <h2 className="text-2xl font-montserrat font-bold text-grip-primary mb-4">
+              Cancel {formatTimeDisplay(cancelClassModal.timeSlot.time)} Class?
+            </h2>
+            
+            {(!cancelClassModal.timeSlot.registrationCount || cancelClassModal.timeSlot.registrationCount === 0) ? (
+              <p className="text-gray-700 mb-6">
+                This will <strong>permanently delete</strong> this time slot. No students are currently registered.
+              </p>
+            ) : (
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
+                <p className="text-red-800 mb-2 font-semibold">
+                  ⚠️ Warning: {cancelClassModal.timeSlot.registrationCount} {cancelClassModal.timeSlot.registrationCount === 1 ? 'student is' : 'students are'} currently registered for this class.
+                </p>
+                <p className="text-red-700 mb-2">
+                  They will be automatically unregistered when you delete this class.
+                </p>
+                <p className="text-red-800 font-bold text-sm">
+                  This action cannot be undone.
+                </p>
+              </div>
+            )}
+
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                type="button"
+                onClick={closeCancelClassModal}
+                disabled={isCancelingClass}
+                className="flex-1 px-4 py-3 rounded-xl font-semibold border border-grip-secondary text-grip-primary hover:bg-grip-secondary/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ minHeight: 48 }}
+              >
+                Keep Class
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  if (!cancelClassModal.timeSlot?.id || isCancelingClass) return;
+                  setIsCancelingClass(true);
+                  try {
+                    const result = await onCancelTimeSlot?.(cancelClassModal.timeSlot.id);
+                    if (result?.success) {
+                      closeCancelClassModal();
+                    } else {
+                      setIsCancelingClass(false);
+                    }
+                  } catch (error) {
+                    console.error('Error canceling class:', error);
+                    setIsCancelingClass(false);
+                  }
+                }}
+                disabled={isCancelingClass}
+                className="flex-1 px-4 py-3 rounded-xl font-semibold text-white transition-colors bg-red-600 hover:bg-red-700 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                style={{ minHeight: 48 }}
+              >
+                {isCancelingClass ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Deleting...</span>
+                  </>
+                ) : (
+                  'Delete Class'
+                )}
               </button>
             </div>
           </div>
