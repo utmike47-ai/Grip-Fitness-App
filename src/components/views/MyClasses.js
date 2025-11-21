@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { TIME_SLOTS } from '../../utils/constants';
 
 const MyClasses = ({ user, events, registrations, onBack, onSelectEvent, onCancelRegistration }) => {
@@ -27,6 +27,128 @@ const MyClasses = ({ user, events, registrations, onBack, onSelectEvent, onCance
   const upcomingRegs = userRegs.filter(reg => new Date(reg.event.date) >= new Date());
   const pastRegs = userRegs.filter(reg => new Date(reg.event.date) < new Date());
 
+  // Calculate Quick Stats - memoized to recalculate when registrations or events change
+  // Only counts PAST events (date <= today) for the logged-in user
+  const stats = useMemo(() => {
+    if (!user || !registrations || !events) {
+      return {
+        classesThisWeek: 0,
+        classesThisMonth: 0,
+        streak: 0
+      };
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    // Step 1: Filter registrations by current user
+    const userRegistrations = registrations.filter(reg => reg.user_id === user.id);
+    
+    if (userRegistrations.length === 0) {
+      return {
+        classesThisWeek: 0,
+        classesThisMonth: 0,
+        streak: 0
+      };
+    }
+
+    // Step 2: Map to events and filter out invalid/missing events
+    const userRegsWithEvents = userRegistrations
+      .map(reg => {
+        const event = events.find(e => e.id === reg.event_id);
+        return event ? { ...reg, event } : null;
+      })
+      .filter(reg => reg !== null && reg.event);
+
+    // Step 3: Filter to only PAST events (date <= today)
+    const pastRegistrations = userRegsWithEvents.filter(reg => {
+      const eventDate = new Date(reg.event.date + 'T00:00:00'); // Parse date string properly
+      eventDate.setHours(0, 0, 0, 0);
+      return eventDate <= today;
+    });
+
+    if (pastRegistrations.length === 0) {
+      return {
+        classesThisWeek: 0,
+        classesThisMonth: 0,
+        streak: 0
+      };
+    }
+
+    // 1. My Classes This Week (Monday-Sunday, past only)
+    const getWeekStart = (date) => {
+      const d = new Date(date);
+      const day = d.getDay();
+      const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Monday = start of week
+      const weekStart = new Date(d);
+      weekStart.setDate(diff);
+      return weekStart;
+    };
+    
+    const weekStart = getWeekStart(today);
+    weekStart.setHours(0, 0, 0, 0);
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekEnd.getDate() + 6);
+    weekEnd.setHours(23, 59, 59, 999);
+    
+    const classesThisWeek = pastRegistrations.filter(reg => {
+      const eventDate = new Date(reg.event.date + 'T00:00:00');
+      eventDate.setHours(0, 0, 0, 0);
+      return eventDate >= weekStart && eventDate <= weekEnd && eventDate <= today;
+    }).length;
+
+    // 2. My Classes This Month (past only)
+    const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+    monthStart.setHours(0, 0, 0, 0);
+    const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    monthEnd.setHours(23, 59, 59, 999);
+    
+    const classesThisMonth = pastRegistrations.filter(reg => {
+      const eventDate = new Date(reg.event.date + 'T00:00:00');
+      eventDate.setHours(0, 0, 0, 0);
+      return eventDate >= monthStart && eventDate <= monthEnd && eventDate <= today;
+    }).length;
+
+    // 3. Current Streak - consecutive days going backwards from today
+    // Get unique dates (YYYY-MM-DD format) when user had registrations
+    const registrationDates = new Set(
+      pastRegistrations.map(reg => {
+        const eventDate = new Date(reg.event.date + 'T00:00:00');
+        eventDate.setHours(0, 0, 0, 0);
+        return eventDate.toISOString().split('T')[0]; // Use YYYY-MM-DD format
+      })
+    );
+
+    let streak = 0;
+    let checkDate = new Date(today);
+    checkDate.setHours(0, 0, 0, 0);
+    
+    // Check backwards from today, counting consecutive days with registrations
+    // Streak breaks if we hit a day with no registration
+    while (true) {
+      const dateString = checkDate.toISOString().split('T')[0];
+      if (registrationDates.has(dateString)) {
+        streak++;
+        checkDate.setDate(checkDate.getDate() - 1);
+      } else {
+        // No registration for this day - streak breaks
+        break;
+      }
+      
+      // Safety check to prevent infinite loop (max 365 days back)
+      const daysAgo = Math.floor((today.getTime() - checkDate.getTime()) / (1000 * 60 * 60 * 24));
+      if (daysAgo > 365) {
+        break;
+      }
+    }
+
+    return {
+      classesThisWeek,
+      classesThisMonth,
+      streak
+    };
+  }, [user, registrations, events]);
+
   return (
     <div className="min-h-screen bg-grip-light pb-20">
       {/* Header */}
@@ -50,6 +172,31 @@ const MyClasses = ({ user, events, registrations, onBack, onSelectEvent, onCance
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 py-6">
+        {/* Quick Stats Section */}
+        {userRegs.length > 0 && (
+          <div className="mb-8 bg-white rounded-2xl shadow-lg p-6">
+            <h2 className="text-xl font-montserrat font-bold text-grip-primary mb-4">
+              Quick Stats
+            </h2>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                <span className="text-gray-700 font-semibold">My Classes This Week</span>
+                <span className="text-2xl font-bold text-grip-primary">{stats.classesThisWeek}</span>
+              </div>
+              <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                <span className="text-gray-700 font-semibold">My Classes This Month</span>
+                <span className="text-2xl font-bold text-grip-primary">{stats.classesThisMonth}</span>
+              </div>
+              <div className="flex justify-between items-center py-2">
+                <span className="text-gray-700 font-semibold">Current Streak</span>
+                <span className="text-2xl font-bold text-grip-primary">
+                  🔥 {stats.streak} {stats.streak === 1 ? 'day' : 'days'}
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
         {userRegs.length === 0 ? (
           <div className="text-center py-16 bg-white rounded-2xl shadow-lg">
             <span className="text-6xl block mb-4">💪</span>

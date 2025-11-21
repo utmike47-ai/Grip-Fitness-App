@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import Logo from '../Logo';
 import Calendar from '../common/Calendar';
 import WorkoutStats from '../common/WorkoutStats';
@@ -29,34 +29,110 @@ const Dashboard = ({ user, events, registrations, attendance, onSignOut, onViewC
   const userRegs = getUserRegistrations();
   const userRole = user?.user_metadata?.role || 'student';
 
-  const getWeekStats = () => {
+  // Calculate personal attendance stats - only PAST events (date <= today)
+  // Memoized to recalculate when user, registrations, or events change
+  const personalStats = useMemo(() => {
+    if (!user || !registrations || !events) {
+      return {
+        classesThisWeek: 0,
+        classesThisMonth: 0,
+        streak: 0
+      };
+    }
+
     const today = new Date();
-    const currentWeekStart = new Date(today);
-    currentWeekStart.setDate(today.getDate() - today.getDay()); // Start of week (Sunday)
-    currentWeekStart.setHours(0, 0, 0, 0);
-    
-    const currentWeekEnd = new Date(currentWeekStart);
-    currentWeekEnd.setDate(currentWeekStart.getDate() + 6); // End of week (Saturday)
-    currentWeekEnd.setHours(23, 59, 59, 999);
-    
-    // Get all classes this week
-    const classesThisWeek = events.filter(event => {
-      const eventDate = new Date(event.date);
-      return eventDate >= currentWeekStart && eventDate <= currentWeekEnd;
-    });
-    
-    // Get user's registered classes this week
-    const myClassesThisWeek = classesThisWeek.filter(event => 
-      registrations.some(reg => 
-        reg.event_id === event.id && reg.user_id === user.id
-      )
-    );
-    
-    return {
-      totalThisWeek: classesThisWeek.length,
-      registeredThisWeek: myClassesThisWeek.length
+    today.setHours(0, 0, 0, 0);
+
+    // Get user's past registrations (date <= today)
+    const userPastRegs = registrations
+      .filter(reg => reg.user_id === user.id)
+      .map(reg => {
+        const event = events.find(e => e.id === reg.event_id);
+        return event ? { ...reg, event } : null;
+      })
+      .filter(reg => reg !== null && reg.event)
+      .filter(reg => {
+        const eventDate = new Date(reg.event.date + 'T00:00:00');
+        eventDate.setHours(0, 0, 0, 0);
+        return eventDate <= today;
+      });
+
+    if (userPastRegs.length === 0) {
+      return {
+        classesThisWeek: 0,
+        classesThisMonth: 0,
+        streak: 0
+      };
+    }
+
+    // 1. My Classes This Week (Monday-Sunday, past only)
+    const getWeekStart = (date) => {
+      const d = new Date(date);
+      const day = d.getDay();
+      const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Monday = start of week
+      const weekStart = new Date(d);
+      weekStart.setDate(diff);
+      return weekStart;
     };
-  };
+
+    const weekStart = getWeekStart(today);
+    weekStart.setHours(0, 0, 0, 0);
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekEnd.getDate() + 6);
+    weekEnd.setHours(23, 59, 59, 999);
+
+    const classesThisWeek = userPastRegs.filter(reg => {
+      const eventDate = new Date(reg.event.date + 'T00:00:00');
+      eventDate.setHours(0, 0, 0, 0);
+      return eventDate >= weekStart && eventDate <= weekEnd && eventDate <= today;
+    }).length;
+
+    // 2. My Classes This Month (past only)
+    const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+    monthStart.setHours(0, 0, 0, 0);
+    const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    monthEnd.setHours(23, 59, 59, 999);
+
+    const classesThisMonth = userPastRegs.filter(reg => {
+      const eventDate = new Date(reg.event.date + 'T00:00:00');
+      eventDate.setHours(0, 0, 0, 0);
+      return eventDate >= monthStart && eventDate <= monthEnd && eventDate <= today;
+    }).length;
+
+    // 3. Current Streak - consecutive days going backwards from today
+    const registrationDates = new Set(
+      userPastRegs.map(reg => {
+        const eventDate = new Date(reg.event.date + 'T00:00:00');
+        eventDate.setHours(0, 0, 0, 0);
+        return eventDate.toISOString().split('T')[0];
+      })
+    );
+
+    let streak = 0;
+    let checkDate = new Date(today);
+    checkDate.setHours(0, 0, 0, 0);
+
+    while (true) {
+      const dateString = checkDate.toISOString().split('T')[0];
+      if (registrationDates.has(dateString)) {
+        streak++;
+        checkDate.setDate(checkDate.getDate() - 1);
+      } else {
+        break;
+      }
+
+      const daysAgo = Math.floor((today.getTime() - checkDate.getTime()) / (1000 * 60 * 60 * 24));
+      if (daysAgo > 365) {
+        break;
+      }
+    }
+
+    return {
+      classesThisWeek,
+      classesThisMonth,
+      streak
+    };
+  }, [user, registrations, events]);
 
   return (
     <div className="min-h-screen bg-grip-light pb-20">
@@ -215,13 +291,19 @@ const Dashboard = ({ user, events, registrations, attendance, onSignOut, onViewC
                   </>
                 ) : (
                   <>
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-600">Classes This Week</span>
-                      <span className="text-2xl font-bold text-grip-primary">{getWeekStats().totalThisWeek}</span>
+                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                      <span className="text-gray-700 font-semibold">My Classes This Week</span>
+                      <span className="text-2xl font-bold text-grip-primary">{personalStats.classesThisWeek}</span>
                     </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-600">My Classes This Week</span>
-                      <span className="text-2xl font-bold text-grip-primary">{getWeekStats().registeredThisWeek}</span>
+                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                      <span className="text-gray-700 font-semibold">My Classes This Month</span>
+                      <span className="text-2xl font-bold text-grip-primary">{personalStats.classesThisMonth}</span>
+                    </div>
+                    <div className="flex justify-between items-center py-2">
+                      <span className="text-gray-700 font-semibold">Current Streak</span>
+                      <span className="text-2xl font-bold text-grip-primary">
+                        🔥 {personalStats.streak} {personalStats.streak === 1 ? 'day' : 'days'}
+                      </span>
                     </div>
                   </>
                 )}

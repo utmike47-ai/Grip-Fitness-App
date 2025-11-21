@@ -137,16 +137,10 @@ const WorkoutStats = ({ attendance, registrations, events, user }) => {
       </div>
 
       {/* Monthly Stats */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="text-center p-3 bg-grip-secondary rounded-lg">
+      <div className="flex justify-center">
+        <div className="text-center p-3 bg-grip-secondary rounded-lg w-full max-w-xs">
           <p className="text-2xl font-bold text-grip-primary">{monthlyCount}</p>
           <p className="text-xs text-gray-600">This Month</p>
-        </div>
-        <div className="text-center p-3 bg-grip-secondary rounded-lg">
-          <p className="text-2xl font-bold text-grip-primary">
-            {registrations.filter(r => r.user_id === user.id).length}
-          </p>
-          <p className="text-xs text-gray-600">Upcoming</p>
         </div>
       </div>
     </div>
