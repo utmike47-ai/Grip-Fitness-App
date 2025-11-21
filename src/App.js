@@ -773,6 +773,7 @@ function App() {
               }));
               fetchUserProfile(user.id); // Refresh profile data
             }}
+            showToast={showToast}
           />;
       
       default:
