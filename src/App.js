@@ -8,6 +8,8 @@ import CreateEvent from './components/views/CreateEvent';
 import MyClasses from './components/views/MyClasses';
 import NotesView from './components/views/NotesView';
 import ProfileEdit from './components/views/ProfileEdit';
+import AdminDashboard from './components/views/AdminDashboard';
+import MemberManagement from './components/views/MemberManagement';
 import Toast from './components/common/Toast';
 import BookingModal from './components/common/BookingModal';
 import BottomNav from './components/common/BottomNav';
@@ -22,6 +24,7 @@ function App() {
   const [registrations, setRegistrations] = useState([]);
   const [userNotes, setUserNotes] = useState([]);
   const [attendance, setAttendance] = useState([]);
+  const [profiles, setProfiles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
   const [toast, setToast] = useState(null);
@@ -299,6 +302,20 @@ function App() {
     }
   }, []);
 
+  const fetchProfiles = useCallback(async () => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name, role')
+        .order('last_name', { ascending: true });
+      
+      if (error) throw error;
+      setProfiles(data || []);
+    } catch (error) {
+      console.error('Error fetching profiles:', error);
+    }
+  }, []);
+
   // Load data when user logs in
   useEffect(() => {
     if (user) {
@@ -306,8 +323,9 @@ function App() {
       fetchRegistrations();
       fetchUserNotes();
       fetchAttendance();
+      fetchProfiles();
     }
-  }, [user, fetchEvents, fetchRegistrations, fetchUserNotes, fetchAttendance]);
+  }, [user, fetchEvents, fetchRegistrations, fetchUserNotes, fetchAttendance, fetchProfiles]);
 
   // Backup refresh to ensure registrations display
   useEffect(() => {
@@ -679,6 +697,31 @@ function App() {
 
   // Render based on currentView
   const renderView = () => {
+    const userRole = user?.user_metadata?.role || 'student';
+    const isCoach = userRole === 'coach' || userRole === 'admin';
+    
+    // Protect admin routes
+    if ((currentView === 'adminDashboard' || currentView === 'manageMembers') && !isCoach) {
+      return <Dashboard 
+        user={user}
+        events={events}
+        registrations={registrations}
+        attendance={attendance}
+        onSignOut={signOut}
+        onViewChange={setCurrentView}
+        onDateSelect={(date) => {
+          setSelectedDate(date);
+          setCurrentView('dayView');
+        }}
+        onEventSelect={(event) => {
+          if (!event?.date) return;
+          const eventDate = new Date(event.date + 'T00:00:00');
+          setSelectedDate(eventDate);
+          setCurrentView('dayView');
+        }}
+      />;
+    }
+    
     switch(currentView) {
       case 'login':
         return <LoginScreen onLogin={signIn} loading={loading} />;
@@ -774,6 +817,33 @@ function App() {
               fetchUserProfile(user.id); // Refresh profile data
             }}
             showToast={showToast}
+          />;
+
+        case 'adminDashboard':
+          return <AdminDashboard 
+            user={user}
+            events={events}
+            registrations={registrations}
+            profiles={profiles}
+            attendance={attendance}
+            onNavigate={(view) => {
+              setCurrentView(view);
+            }}
+            onEventSelect={(event) => {
+              setSelectedEvent(event);
+              if (event && event.date) {
+                setSelectedDate(new Date(event.date + 'T00:00:00'));
+              }
+            }}
+          />;
+
+        case 'manageMembers':
+          return <MemberManagement 
+            user={user}
+            profiles={profiles}
+            onBack={() => setCurrentView('adminDashboard')}
+            showToast={showToast}
+            onRefreshProfiles={fetchProfiles}
           />;
       
       default:
