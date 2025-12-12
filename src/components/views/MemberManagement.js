@@ -3,7 +3,7 @@ import { supabase } from '../../utils/supabaseClient';
 
 const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshProfiles }) => {
   const userRole = user?.user_metadata?.role || 'student';
-  const isAuthorized = userRole === 'coach' || userRole === 'admin';
+  const isAuthorized = userRole === 'admin';
 
   const [searchQuery, setSearchQuery] = useState('');
   const [members, setMembers] = useState([]);

@@ -257,7 +257,7 @@ const AdminDashboard = ({ user, events, registrations, profiles = [], attendance
 
   // NOW check authorization AFTER all hooks have been called
   const userRole = user?.user_metadata?.role || 'student';
-  const isAuthorized = userRole === 'coach' || userRole === 'admin';
+  const isAuthorized = userRole === 'admin';
 
   // Block unauthorized access
   if (!isAuthorized) {

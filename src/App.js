@@ -699,9 +699,10 @@ function App() {
   const renderView = () => {
     const userRole = user?.user_metadata?.role || 'student';
     const isCoach = userRole === 'coach' || userRole === 'admin';
+    const isAdmin = userRole === 'admin';
     
-    // Protect admin routes
-    if ((currentView === 'adminDashboard' || currentView === 'manageMembers') && !isCoach) {
+    // Protect admin routes - only admins can access
+    if ((currentView === 'adminDashboard' || currentView === 'manageMembers') && !isAdmin) {
       return <Dashboard 
         user={user}
         events={events}

@@ -2,6 +2,7 @@ import React from 'react';
 
 const BottomNav = ({ userRole, currentView, onNavigate }) => {
   const isCoach = userRole === 'coach' || userRole === 'admin';
+  const isAdmin = userRole === 'admin';
   const isStudent = userRole === 'student';
   
   return (
@@ -24,7 +25,7 @@ const BottomNav = ({ userRole, currentView, onNavigate }) => {
           <span className="text-xs">Home</span>
         </button>
 
-        {/* Second Button - Create for Coach, My Classes for Student */}
+        {/* Second Button - Create for Coach/Admin, My Classes for Student */}
         {isCoach ? (
           <button
             onClick={() => onNavigate('createEvent')}
@@ -67,8 +68,8 @@ const BottomNav = ({ userRole, currentView, onNavigate }) => {
           </button>
         )}
 
-        {/* Admin Button - Only visible to coaches and admins */}
-        {isCoach && (
+        {/* Admin Button - Only visible to admins */}
+        {isAdmin && (
           <button
             onClick={() => {
               onNavigate('adminDashboard');
