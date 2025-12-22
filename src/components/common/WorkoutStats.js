@@ -125,10 +125,10 @@ const WorkoutStats = ({ attendance, registrations, events, user }) => {
               key={index}
               className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm
                 ${day.worked 
-                  ? 'bg-grip-primary text-white' 
+                  ? 'bg-gym-primary text-white' 
                   : day.isToday 
-                    ? 'bg-grip-primary/50 text-white' 
-                    : 'bg-grip-secondary text-gray-600'}`}
+                    ? 'bg-gym-primary/50 text-white' 
+                    : 'bg-gray-200 text-gray-600'}`}
             >
               {day.day}
             </div>
@@ -138,7 +138,7 @@ const WorkoutStats = ({ attendance, registrations, events, user }) => {
 
       {/* Monthly Stats */}
       <div className="flex justify-center">
-        <div className="text-center p-4 bg-grip-secondary rounded-grip w-full max-w-xs">
+        <div className="text-center p-4 bg-gray-100 rounded-grip w-full max-w-xs">
           <p className="text-2xl font-bold text-gym-accent">{monthlyCount}</p>
           <p className="text-xs text-gray-600">This Month</p>
         </div>
