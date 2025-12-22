@@ -54,7 +54,7 @@ const Calendar = ({ events, onDateSelect }) => {
       
       <div className="grid grid-cols-7 gap-2 mb-2">
         {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-          <div key={day} className="p-2 text-center font-semibold text-grip-primary text-sm opacity-70">
+          <div key={day} className="p-2 text-center font-semibold text-gym-primary text-sm opacity-70">
             {day}
           </div>
         ))}
@@ -71,17 +71,17 @@ const Calendar = ({ events, onDateSelect }) => {
               key={index}
               onClick={() => onDateSelect(day)}
               className={`p-3 h-14 text-base relative rounded-lg transition-all font-semibold
-                ${isCurrentMonth ? 'text-grip-dark' : 'text-gray-600 opacity-50'} 
-                ${isToday ? 'bg-grip-primary text-white font-extrabold ring-2 ring-white ring-offset-2' : 'hover:bg-gray-100'}`}
+                ${isCurrentMonth ? 'text-gym-text-dark' : 'text-gray-600 opacity-50'} 
+                ${isToday ? 'bg-gym-primary text-white font-extrabold ring-2 ring-white ring-offset-2' : 'hover:bg-gray-100'}`}
             >
               {day.getDate()}
               {dayEvents.length > 0 && (
                 <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 flex gap-1">
                   {dayEvents.some(e => e.type === 'workout') && (
-                    <div className="w-2 h-2 bg-grip-primary rounded-full"></div>
+                    <div className="w-2 h-2 bg-gym-primary rounded-full"></div>
                   )}
                   {dayEvents.some(e => e.type === 'social') && (
-                    <div className="w-2 h-2 bg-grip-primary rounded-full"></div>
+                    <div className="w-2 h-2 bg-gym-primary rounded-full"></div>
                   )}
                 </div>
               )}
