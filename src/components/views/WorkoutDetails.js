@@ -72,9 +72,11 @@ const WorkoutDetails = ({
   ), [registrations]);
 
   const formatTime = useCallback((time24) => {
-    const base = time24?.split(':').slice(0, 2).join(':');
-    const match = TIME_SLOTS.find(slot => slot.value === base);
-    return match ? match.display : time24;
+    if (!time24) return 'No time set';
+    // Remove seconds if present (e.g., "16:30:00" becomes "16:30")
+    const timeWithoutSeconds = time24.split(':').slice(0, 2).join(':');
+    const match = TIME_SLOTS.find(slot => slot.value === timeWithoutSeconds);
+    return match ? match.display : timeWithoutSeconds;
   }, []);
 
   const closeModal = useCallback(() => {
@@ -413,7 +415,7 @@ const WorkoutDetails = ({
 
         {/* Time Slots */}
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-mjg-text-card">Available Times</h3>
+          <h3 className="text-lg font-semibold text-white">Available Times:</h3>
           {relatedEvents.map((slot) => {
             const regs = getRegistrationsForEvent(slot.id);
             const userRegistered = isUserRegistered(slot.id);
@@ -424,8 +426,8 @@ const WorkoutDetails = ({
             return (
               <div key={slot.id} className="bg-mjg-card rounded-mjg shadow-mjg border border-mjg-border p-4">
                 <div className="flex justify-between items-center mb-4">
-                  <div>
-                    <p className="text-xl font-bold text-mjg-text-card">
+                  <div className="flex-1">
+                    <p className="text-4xl font-extrabold text-mjg-text-card mb-1">
                       {formatTime(slot.time)}
                     </p>
                     <p className="text-sm text-mjg-text-secondary">
