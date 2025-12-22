@@ -1,5 +1,6 @@
 import React, { useMemo, useEffect } from 'react';
 import { TIME_SLOTS } from '../../utils/constants';
+import Logo from '../Logo';
 
 const AdminDashboard = ({ user, events, registrations, profiles = [], attendance = [], onNavigate, onEventSelect }) => {
   // ALL HOOKS MUST BE CALLED FIRST - before any conditional returns

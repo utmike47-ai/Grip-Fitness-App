@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { supabase } from '../../utils/supabaseClient';
+import Logo from '../Logo';
 
 const ProfileEdit = ({ user, onBack, onProfileUpdate, showToast }) => {
   const [firstName, setFirstName] = useState(user?.user_metadata?.first_name || '');
