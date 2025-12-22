@@ -141,7 +141,7 @@ const Dashboard = ({ user, events, registrations, attendance, onSignOut, onViewC
       <div className="bg-gym-secondary shadow-lg border-b border-gym-secondary">
         <div className="max-w-7xl mx-auto px-4 py-4 h-18 flex items-center">
           <div className="flex justify-between items-center w-full">
-            <Logo size="medium" />
+            <Logo size="medium" variant="dark" />
             <div className="flex items-center gap-2">
               {userRole === 'coach' && (
                 <button
