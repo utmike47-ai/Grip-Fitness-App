@@ -318,13 +318,13 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
   // Redirect if not authorized
   if (!isAuthorized) {
     return (
-      <div className="min-h-screen bg-grip-light pb-20 flex items-center justify-center">
-        <div className="bg-white rounded-grip shadow-grip border border-gray-300 p-4 text-center max-w-md mx-4">
-          <p className="text-xl font-semibold text-grip-dark mb-2">Access Denied</p>
+      <div className="min-h-screen pb-20 pb-20 flex items-center justify-center">
+        <div className="bg-white rounded-[12px] shadow-gym-300 p-4 text-center max-w-md mx-4">
+          <p className="text-xl font-semibold text-gym-text-dark mb-2">Access Denied</p>
           <p className="text-gray-600 mb-4">You don't have permission to access this page.</p>
           <button
             onClick={onBack}
-              className="bg-grip-primary text-white px-4 py-3 rounded-grip font-medium hover:opacity-90 transition-all min-h-[48px]"
+              className="bg-gym-primary text-white px-4 py-3 rounded-grip font-medium hover:opacity-90 transition-all min-h-[48px]"
           >
             Go Back
           </button>
@@ -334,21 +334,21 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
   }
 
   return (
-    <div className="min-h-screen bg-grip-light pb-20">
+    <div className="min-h-screen pb-20 pb-20">
       {/* Header */}
-      <div className="bg-grip-secondary shadow-grip border-b border-gray-300">
+      <div className="bg-gym-secondary shadow-grip border-b border-gray-300">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <button
                 onClick={onBack}
-                className="mr-4 text-grip-primary hover:text-grip-primary transition-colors"
+                className="mr-4 text-gym-accent hover:text-gym-accent transition-colors"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
-              <h1 className="text-2xl font-montserrat font-semibold text-grip-primary">
+              <h1 className="text-2xl font-poppins font-bold text-gym-accent">
                 Manage Members
               </h1>
             </div>
@@ -364,7 +364,7 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
                 setAddFormErrors({});
                 setAddModalOpen(true);
               }}
-              className="bg-grip-primary text-white px-4 py-3 rounded-grip font-medium hover:opacity-90 transition-all min-h-[48px]"
+              className="bg-gym-primary text-white px-4 py-3 rounded-grip font-medium hover:opacity-90 transition-all min-h-[48px]"
             >
               Add Member
             </button>
@@ -391,9 +391,9 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
             <p className="mt-4 text-gray-600">Loading members...</p>
           </div>
         ) : filteredMembers.length === 0 ? (
-          <div className="bg-white rounded-grip shadow-grip border border-gray-300 p-12 text-center">
+          <div className="bg-white rounded-[12px] shadow-gym-300 p-12 text-center">
             <div className="text-6xl mb-4">👥</div>
-                <p className="text-xl font-semibold text-grip-dark mb-2">
+                <p className="text-xl font-semibold text-gym-text-dark mb-2">
               {searchQuery.trim() 
                 ? `No members found matching '${searchQuery}'` 
                 : 'No members yet'}
@@ -410,26 +410,26 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
         ) : (
           <>
             {/* Desktop Table View */}
-            <div className="hidden md:block bg-white rounded-grip shadow-grip border border-gray-300 overflow-hidden">
+            <div className="hidden md:block bg-white rounded-[12px] shadow-gym-300 overflow-hidden">
               <table className="w-full">
-                <thead className="bg-grip-secondary">
+                <thead className="bg-gym-secondary">
                   <tr>
-                    <th className="px-4 py-4 text-left text-sm font-semibold text-grip-primary">First Name</th>
-                    <th className="px-4 py-4 text-left text-sm font-semibold text-grip-primary">Last Name</th>
-                    <th className="px-4 py-4 text-left text-sm font-semibold text-grip-primary">Role</th>
-                    <th className="px-4 py-4 text-right text-sm font-semibold text-grip-primary">Actions</th>
+                    <th className="px-4 py-4 text-left text-sm font-semibold text-gym-accent">First Name</th>
+                    <th className="px-4 py-4 text-left text-sm font-semibold text-gym-accent">Last Name</th>
+                    <th className="px-4 py-4 text-left text-sm font-semibold text-gym-accent">Role</th>
+                    <th className="px-4 py-4 text-right text-sm font-semibold text-gym-accent">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {filteredMembers.map((member) => (
                     <tr key={member.id} className="hover:bg-gray-50">
-                      <td className="px-4 py-4 text-sm text-grip-primary">{member.first_name}</td>
-                      <td className="px-4 py-4 text-sm text-grip-primary">{member.last_name}</td>
+                      <td className="px-4 py-4 text-sm text-gym-accent">{member.first_name}</td>
+                      <td className="px-4 py-4 text-sm text-gym-accent">{member.last_name}</td>
                       <td className="px-4 py-4">
                         <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
                           member.role === 'coach' || member.role === 'admin'
-                            ? 'bg-grip-primary text-white'
-                            : 'bg-grip-secondary text-gray-600'
+                            ? 'bg-gym-primary text-white'
+                            : 'bg-gym-secondary text-gray-600'
                         }`}>
                           {member.role === 'coach' || member.role === 'admin' ? 'Coach' : 'Student'}
                         </span>
@@ -438,7 +438,7 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
                         <div className="flex justify-end gap-2">
                           <button
                             onClick={() => openEditModal(member)}
-                            className="px-4 py-2 text-sm bg-grip-secondary text-grip-primary rounded-grip hover:bg-grip-secondary/70 transition-all min-h-[48px]"
+                            className="px-4 py-2 text-sm bg-gym-secondary text-gym-accent rounded-grip hover:bg-gym-secondary/70 transition-all min-h-[48px]"
                           >
                             Edit
                           </button>
@@ -462,13 +462,13 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
                 <div key={member.id} className="bg-white rounded-grip shadow-grip p-4">
                   <div className="flex justify-between items-start mb-3">
                     <div>
-                      <h3 className="font-semibold text-lg text-grip-primary">
+                      <h3 className="font-semibold text-lg text-gym-accent">
                         {member.first_name} {member.last_name}
                       </h3>
                       <span className={`inline-block mt-1 px-3 py-1 rounded-full text-xs font-semibold ${
                         member.role === 'coach' || member.role === 'admin'
-                          ? 'bg-grip-primary text-white'
-                          : 'bg-grip-secondary text-grip-primary'
+                          ? 'bg-gym-primary text-white'
+                          : 'bg-gym-secondary text-gym-accent'
                       }`}>
                         {member.role === 'coach' || member.role === 'admin' ? 'Coach' : 'Student'}
                       </span>
@@ -477,7 +477,7 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
                   <div className="flex gap-2 mt-4">
                     <button
                       onClick={() => openEditModal(member)}
-                      className="flex-1 px-4 py-3 text-sm bg-grip-secondary text-grip-primary rounded-grip hover:bg-grip-secondary/70 transition-all font-medium min-h-[48px]"
+                      className="flex-1 px-4 py-3 text-sm bg-gym-secondary text-gym-accent rounded-grip hover:bg-gym-secondary/70 transition-all font-medium min-h-[48px]"
                     >
                       Edit
                     </button>
@@ -498,15 +498,15 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
       {/* Add Member Modal */}
       {addModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-grip shadow-grip border border-gray-300 p-4 max-w-md w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-[12px] shadow-gym-300 p-4 max-w-md w-full max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-8">
-              <h2 className="text-2xl font-montserrat font-semibold text-grip-dark">Add Member</h2>
+              <h2 className="text-2xl font-poppins font-bold text-gym-text-dark">Add Member</h2>
               <button
                 onClick={() => {
                   setAddModalOpen(false);
                   setAddFormErrors({});
                 }}
-                className="text-gray-600 hover:text-grip-primary"
+                className="text-gray-600 hover:text-gym-accent"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -517,7 +517,7 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
             <form onSubmit={handleAddMember}>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-semibold text-grip-dark mb-2">
+                  <label className="block text-sm font-semibold text-gym-text-dark mb-2">
                     First Name *
                   </label>
                   <input
@@ -538,7 +538,7 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-grip-dark mb-2">
+                  <label className="block text-sm font-semibold text-gym-text-dark mb-2">
                     Last Name *
                   </label>
                   <input
@@ -559,7 +559,7 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-grip-dark mb-2">
+                  <label className="block text-sm font-semibold text-gym-text-dark mb-2">
                     Email *
                   </label>
                   <input
@@ -580,7 +580,7 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-grip-dark mb-2">
+                  <label className="block text-sm font-semibold text-gym-text-dark mb-2">
                     Password * (min 6 characters)
                   </label>
                   <input
@@ -602,7 +602,7 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-grip-dark mb-2">
+                  <label className="block text-sm font-semibold text-gym-text-dark mb-2">
                     Role *
                   </label>
                   <select
@@ -623,14 +623,14 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
                     setAddModalOpen(false);
                     setAddFormErrors({});
                   }}
-                  className="flex-1 bg-grip-secondary text-grip-primary py-3 rounded-grip font-medium hover:bg-grip-secondary/80 transition-all min-h-[48px]"
+                  className="flex-1 bg-gym-secondary text-gym-accent py-3 rounded-grip font-medium hover:bg-gym-secondary/80 transition-all min-h-[48px]"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={addFormLoading}
-                  className="flex-1 bg-grip-primary text-white py-3 rounded-grip font-medium hover:opacity-90 transition-all disabled:bg-grip-secondary disabled:cursor-not-allowed min-h-[48px]"
+                  className="flex-1 bg-gym-primary text-white py-3 rounded-grip font-medium hover:opacity-90 transition-all disabled:bg-gym-secondary disabled:cursor-not-allowed min-h-[48px]"
                 >
                   {addFormLoading ? 'Adding...' : 'Add Member'}
                 </button>
@@ -643,15 +643,15 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
       {/* Edit Member Modal */}
       {editModalOpen && selectedMember && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl p-4 max-w-md w-full">
+          <div className="bg-white rounded-[12px] p-4 max-w-md w-full">
             <div className="flex justify-between items-center mb-8">
-              <h2 className="text-2xl font-montserrat font-semibold text-grip-dark">Edit Member</h2>
+              <h2 className="text-2xl font-poppins font-bold text-gym-text-dark">Edit Member</h2>
               <button
                 onClick={() => {
                   setEditModalOpen(false);
                   setSelectedMember(null);
                 }}
-                className="text-gray-600 hover:text-grip-primary"
+                className="text-gray-600 hover:text-gym-accent"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -662,20 +662,20 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
             <form onSubmit={handleEditMember}>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-semibold text-grip-dark mb-2">
+                  <label className="block text-sm font-semibold text-gym-text-dark mb-2">
                     Email
                   </label>
                   <input
                     type="email"
                     value={selectedMember.email || 'N/A'}
                     disabled
-                    className="w-full px-4 py-3 border border-gray-300 rounded-grip bg-grip-secondary text-gray-600 cursor-not-allowed"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-grip bg-gym-secondary text-gray-600 cursor-not-allowed"
                   />
                   <p className="text-xs text-gray-600 mt-1">Email cannot be changed</p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-grip-dark mb-2">
+                  <label className="block text-sm font-semibold text-gym-text-dark mb-2">
                     First Name *
                   </label>
                   <input
@@ -688,7 +688,7 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-grip-dark mb-2">
+                  <label className="block text-sm font-semibold text-gym-text-dark mb-2">
                     Last Name *
                   </label>
                   <input
@@ -701,7 +701,7 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-grip-dark mb-2">
+                  <label className="block text-sm font-semibold text-gym-text-dark mb-2">
                     Role *
                   </label>
                   <select
@@ -722,14 +722,14 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
                     setEditModalOpen(false);
                     setSelectedMember(null);
                   }}
-                  className="flex-1 bg-grip-secondary text-grip-primary py-3 rounded-grip font-medium hover:bg-grip-secondary/80 transition-all min-h-[48px]"
+                  className="flex-1 bg-gym-secondary text-gym-accent py-3 rounded-grip font-medium hover:bg-gym-secondary/80 transition-all min-h-[48px]"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={editFormLoading}
-                  className="flex-1 bg-grip-primary text-white py-3 rounded-grip font-medium hover:opacity-90 transition-all disabled:bg-grip-secondary disabled:cursor-not-allowed min-h-[48px]"
+                  className="flex-1 bg-gym-primary text-white py-3 rounded-grip font-medium hover:opacity-90 transition-all disabled:bg-gym-secondary disabled:cursor-not-allowed min-h-[48px]"
                 >
                   {editFormLoading ? 'Updating...' : 'Update Member'}
                 </button>
@@ -742,15 +742,15 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
       {/* Delete Confirmation Modal */}
       {deleteModalOpen && selectedMember && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl p-4 max-w-md w-full">
+          <div className="bg-white rounded-[12px] p-4 max-w-md w-full">
             <div className="flex justify-between items-center mb-8">
-              <h2 className="text-2xl font-montserrat font-semibold text-grip-dark">Delete Member</h2>
+              <h2 className="text-2xl font-poppins font-bold text-gym-text-dark">Delete Member</h2>
               <button
                 onClick={() => {
                   setDeleteModalOpen(false);
                   setSelectedMember(null);
                 }}
-                className="text-gray-600 hover:text-grip-primary"
+                className="text-gray-600 hover:text-gym-accent"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -759,8 +759,8 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
             </div>
 
             <div className="mb-8">
-              <p className="text-grip-dark mb-4">
-                Delete <span className="font-semibold text-grip-dark">
+              <p className="text-gym-text-dark mb-4">
+                Delete <span className="font-semibold text-gym-text-dark">
                   {selectedMember.first_name} {selectedMember.last_name}
                 </span>?
               </p>
@@ -776,7 +776,7 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
                   setDeleteModalOpen(false);
                   setSelectedMember(null);
                 }}
-                className="flex-1 bg-grip-secondary text-grip-primary py-3 rounded-grip font-semibold hover:bg-grip-secondary transition-all"
+                className="flex-1 bg-gym-secondary text-gym-accent py-3 rounded-grip font-semibold hover:bg-gym-secondary transition-all"
               >
                 Cancel
               </button>
