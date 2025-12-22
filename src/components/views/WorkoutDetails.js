@@ -79,6 +79,7 @@ const WorkoutDetails = ({
       const match = TIME_SLOTS.find(slot => slot.value === timeWithoutSeconds);
       return match ? match.display : timeWithoutSeconds;
     } catch (error) {
+      console.error('Error formatting time:', error);
       return time24 || 'Time TBD';
     }
   }, []);

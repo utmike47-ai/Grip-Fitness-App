@@ -67,10 +67,16 @@ const DayView = ({
   const isCoach = user?.user_metadata?.role === 'coach';
 
   const formatTimeDisplay = (time24) => {
-    // Remove seconds if present (e.g., "16:30:00" becomes "16:30")
-    const timeWithoutSeconds = time24.split(':').slice(0, 2).join(':');
-    const timeSlot = TIME_SLOTS.find(slot => slot.value === timeWithoutSeconds);
-    return timeSlot ? timeSlot.display : time24;
+    if (!time24) return 'Time TBD';
+    try {
+      // Remove seconds if present (e.g., "16:30:00" becomes "16:30")
+      const timeWithoutSeconds = time24.split(':').slice(0, 2).join(':');
+      const timeSlot = TIME_SLOTS.find(slot => slot.value === timeWithoutSeconds);
+      return timeSlot ? timeSlot.display : timeWithoutSeconds;
+    } catch (error) {
+      console.error('Error formatting time:', error);
+      return time24 || 'Time TBD';
+    }
   };
 
   // Group events by title
@@ -557,13 +563,13 @@ const DayView = ({
                       return (
                         <div key={timeSlot.id} className="border border-gray-300 rounded-grip p-4">
                           <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                              <span className="text-xl font-bold text-grip-primary">
+                            <div className="flex-1">
+                              <p className="text-4xl font-extrabold text-grip-primary mb-1">
                                 {formatTimeDisplay(timeSlot.time)}
-                              </span>
-                              <span className="text-sm text-gray-600">
+                              </p>
+                              <p className="text-sm text-gray-600">
                                 {timeSlot.registrationCount}/15 registered
-                              </span>
+                              </p>
                             </div>
                             
                             <div className="flex flex-col gap-2">

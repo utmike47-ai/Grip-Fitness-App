@@ -140,7 +140,7 @@ const LoginScreen = ({ onLogin, loading }) => {
             <>
               <div className="flex gap-2">
                 <div className="flex-1">
-                  <label className="block text-sm font-medium text-white mb-2">
+                  <label className="block text-sm font-semibold text-grip-dark mb-2">
                     First Name
                   </label>
                   <input
@@ -152,7 +152,7 @@ const LoginScreen = ({ onLogin, loading }) => {
                   />
                 </div>
                 <div className="flex-1">
-                  <label className="block text-sm font-medium text-white mb-2">
+                  <label className="block text-sm font-semibold text-grip-dark mb-2">
                     Last Name
                   </label>
                   <input
@@ -166,7 +166,7 @@ const LoginScreen = ({ onLogin, loading }) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-white mb-2">
+                <label className="block text-sm font-semibold text-grip-dark mb-2">
                   I am a...
                 </label>
                 <div className="flex gap-2">
@@ -195,7 +195,7 @@ const LoginScreen = ({ onLogin, loading }) => {
 
           {isSignUp && (
             <div>
-              <label className="block text-sm font-semibold text-white mb-2">
+              <label className="block text-sm font-semibold text-grip-dark mb-2">
                 Access Code *
               </label>
               <input
@@ -227,7 +227,7 @@ const LoginScreen = ({ onLogin, loading }) => {
           </div>
           
           <div className="mb-4">
-            <label className="block text-sm font-semibold text-white mb-2">
+            <label className="block text-sm font-semibold text-grip-dark mb-2">
               Password {isSignUp && '*'}
             </label>
             <input
@@ -255,7 +255,7 @@ const LoginScreen = ({ onLogin, loading }) => {
             {/* Password Requirements Checklist */}
             {isSignUp && showRequirements && (
               <div className="mt-2 p-3 bg-gray-50 rounded-grip text-sm">
-                <p className="font-semibold text-white mb-2">Password must have:</p>
+                <p className="font-semibold text-grip-dark mb-2">Password must have:</p>
                 <ul className="space-y-1">
                   <li className={`flex items-center ${validatePassword(password).requirements.minLength ? 'text-green-600' : 'text-gray-600'}`}>
                     <span className="mr-2">{validatePassword(password).requirements.minLength ? '✓' : '○'}</span>
