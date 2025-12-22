@@ -263,7 +263,7 @@ const AdminDashboard = ({ user, events, registrations, profiles = [], attendance
   if (!isAuthorized) {
     return (
       <div className="min-h-screen pb-20 pb-20 flex items-center justify-center px-4">
-        <div className="bg-white rounded-grip shadow-lg border border-gray-300 p-4 text-center max-w-md w-full">
+        <div className="bg-white rounded-[12px] shadow-gym p-4 text-center max-w-md w-full">
           <div className="text-6xl mb-4">🔒</div>
           <h2 className="text-2xl font-semibold text-white mb-2">Access Denied</h2>
           <p className="text-gray-600 mb-8">You don't have permission to access the admin dashboard.</p>
@@ -296,25 +296,25 @@ const AdminDashboard = ({ user, events, registrations, profiles = [], attendance
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {/* Total Members */}
-            <div className="bg-white rounded-grip shadow-lg p-4 border border-gray-300">
+            <div className="bg-white rounded-[12px] shadow-gym p-4">
               <div className="text-sm text-gray-600 mb-2">Total Members</div>
               <div className="text-3xl font-bold text-gym-text-dark">{stats.totalMembers}</div>
             </div>
 
             {/* Active This Week */}
-            <div className="bg-white rounded-grip shadow-lg p-4 border border-gray-300">
+            <div className="bg-white rounded-[12px] shadow-gym p-4">
               <div className="text-sm text-gray-600 mb-2">Active This Week</div>
               <div className="text-3xl font-bold text-gym-text-dark">{stats.activeThisWeek}</div>
             </div>
 
             {/* Total Classes This Week */}
-            <div className="bg-white rounded-grip shadow-lg p-4 border border-gray-300">
+            <div className="bg-white rounded-[12px] shadow-gym p-4">
               <div className="text-sm text-gray-600 mb-2">Classes This Week</div>
               <div className="text-3xl font-bold text-gym-text-dark">{stats.classesThisWeek}</div>
             </div>
 
             {/* Today's Classes */}
-            <div className="bg-white rounded-grip shadow-lg p-4 border border-gray-300">
+            <div className="bg-white rounded-[12px] shadow-gym p-4">
               <div className="text-sm text-gray-600 mb-2">Today's Classes</div>
               <div className="text-3xl font-bold text-gym-text-dark">{stats.todaysClasses}</div>
             </div>
@@ -327,7 +327,7 @@ const AdminDashboard = ({ user, events, registrations, profiles = [], attendance
             Today's Classes
           </h2>
           {todaysClassesWithCounts.length === 0 ? (
-            <div className="bg-white rounded-grip shadow-lg p-4 border border-gray-300 text-center">
+            <div className="bg-white rounded-[12px] shadow-gym p-4 text-center">
               <span className="text-4xl block mb-2">📅</span>
               <p className="text-gym-text-dark text-lg font-medium">No classes scheduled for today</p>
               <p className="text-gray-600 text-sm mt-2">Click "Create Workout" to schedule one</p>
@@ -379,7 +379,7 @@ const AdminDashboard = ({ user, events, registrations, profiles = [], attendance
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Most Active This Month */}
-            <div className="bg-white rounded-grip shadow-lg p-4 border border-gray-300">
+            <div className="bg-white rounded-[12px] shadow-gym p-4">
               <h3 className="text-lg font-semibold text-gym-text-dark mb-4">
                 🏆 Most Active This Month
               </h3>
@@ -408,7 +408,7 @@ const AdminDashboard = ({ user, events, registrations, profiles = [], attendance
             </div>
 
             {/* Need Attention */}
-            <div className="bg-white rounded-grip shadow-lg p-4 border border-gray-300">
+            <div className="bg-white rounded-[12px] shadow-gym p-4">
               <h3 className="text-lg font-semibold text-gym-text-dark mb-4">
                 ⚠️ Need Attention
               </h3>
@@ -436,7 +436,7 @@ const AdminDashboard = ({ user, events, registrations, profiles = [], attendance
             </div>
 
             {/* Current Streaks */}
-            <div className="bg-white rounded-grip shadow-lg p-4 border border-gray-300">
+            <div className="bg-white rounded-[12px] shadow-gym p-4">
               <h3 className="text-lg font-semibold text-gym-text-dark mb-4">
                 🔥 Current Streaks
               </h3>
