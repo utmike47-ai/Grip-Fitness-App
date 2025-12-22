@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { fetchNoteForEvent, saveNote, deleteNote } from '../../utils/notesService';
 import { TIME_SLOTS } from '../../utils/constants';
+import Logo from '../Logo';
 
 const NOTE_MAX_LENGTH = 500;
 const MODAL_CLOSE_DELAY = 1200;
@@ -230,6 +231,7 @@ const WorkoutDetails = ({
       {/* Header */}
       <div className="bg-gym-secondary shadow-lg border-b border-gym-secondary">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+          <Logo size="medium" variant="dark" />
           <button
             type="button"
             onClick={onBack}
@@ -238,10 +240,6 @@ const WorkoutDetails = ({
           >
             ← Back
           </button>
-          <h1 className="text-2xl font-poppins font-bold text-white">
-            {event.title}
-          </h1>
-          <span className="w-16" />
         </div>
       </div>
 

@@ -47,10 +47,12 @@ const CreateEvent = ({ user, onBack, onCreateEvent, editMode = false, existingEv
     <div className="min-h-screen pb-20">
       {/* Header */}
       <div className="bg-gym-secondary shadow-lg border-b border-gym-secondary">
-        <div className="max-w-7xl mx-auto px-4 py-4">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+          <Logo size="medium" variant="dark" />
           <h1 className="text-2xl font-poppins font-bold text-white">
             {editMode ? 'Edit Event' : 'Create Event'}
           </h1>
+          <span className="w-16" />
         </div>
       </div>
 

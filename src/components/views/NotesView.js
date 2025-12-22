@@ -44,11 +44,16 @@ const NotesView = ({ selectedEvent, userNotes, user, onBack, onSaveNote }) => {
   return (
     <div className="min-h-screen pb-20 pb-20">
       {/* Header */}
-      <div className="bg-gym-secondary shadow-lg border-b border-gray-300">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <h1 className="text-2xl font-poppins font-bold text-gym-accent">
-            Workout Notes
-          </h1>
+      <div className="bg-gym-secondary shadow-lg border-b border-gym-secondary">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+          <Logo size="medium" variant="dark" />
+          <button
+            onClick={onBack}
+            className="text-white hover:text-gym-accent transition-colors"
+            style={{ minWidth: 44, minHeight: 44 }}
+          >
+            ← Back
+          </button>
         </div>
       </div>
 

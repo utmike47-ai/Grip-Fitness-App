@@ -336,22 +336,23 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
   return (
     <div className="min-h-screen pb-20 pb-20">
       {/* Header */}
-      <div className="bg-gym-secondary shadow-grip border-b border-gray-300">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <button
-                onClick={onBack}
-                className="mr-4 text-gym-accent hover:text-gym-accent transition-colors"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-              <h1 className="text-2xl font-poppins font-bold text-gym-accent">
-                Manage Members
-              </h1>
-            </div>
+      <div className="bg-gym-secondary shadow-lg border-b border-gym-secondary">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+          <Logo size="medium" variant="dark" />
+          <div className="flex items-center gap-4">
+            <button
+              onClick={onBack}
+              className="text-white hover:text-gym-accent transition-colors"
+              style={{ minWidth: 44, minHeight: 44 }}
+            >
+              ← Back
+            </button>
+          </div>
+        </div>
+        <div className="max-w-7xl mx-auto px-4 pb-4 flex items-center justify-between">
+          <h1 className="text-2xl font-poppins font-bold text-white">
+            Manage Members
+          </h1>
             <button
               onClick={() => {
                 setAddFormData({

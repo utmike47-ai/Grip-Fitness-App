@@ -3,6 +3,7 @@ import { TIME_SLOTS } from '../../utils/constants';
 import { useSwipeable } from 'react-swipeable';
 import { fetchNoteForEvent, saveNote, deleteNote } from '../../utils/notesService';
 import { supabase } from '../../utils/supabaseClient';
+import Logo from '../Logo';
 
 const DayView = ({ 
   selectedDate, 
@@ -441,7 +442,8 @@ const DayView = ({
     <div {...handlers} className="min-h-screen pb-20">
       {/* Header */}
       <div className="bg-gym-secondary shadow-lg border-b border-gym-secondary">
-        <div className="max-w-7xl mx-auto px-4 py-4">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+          <Logo size="medium" variant="dark" />
           <div className="flex items-center justify-center gap-2">
             <span className="text-gray-400 text-sm">←</span>
             <h1 className="text-2xl font-poppins font-bold text-white">
@@ -454,6 +456,7 @@ const DayView = ({
             </h1>
             <span className="text-gray-400 text-sm">→</span>
           </div>
+          <span className="w-16" />
         </div>
       </div>
 

@@ -111,7 +111,7 @@ const LoginScreen = ({ onLogin, loading }) => {
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="bg-white rounded-[12px] shadow-gym p-4 w-full max-w-md">
         <div className="text-center mb-8">
-          <Logo size="large" />
+          <Logo size="large" variant="light" />
         </div>
         
         <div className="flex gap-2 mb-4">

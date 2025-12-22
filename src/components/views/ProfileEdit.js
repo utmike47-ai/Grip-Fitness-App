@@ -111,19 +111,16 @@ const ProfileEdit = ({ user, onBack, onProfileUpdate, showToast }) => {
   return (
     <div className="min-h-screen pb-20">
       <div className="bg-gym-secondary shadow-lg border-b border-gym-secondary">
-        <div className="max-w-7xl mx-auto px-4 py-4">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+          <Logo size="medium" variant="dark" />
           <div className="flex items-center">
             <button
               onClick={onBack}
-              className="mr-4 text-white hover:text-gym-accent transition-colors"
+              className="text-white hover:text-gym-accent transition-colors"
+              style={{ minWidth: 44, minHeight: 44 }}
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
+              ← Back
             </button>
-            <h1 className="text-2xl font-poppins font-bold text-white">
-              Edit Profile
-            </h1>
           </div>
         </div>
       </div>
