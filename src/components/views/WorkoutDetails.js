@@ -244,7 +244,7 @@ const WorkoutDetails = ({
         <div className="bg-mjg-card rounded-mjg shadow-mjg border border-mjg-border p-4 mb-8">
           <div className="flex justify-between items-start mb-4">
             <div className="flex-1 pr-6">
-              <h2 className="text-xl font-bold text-white mb-2">
+              <h2 className="text-xl font-bold text-mjg-text-card mb-2">
                 {new Date(event.date + 'T12:00:00').toLocaleDateString('en-US', { 
                   weekday: 'long', 
                   month: 'long', 
@@ -252,7 +252,7 @@ const WorkoutDetails = ({
                 })}
               </h2>
               {event.details && (
-                <div className="text-mjg-text-primary leading-relaxed">
+                <div className="text-mjg-text-card leading-relaxed">
                   {event.details
                     .split('\n')
                     .filter(line => line.trim())
@@ -316,7 +316,7 @@ const WorkoutDetails = ({
               <div className="flex items-start justify-between mb-4">
                 <div>
                   <p className="text-xs uppercase tracking-wide text-mjg-text-secondary font-semibold">Workout</p>
-                  <h2 id={modalTitleId} className="text-2xl font-poppins font-semibold text-mjg-text-primary">
+                  <h2 id={modalTitleId} className="text-2xl font-poppins font-semibold text-mjg-text-card">
                     {event.title}
                   </h2>
                   {activeEvent && (
@@ -354,7 +354,7 @@ const WorkoutDetails = ({
                 </div>
               )}
 
-              <label className="block text-sm font-semibold text-white mb-2" htmlFor="workout-note">
+              <label className="block text-sm font-semibold text-mjg-text-card mb-2" htmlFor="workout-note">
                 Your Notes
               </label>
 
@@ -413,7 +413,7 @@ const WorkoutDetails = ({
 
         {/* Time Slots */}
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-mjg-text-primary">Available Times</h3>
+          <h3 className="text-lg font-semibold text-mjg-text-card">Available Times</h3>
           {relatedEvents.map((slot) => {
             const regs = getRegistrationsForEvent(slot.id);
             const userRegistered = isUserRegistered(slot.id);
@@ -425,7 +425,7 @@ const WorkoutDetails = ({
               <div key={slot.id} className="bg-mjg-card rounded-mjg shadow-mjg border border-mjg-border p-4">
                 <div className="flex justify-between items-center mb-4">
                   <div>
-                    <p className="text-xl font-bold text-mjg-text-primary">
+                    <p className="text-xl font-bold text-mjg-text-card">
                       {formatTime(slot.time)}
                     </p>
                     <p className="text-sm text-mjg-text-secondary">
@@ -464,12 +464,12 @@ const WorkoutDetails = ({
                 {/* Registered Users List */}
                 {regs.length > 0 && (
                   <div className="pt-4 border-t border-mjg-border">
-                    <p className="font-semibold text-white mb-2">
+                    <p className="font-semibold text-mjg-text-card mb-2">
                       Registered Participants ({regs.length}):
                     </p>
                     <div className="space-y-2">
                       {regs.map(reg => (
-                        <div key={reg.id} className="text-sm text-mjg-text-primary">
+                        <div key={reg.id} className="text-sm text-mjg-text-card">
                           • {reg.user_name}
                         </div>
                       ))}

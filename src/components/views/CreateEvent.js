@@ -59,7 +59,7 @@ const CreateEvent = ({ user, onBack, onCreateEvent, editMode = false, existingEv
         <form onSubmit={handleSubmit} className="bg-mjg-card rounded-mjg shadow-mjg border border-mjg-border p-4">
           {/* Event Type */}
           <div className="mb-8">
-            <label className="block text-sm font-semibold text-mjg-text-primary mb-3">
+            <label className="block text-sm font-semibold text-mjg-text-card mb-3">
               Event Type
             </label>
             <div className="flex gap-4">
@@ -69,7 +69,7 @@ const CreateEvent = ({ user, onBack, onCreateEvent, editMode = false, existingEv
                 className={`flex-1 py-3 px-4 rounded-mjg font-semibold transition-all
                   ${eventData.type === 'workout'
                     ? 'bg-mjg-accent text-white'
-                    : 'bg-mjg-bg-secondary text-mjg-text-primary hover:bg-mjg-bg-secondary/70'}`}
+                      : 'bg-mjg-bg-secondary text-mjg-text-card hover:bg-mjg-bg-secondary/70'}`}
               >
                 💪 Workout
               </button>
@@ -88,7 +88,7 @@ const CreateEvent = ({ user, onBack, onCreateEvent, editMode = false, existingEv
 
           {/* Title */}
           <div className="mb-8">
-            <label className="block text-sm font-semibold text-white mb-2">
+            <label className="block text-sm font-semibold text-mjg-text-card mb-2">
               Event Title *
             </label>
             <input
@@ -103,7 +103,7 @@ const CreateEvent = ({ user, onBack, onCreateEvent, editMode = false, existingEv
 
           {/* Date */}
           <div className="mb-8">
-            <label className="block text-sm font-semibold text-white mb-2">
+            <label className="block text-sm font-semibold text-mjg-text-card mb-2">
               Date *
             </label>
             <input
@@ -117,7 +117,7 @@ const CreateEvent = ({ user, onBack, onCreateEvent, editMode = false, existingEv
 
           {/* Time Slots */}
           <div className="mb-8">
-            <label className="block text-sm font-semibold text-mjg-text-primary mb-3">
+            <label className="block text-sm font-semibold text-mjg-text-card mb-3">
               Class Times * (Select one or more)
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -129,7 +129,7 @@ const CreateEvent = ({ user, onBack, onCreateEvent, editMode = false, existingEv
                   className={`py-3 px-4 rounded-mjg font-semibold transition-all
                     ${eventData.times.includes(slot.value)
                       ? 'bg-mjg-accent text-white'
-                      : 'bg-mjg-bg-secondary text-mjg-text-primary hover:bg-mjg-bg-secondary'}`}
+                      : 'bg-mjg-bg-secondary text-mjg-text-card hover:bg-mjg-bg-secondary'}`}
                 >
                   {slot.display}
                 </button>
@@ -139,7 +139,7 @@ const CreateEvent = ({ user, onBack, onCreateEvent, editMode = false, existingEv
 
           {/* Details */}
           <div className="mb-8">
-            <label className="block text-sm font-semibold text-white mb-2">
+            <label className="block text-sm font-semibold text-mjg-text-card mb-2">
               Details (Optional)
             </label>
             <textarea
@@ -159,9 +159,9 @@ const CreateEvent = ({ user, onBack, onCreateEvent, editMode = false, existingEv
           {/* Social Event Capacity */}
           {eventData.type === 'social' && (
             <div className="mb-8">
-              <label className="block text-sm font-semibold text-white mb-2">
+            <label className="block text-sm font-semibold text-mjg-text-card mb-2">
                 Maximum Capacity
-              </label>
+            </label>
               <input
                 type="number"
                 value={eventData.maxCapacity}
@@ -181,7 +181,7 @@ const CreateEvent = ({ user, onBack, onCreateEvent, editMode = false, existingEv
             <button
               type="button"
               onClick={onBack}
-              className="flex-1 bg-mjg-bg-secondary text-mjg-text-primary py-3 rounded-mjg font-semibold hover:bg-mjg-bg-secondary transition-all"
+              className="flex-1 bg-mjg-bg-secondary text-mjg-text-card py-3 rounded-mjg font-semibold hover:bg-mjg-bg-secondary transition-all"
             >
               Cancel
             </button>

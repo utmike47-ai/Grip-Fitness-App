@@ -510,7 +510,7 @@ const DayView = ({
   </div>
 </div>
 {eventGroup.details && (
-  <div className="text-mjg-text-primary leading-relaxed">
+  <div className="text-mjg-text-card leading-relaxed">
     {eventGroup.details
       .split('\n')
       .filter(line => line.trim())
@@ -532,7 +532,7 @@ const DayView = ({
                 </div>
 
                 <div className="border-t border-mjg-border pt-4">
-                  <h3 className="font-semibold text-mjg-text-primary mb-4">Available Times:</h3>
+                  <h3 className="font-semibold text-mjg-text-card mb-4">Available Times:</h3>
                   {isCoach && (
                     <button
                       type="button"
@@ -754,7 +754,7 @@ const DayView = ({
             <h2 className="text-xl font-poppins font-semibold text-white mb-2">
               Remove Student
             </h2>
-            <p className="text-mjg-text-primary mb-8">
+            <p className="text-mjg-text-card mb-8">
               Remove {removeModal.studentName} from this class?
             </p>
             <div className="flex flex-col sm:flex-row gap-2">
@@ -786,7 +786,7 @@ const DayView = ({
         >
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-4 sm:p-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-start justify-between mb-4">
-              <h2 className="text-2xl font-poppins font-semibold text-mjg-text-primary">Add Student to Class</h2>
+              <h2 className="text-2xl font-poppins font-semibold text-mjg-text-card">Add Student to Class</h2>
               <button
                 type="button"
                 onClick={closeAddStudentModal}
@@ -824,7 +824,7 @@ const DayView = ({
             </div>
 
             <div className="mb-8">
-              <label className="block text-sm font-semibold text-white mb-2" htmlFor="add-student-search">
+              <label className="block text-sm font-semibold text-mjg-text-card mb-2" htmlFor="add-student-search">
                 Search Student:
               </label>
               <input
@@ -911,12 +911,12 @@ const DayView = ({
           className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6 bg-black/60"
         >
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-4 sm:p-4">
-            <h2 className="text-2xl font-poppins font-semibold text-mjg-text-primary mb-4">
+            <h2 className="text-2xl font-poppins font-semibold text-mjg-text-card mb-4">
               Cancel {formatTimeDisplay(cancelClassModal.timeSlot.time)} Class?
             </h2>
             
             {(!cancelClassModal.timeSlot.registrationCount || cancelClassModal.timeSlot.registrationCount === 0) ? (
-              <p className="text-mjg-text-primary mb-8">
+              <p className="text-mjg-text-card mb-8">
                 This will <strong>permanently delete</strong> this time slot. No students are currently registered.
               </p>
             ) : (

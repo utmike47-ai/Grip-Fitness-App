@@ -320,7 +320,7 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
     return (
       <div className="min-h-screen bg-mjg-bg-primary pb-20 flex items-center justify-center">
         <div className="bg-mjg-card rounded-mjg shadow-mjg border border-mjg-border p-4 text-center max-w-md mx-4">
-          <p className="text-xl font-semibold text-white mb-2">Access Denied</p>
+          <p className="text-xl font-semibold text-mjg-text-card mb-2">Access Denied</p>
           <p className="text-mjg-text-secondary mb-4">You don't have permission to access this page.</p>
           <button
             onClick={onBack}
@@ -500,7 +500,7 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
           <div className="bg-mjg-card rounded-mjg shadow-mjg border border-mjg-border p-4 max-w-md w-full max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-8">
-              <h2 className="text-2xl font-poppins font-semibold text-mjg-text-primary">Add Member</h2>
+              <h2 className="text-2xl font-poppins font-semibold text-mjg-text-card">Add Member</h2>
               <button
                 onClick={() => {
                   setAddModalOpen(false);
@@ -517,7 +517,7 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
             <form onSubmit={handleAddMember}>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-semibold text-white mb-2">
+                  <label className="block text-sm font-semibold text-mjg-text-card mb-2">
                     First Name *
                   </label>
                   <input
@@ -538,7 +538,7 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-white mb-2">
+                  <label className="block text-sm font-semibold text-mjg-text-card mb-2">
                     Last Name *
                   </label>
                   <input
@@ -559,7 +559,7 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-white mb-2">
+                  <label className="block text-sm font-semibold text-mjg-text-card mb-2">
                     Email *
                   </label>
                   <input
@@ -580,7 +580,7 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-white mb-2">
+                  <label className="block text-sm font-semibold text-mjg-text-card mb-2">
                     Password * (min 6 characters)
                   </label>
                   <input
@@ -602,7 +602,7 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-white mb-2">
+                  <label className="block text-sm font-semibold text-mjg-text-card mb-2">
                     Role *
                   </label>
                   <select
@@ -645,7 +645,7 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl p-4 max-w-md w-full">
             <div className="flex justify-between items-center mb-8">
-              <h2 className="text-2xl font-poppins font-semibold text-mjg-text-primary">Edit Member</h2>
+              <h2 className="text-2xl font-poppins font-semibold text-mjg-text-card">Edit Member</h2>
               <button
                 onClick={() => {
                   setEditModalOpen(false);
@@ -662,7 +662,7 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
             <form onSubmit={handleEditMember}>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-semibold text-white mb-2">
+                  <label className="block text-sm font-semibold text-mjg-text-card mb-2">
                     Email
                   </label>
                   <input
@@ -675,7 +675,7 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-white mb-2">
+                  <label className="block text-sm font-semibold text-mjg-text-card mb-2">
                     First Name *
                   </label>
                   <input
@@ -688,7 +688,7 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-white mb-2">
+                  <label className="block text-sm font-semibold text-mjg-text-card mb-2">
                     Last Name *
                   </label>
                   <input
@@ -701,7 +701,7 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-white mb-2">
+                  <label className="block text-sm font-semibold text-mjg-text-card mb-2">
                     Role *
                   </label>
                   <select
@@ -744,7 +744,7 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl p-4 max-w-md w-full">
             <div className="flex justify-between items-center mb-8">
-              <h2 className="text-2xl font-poppins font-semibold text-mjg-text-primary">Delete Member</h2>
+              <h2 className="text-2xl font-poppins font-semibold text-mjg-text-card">Delete Member</h2>
               <button
                 onClick={() => {
                   setDeleteModalOpen(false);
@@ -759,8 +759,8 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
             </div>
 
             <div className="mb-8">
-              <p className="text-mjg-text-primary mb-4">
-                Delete <span className="font-semibold text-mjg-text-primary">
+              <p className="text-mjg-text-card mb-4">
+                Delete <span className="font-semibold text-mjg-text-card">
                   {selectedMember.first_name} {selectedMember.last_name}
                 </span>?
               </p>

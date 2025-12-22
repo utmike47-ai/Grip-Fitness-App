@@ -71,7 +71,7 @@ const NotesView = ({ selectedEvent, userNotes, user, onBack, onSaveNote }) => {
 
         {/* Notes Card */}
         <div className="bg-mjg-card rounded-mjg shadow-mjg border border-mjg-border p-4">
-          <h3 className="text-lg font-semibold text-mjg-text-primary mb-4">
+          <h3 className="text-lg font-semibold text-mjg-text-card mb-4">
             Your Personal Notes
           </h3>
           

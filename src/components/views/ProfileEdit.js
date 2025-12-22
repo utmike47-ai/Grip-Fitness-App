@@ -131,11 +131,11 @@ const ProfileEdit = ({ user, onBack, onProfileUpdate, showToast }) => {
       <div className="max-w-md mx-auto px-4 py-6 space-y-8">
         {/* Edit Profile Form */}
         <form onSubmit={handleSubmit} className="bg-mjg-card rounded-mjg shadow-mjg border border-mjg-border p-4">
-          <h2 className="text-lg font-poppins font-semibold text-mjg-text-primary mb-4">
+          <h2 className="text-lg font-poppins font-semibold text-mjg-text-card mb-4">
             Edit Profile
           </h2>
           <div className="mb-4">
-            <label className="block text-sm font-semibold text-white mb-2">
+            <label className="block text-sm font-semibold text-mjg-text-card mb-2">
               First Name
             </label>
             <input
@@ -149,7 +149,7 @@ const ProfileEdit = ({ user, onBack, onProfileUpdate, showToast }) => {
           </div>
 
           <div className="mb-8">
-            <label className="block text-sm font-semibold text-white mb-2">
+            <label className="block text-sm font-semibold text-mjg-text-card mb-2">
               Last Name
             </label>
             <input
@@ -182,7 +182,7 @@ const ProfileEdit = ({ user, onBack, onProfileUpdate, showToast }) => {
 
         {/* Change Password Form */}
         <form onSubmit={handlePasswordChange} className="bg-mjg-card rounded-mjg shadow-mjg border border-mjg-border p-4">
-          <h2 className="text-lg font-poppins font-semibold text-mjg-text-primary mb-4">
+          <h2 className="text-lg font-poppins font-semibold text-mjg-text-card mb-4">
             Change Password
           </h2>
           
@@ -193,7 +193,7 @@ const ProfileEdit = ({ user, onBack, onProfileUpdate, showToast }) => {
           )}
 
           <div className="mb-4">
-            <label className="block text-sm font-semibold text-white mb-2">
+            <label className="block text-sm font-semibold text-mjg-text-card mb-2">
               New Password
             </label>
             <input
@@ -212,7 +212,7 @@ const ProfileEdit = ({ user, onBack, onProfileUpdate, showToast }) => {
           </div>
 
           <div className="mb-8">
-            <label className="block text-sm font-semibold text-white mb-2">
+            <label className="block text-sm font-semibold text-mjg-text-card mb-2">
               Confirm New Password
             </label>
             <input

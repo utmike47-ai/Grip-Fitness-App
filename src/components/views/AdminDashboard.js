@@ -291,39 +291,39 @@ const AdminDashboard = ({ user, events, registrations, profiles = [], attendance
 
         {/* Quick Stats Section */}
         <div className="mb-8">
-          <h2 className="text-xl font-poppins font-semibold text-mjg-text-primary mb-4">
+          <h2 className="text-xl font-poppins font-semibold text-white mb-4">
             Quick Stats
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {/* Total Members */}
             <div className="bg-mjg-card rounded-mjg shadow-mjg p-4 border border-mjg-border">
               <div className="text-sm text-mjg-text-secondary mb-2">Total Members</div>
-              <div className="text-3xl font-bold text-mjg-text-primary">{stats.totalMembers}</div>
+              <div className="text-3xl font-bold text-mjg-text-card">{stats.totalMembers}</div>
             </div>
 
             {/* Active This Week */}
             <div className="bg-mjg-card rounded-mjg shadow-mjg p-4 border border-mjg-border">
               <div className="text-sm text-mjg-text-secondary mb-2">Active This Week</div>
-              <div className="text-3xl font-bold text-mjg-text-primary">{stats.activeThisWeek}</div>
+              <div className="text-3xl font-bold text-mjg-text-card">{stats.activeThisWeek}</div>
             </div>
 
             {/* Total Classes This Week */}
             <div className="bg-mjg-card rounded-mjg shadow-mjg p-4 border border-mjg-border">
               <div className="text-sm text-mjg-text-secondary mb-2">Classes This Week</div>
-              <div className="text-3xl font-bold text-mjg-text-primary">{stats.classesThisWeek}</div>
+              <div className="text-3xl font-bold text-mjg-text-card">{stats.classesThisWeek}</div>
             </div>
 
             {/* Today's Classes */}
             <div className="bg-mjg-card rounded-mjg shadow-mjg p-4 border border-mjg-border">
               <div className="text-sm text-mjg-text-secondary mb-2">Today's Classes</div>
-              <div className="text-3xl font-bold text-mjg-text-primary">{stats.todaysClasses}</div>
+              <div className="text-3xl font-bold text-mjg-text-card">{stats.todaysClasses}</div>
             </div>
           </div>
         </div>
 
         {/* Today's Classes Section */}
         <div className="mb-8">
-          <h2 className="text-xl font-poppins font-semibold text-mjg-text-primary mb-4">
+          <h2 className="text-xl font-poppins font-semibold text-white mb-4">
             Today's Classes
           </h2>
           {todaysClassesWithCounts.length === 0 ? (
@@ -347,7 +347,7 @@ const AdminDashboard = ({ user, events, registrations, profiles = [], attendance
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <h3 className="font-semibold text-lg text-mjg-text-primary">
+                        <h3 className="font-semibold text-lg text-mjg-text-card">
                           {event.title}
                         </h3>
                         {event.isFull && (
@@ -359,7 +359,7 @@ const AdminDashboard = ({ user, events, registrations, profiles = [], attendance
                       <p className="text-mjg-text-secondary text-sm">{formatTime(event.time)}</p>
                     </div>
                     <div className="text-right">
-                      <div className="text-2xl font-bold text-mjg-text-primary">
+                      <div className="text-2xl font-bold text-mjg-text-card">
                         {event.registrationCount}/{event.maxCapacity}
                       </div>
                       <p className="text-xs text-mjg-text-secondary mt-1">registered</p>
@@ -373,14 +373,14 @@ const AdminDashboard = ({ user, events, registrations, profiles = [], attendance
 
         {/* Member Activity Section */}
         <div className="mb-8">
-          <h2 className="text-xl font-poppins font-semibold text-mjg-text-primary mb-4">
+          <h2 className="text-xl font-poppins font-semibold text-white mb-4">
             Member Activity
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Most Active This Month */}
             <div className="bg-mjg-card rounded-mjg shadow-mjg p-4 border border-mjg-border">
-              <h3 className="text-lg font-semibold text-mjg-text-primary mb-4">
+              <h3 className="text-lg font-semibold text-mjg-text-card mb-4">
                 🏆 Most Active This Month
               </h3>
               {memberActivity.mostActive.length === 0 ? (
@@ -409,7 +409,7 @@ const AdminDashboard = ({ user, events, registrations, profiles = [], attendance
 
             {/* Need Attention */}
             <div className="bg-mjg-card rounded-mjg shadow-mjg p-4 border border-mjg-border">
-              <h3 className="text-lg font-semibold text-mjg-text-primary mb-4">
+              <h3 className="text-lg font-semibold text-mjg-text-card mb-4">
                 ⚠️ Need Attention
               </h3>
               {memberActivity.inactive.length === 0 ? (
@@ -437,7 +437,7 @@ const AdminDashboard = ({ user, events, registrations, profiles = [], attendance
 
             {/* Current Streaks */}
             <div className="bg-mjg-card rounded-mjg shadow-mjg p-4 border border-mjg-border">
-              <h3 className="text-lg font-semibold text-mjg-text-primary mb-4">
+              <h3 className="text-lg font-semibold text-mjg-text-card mb-4">
                 🔥 Current Streaks
               </h3>
               {memberActivity.streaks.length === 0 ? (
@@ -465,7 +465,7 @@ const AdminDashboard = ({ user, events, registrations, profiles = [], attendance
 
         {/* Quick Actions Section */}
         <div>
-          <h2 className="text-xl font-poppins font-semibold text-mjg-text-primary mb-4">
+          <h2 className="text-xl font-poppins font-semibold text-white mb-4">
             Quick Actions
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -475,12 +475,12 @@ const AdminDashboard = ({ user, events, registrations, profiles = [], attendance
             >
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-mjg-bg-secondary rounded-mjg flex items-center justify-center">
-                  <svg className="w-6 h-6 text-mjg-text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-6 h-6 text-mjg-text-card" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-lg text-mjg-text-primary">Manage Members</h3>
+                  <h3 className="font-semibold text-lg text-mjg-text-card">Manage Members</h3>
                   <p className="text-sm text-mjg-text-secondary mt-1">View and manage gym members</p>
                 </div>
               </div>
@@ -492,12 +492,12 @@ const AdminDashboard = ({ user, events, registrations, profiles = [], attendance
             >
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-mjg-bg-secondary rounded-mjg flex items-center justify-center">
-                  <svg className="w-6 h-6 text-mjg-text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-6 h-6 text-mjg-text-card" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-lg text-mjg-text-primary">Create Workout</h3>
+                  <h3 className="font-semibold text-lg text-mjg-text-card">Create Workout</h3>
                   <p className="text-sm text-mjg-text-secondary mt-1">Schedule a new workout class</p>
                 </div>
               </div>

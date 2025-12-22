@@ -41,7 +41,8 @@
   h1, h2, h3, h4, h5, h6 {
     @apply font-poppins font-semibold;
     font-weight: 600;
-    color: #FFFFFF; /* White for headings on dark background */
+    /* Default to white for headings on dark background, but can be overridden in components */
+    color: #FFFFFF;
   }
 }
 
