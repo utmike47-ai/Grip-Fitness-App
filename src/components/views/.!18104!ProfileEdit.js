@@ -39,19 +39,16 @@ const ProfileEdit = ({ user, onBack, onProfileUpdate, showToast }) => {
       });
       
       if (showToast) {
-        showToast('Profile updated! ✓', 'success');
+        showToast('Profile updated successfully!');
       } else {
         alert('Profile updated successfully!');
-      }
-      if (showToast) {
-        showToast('Profile updated! ✓', 'success');
       }
       onBack();
     } catch (error) {
       if (showToast) {
-        showToast('Couldn\'t update profile. Please try again.', 'error');
+        showToast('Error updating profile: ' + error.message, 'error');
       } else {
-        alert('Couldn\'t update profile. Please try again.');
+        alert('Error updating profile: ' + error.message);
       }
     } finally {
       setLoading(false);
@@ -93,12 +90,12 @@ const ProfileEdit = ({ user, onBack, onProfileUpdate, showToast }) => {
       setPasswordError('');
 
       if (showToast) {
-        showToast('Password updated! ✓', 'success');
+        showToast('Password updated successfully!');
       } else {
         alert('Password updated successfully!');
       }
     } catch (error) {
-      const errorMessage = 'Couldn\'t update password. Please try again.';
+      const errorMessage = error.message || 'Failed to update password';
       setPasswordError(errorMessage);
       if (showToast) {
         showToast(errorMessage, 'error');
@@ -110,7 +107,7 @@ const ProfileEdit = ({ user, onBack, onProfileUpdate, showToast }) => {
 
   return (
     <div className="min-h-screen bg-mjg-bg-primary pb-20">
-      <div className="bg-mjg-bg-secondary shadow-mjg border-b border-mjg-border">
+      <div className="bg-mjg-card shadow-mjg border-b border-grip-secondary">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center">
             <button
@@ -128,35 +125,35 @@ const ProfileEdit = ({ user, onBack, onProfileUpdate, showToast }) => {
         </div>
       </div>
 
-      <div className="max-w-md mx-auto px-4 py-6 space-y-8">
+      <div className="max-w-md mx-auto px-4 py-6 space-y-6">
         {/* Edit Profile Form */}
         <form onSubmit={handleSubmit} className="bg-mjg-card rounded-mjg shadow-mjg border border-mjg-border p-4">
           <h2 className="text-lg font-poppins font-semibold text-mjg-text-primary mb-4">
             Edit Profile
           </h2>
           <div className="mb-4">
-            <label className="block text-sm font-semibold text-white mb-2">
+            <label className="block text-sm font-semibold text-mjg-text-primary mb-2">
               First Name
             </label>
             <input
               type="text"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
-              className="w-full px-4 py-3 border border-mjg-border rounded-mjg focus:outline-none focus:ring-2 focus:ring-mjg-accent focus:border-transparent"
+              className="w-full px-4 py-3 border border-grip-secondary rounded-mjg focus:outline-none focus:ring-2 focus:ring-mjg-accent focus:border-transparent"
               placeholder="Enter your first name"
               required
             />
           </div>
 
-          <div className="mb-8">
-            <label className="block text-sm font-semibold text-white mb-2">
+          <div className="mb-6">
+            <label className="block text-sm font-semibold text-mjg-text-primary mb-2">
               Last Name
             </label>
             <input
               type="text"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
-              className="w-full px-4 py-3 border border-mjg-border rounded-mjg focus:outline-none focus:ring-2 focus:ring-mjg-accent focus:border-transparent"
+              className="w-full px-4 py-3 border border-grip-secondary rounded-mjg focus:outline-none focus:ring-2 focus:ring-mjg-accent focus:border-transparent"
               placeholder="Enter your last name"
               required
             />
@@ -193,7 +190,7 @@ const ProfileEdit = ({ user, onBack, onProfileUpdate, showToast }) => {
           )}
 
           <div className="mb-4">
-            <label className="block text-sm font-semibold text-white mb-2">
+            <label className="block text-sm font-semibold text-mjg-text-primary mb-2">
               New Password
             </label>
             <input
@@ -203,7 +200,7 @@ const ProfileEdit = ({ user, onBack, onProfileUpdate, showToast }) => {
                 setNewPassword(e.target.value);
                 setPasswordError('');
               }}
-              className="w-full px-4 py-3 border border-mjg-border rounded-mjg focus:outline-none focus:ring-2 focus:ring-mjg-accent focus:border-transparent"
+              className="w-full px-4 py-3 border border-grip-secondary rounded-mjg focus:outline-none focus:ring-2 focus:ring-mjg-accent focus:border-transparent"
               placeholder="Enter new password (min 8 characters)"
               minLength={8}
               required
@@ -211,8 +208,8 @@ const ProfileEdit = ({ user, onBack, onProfileUpdate, showToast }) => {
             <p className="text-xs text-mjg-text-secondary mt-1">Must be at least 8 characters</p>
           </div>
 
-          <div className="mb-8">
-            <label className="block text-sm font-semibold text-white mb-2">
+          <div className="mb-6">
+            <label className="block text-sm font-semibold text-mjg-text-primary mb-2">
               Confirm New Password
             </label>
             <input
@@ -222,7 +219,7 @@ const ProfileEdit = ({ user, onBack, onProfileUpdate, showToast }) => {
                 setConfirmPassword(e.target.value);
                 setPasswordError('');
               }}
-              className="w-full px-4 py-3 border border-mjg-border rounded-mjg focus:outline-none focus:ring-2 focus:ring-mjg-accent focus:border-transparent"
+              className="w-full px-4 py-3 border border-grip-secondary rounded-mjg focus:outline-none focus:ring-2 focus:ring-mjg-accent focus:border-transparent"
               placeholder="Confirm new password"
               minLength={8}
               required

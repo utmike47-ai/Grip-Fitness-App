@@ -26,6 +26,9 @@ function App() {
   const [attendance, setAttendance] = useState([]);
   const [profiles, setProfiles] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [loadingEvents, setLoadingEvents] = useState(false);
+  const [loadingRegistrations, setLoadingRegistrations] = useState(false);
+  const [loadingError, setLoadingError] = useState(null);
   const [editingEvent, setEditingEvent] = useState(null);
   const [toast, setToast] = useState(null);
   const [bookingModal, setBookingModal] = useState({ isOpen: false, details: null }); 
@@ -221,6 +224,8 @@ function App() {
   // Data fetching functions
   const fetchEvents = useCallback(async () => {
     try {
+      setLoadingEvents(true);
+      setLoadingError(null);
       const { data, error } = await supabase
         .from('events')
         .select('*')
@@ -230,11 +235,15 @@ function App() {
       setEvents(data || []);
     } catch (error) {
       console.error('Error fetching events:', error);
+      setLoadingError('Couldn\'t load classes. Try refreshing the page?');
+    } finally {
+      setLoadingEvents(false);
     }
   }, []);
 
   const fetchRegistrations = useCallback(async () => {
     try {
+      setLoadingRegistrations(true);
       // Fetch registrations first
       const { data: regData, error: regError } = await supabase
         .from('registrations')
@@ -271,6 +280,8 @@ function App() {
     } catch (error) {
       console.error('Unexpected error in fetchRegistrations:', error);
       setRegistrations([]);
+    } finally {
+      setLoadingRegistrations(false);
     }
   }, []);
 
@@ -363,12 +374,12 @@ function App() {
         }
       });
       
-      showToast('Successfully registered!');
+      showToast('Registered successfully! ✓', 'success');
     } catch (error) {
       if (error.code === '23505') {
-        showToast('You are already registered for this event!');
+        showToast('You\'re already registered for this event!', 'error');
       } else {
-        showToast('Registration failed: ' + error.message);
+        showToast('Couldn\'t register. Please try again.', 'error');
       }
     }
   };
@@ -383,9 +394,9 @@ function App() {
       
       if (error) throw error;
       await fetchRegistrations();
-      showToast('Registration cancelled');
+      showToast('Registration cancelled ✓', 'success');
     } catch (error) {
-      showToast('Failed to cancel registration: ' + error.message);
+        showToast('Couldn\'t cancel registration. Please try again.', 'error');
     }
   };
 
@@ -408,10 +419,10 @@ function App() {
       
       await fetchEvents();
       setCurrentView('dashboard');
-      showToast('Event created successfully!');
+      showToast('Class created! ✓', 'success');
     } catch (error) {
       console.error('Failed to create event:', error);
-      showToast('Failed to create event: ' + error.message);
+        showToast('Couldn\'t create class. Please try again.', 'error');
     }
   };
 
@@ -452,7 +463,7 @@ function App() {
       setEditingEvent(null);
     } catch (error) {
       console.error('Update error:', error);
-      showToast('Failed to update event: ' + error.message);
+        showToast('Couldn\'t update class. Please try again.', 'error');
     }
   };
 
@@ -516,7 +527,7 @@ function App() {
       
       await fetchEvents();
       await fetchRegistrations();
-      showToast('Event deleted successfully!');
+      showToast('Class deleted! ✓', 'success');
       setCurrentView('dashboard');
     } catch (error) {
       console.error('Delete failed:', error);
@@ -570,11 +581,11 @@ function App() {
       // Refresh data to update UI
       await fetchEvents();
       await fetchRegistrations();
-      showToast('Class canceled');
+      showToast('Class cancelled! ✓', 'success');
       return { success: true };
     } catch (error) {
       console.error('Failed to cancel class:', error);
-      showToast('Failed to cancel class. Please try again.', 'error');
+        showToast('Couldn\'t cancel class. Please try again.', 'error');
       return { success: false, error };
     }
   }, [user, fetchEvents, fetchRegistrations]);
@@ -646,7 +657,7 @@ function App() {
       }
       
       await fetchUserNotes();
-      showToast('Note saved successfully!');
+      showToast('Note saved! ✓', 'success');
       return true;
     } catch (error) {
       showToast('Failed to save note: ' + error.message);
@@ -664,10 +675,10 @@ function App() {
       if (error) throw error;
 
       await fetchRegistrations();
-      showToast('Student removed from class');
+      showToast('Student removed! ✓', 'success');
     } catch (error) {
       console.error('Failed to remove student:', error);
-      showToast('Failed to remove student: ' + error.message);
+        showToast('Couldn\'t remove student. Please try again.', 'error');
     }
   }, [fetchRegistrations]);
 
@@ -690,7 +701,7 @@ function App() {
       return { success: true };
     } catch (error) {
       console.error('Failed to add student:', error);
-      showToast('Failed to add student: ' + error.message, 'error');
+        showToast('Couldn\'t add student. Please try again.', 'error');
       return { success: false, error };
     }
   }, [fetchRegistrations]);

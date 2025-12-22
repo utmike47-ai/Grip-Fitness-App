@@ -219,19 +219,19 @@ const WorkoutDetails = ({
   const noteButtonLabel = hasWorkoutNote ? 'VIEW/EDIT NOTES' : 'WORKOUT NOTES';
 
   return (
-    <div className="min-h-screen bg-grip-light pb-20">
+    <div className="min-h-screen bg-mjg-bg-primary pb-20">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-grip-secondary">
+      <div className="bg-mjg-bg-secondary shadow-mjg border-b border-mjg-border">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <button
             type="button"
             onClick={onBack}
-            className="text-grip-primary hover:text-grip-accent font-semibold"
+            className="text-mjg-text-primary hover:text-mjg-accent font-semibold"
             style={{ minWidth: 44, minHeight: 44 }}
           >
             ← Back
           </button>
-          <h1 className="text-2xl font-montserrat font-bold text-grip-primary">
+          <h1 className="text-2xl font-poppins font-semibold text-mjg-text-primary">
             {event.title}
           </h1>
           <span className="w-16" />
@@ -241,10 +241,10 @@ const WorkoutDetails = ({
       {/* Content */}
       <div className="max-w-4xl mx-auto px-4 py-6">
         {/* Workout Info */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+        <div className="bg-mjg-card rounded-mjg shadow-mjg border border-mjg-border p-4 mb-8">
           <div className="flex justify-between items-start mb-4">
             <div className="flex-1 pr-6">
-              <h2 className="text-xl font-bold text-grip-primary mb-2">
+              <h2 className="text-xl font-bold text-white mb-2">
                 {new Date(event.date + 'T12:00:00').toLocaleDateString('en-US', { 
                   weekday: 'long', 
                   month: 'long', 
@@ -252,7 +252,7 @@ const WorkoutDetails = ({
                 })}
               </h2>
               {event.details && (
-                <div className="text-gray-700 leading-relaxed">
+                <div className="text-mjg-text-primary leading-relaxed">
                   {event.details
                     .split('\n')
                     .filter(line => line.trim())
@@ -277,7 +277,7 @@ const WorkoutDetails = ({
                 <span
                   className={`w-full inline-flex items-center justify-center px-4 py-3 rounded-full text-sm font-semibold ${
                     event.type === 'workout'
-                      ? 'bg-grip-primary text-white'
+                      ? 'bg-mjg-accent text-white'
                       : 'bg-green-100 text-green-800'
                   }`}
                   style={{ minHeight: 48 }}
@@ -309,18 +309,18 @@ const WorkoutDetails = ({
               role="dialog"
               aria-modal="true"
               aria-labelledby={modalTitleId}
-              className={`bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 sm:p-8 transition-all duration-200 transform ${
+              className={`bg-mjg-card rounded-mjg shadow-mjg-lg border border-mjg-border w-full max-w-lg p-4 sm:p-4 transition-all duration-200 transform ${
                 modalActive ? 'scale-100 translate-y-0' : 'scale-95 -translate-y-4'
               } max-h-[90vh] overflow-y-auto flex flex-col`}
             >
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <p className="text-xs uppercase tracking-wide text-grip-secondary font-semibold">Workout</p>
-                  <h2 id={modalTitleId} className="text-2xl font-montserrat font-bold text-grip-primary">
+                  <p className="text-xs uppercase tracking-wide text-mjg-text-secondary font-semibold">Workout</p>
+                  <h2 id={modalTitleId} className="text-2xl font-poppins font-semibold text-mjg-text-primary">
                     {event.title}
                   </h2>
                   {activeEvent && (
-                    <p className="text-sm text-gray-600 mt-1">
+                    <p className="text-sm text-mjg-text-secondary mt-1">
                       {formatTime(activeEvent.time)} on {new Date(activeEvent.date + 'T12:00:00').toLocaleDateString('en-US', {
                         weekday: 'short',
                         month: 'short',
@@ -332,7 +332,7 @@ const WorkoutDetails = ({
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="text-gray-500 hover:text-grip-primary text-sm font-semibold"
+                  className="text-mjg-text-secondary hover:text-mjg-text-primary text-sm font-semibold"
                   aria-label="Close notes modal"
                   style={{ minWidth: 44, minHeight: 44 }}
                 >
@@ -344,7 +344,7 @@ const WorkoutDetails = ({
                 <div
                   role="status"
                   aria-live="polite"
-                  className={`mb-4 rounded-xl px-4 py-3 text-sm font-semibold text-center ${
+                  className={`mb-4 rounded-mjg px-4 py-3 text-sm font-semibold text-center ${
                     feedback.type === 'success'
                       ? 'bg-green-100 text-green-700'
                       : 'bg-red-100 text-red-700'
@@ -354,13 +354,13 @@ const WorkoutDetails = ({
                 </div>
               )}
 
-              <label className="block text-sm font-semibold text-grip-primary mb-2" htmlFor="workout-note">
+              <label className="block text-sm font-semibold text-white mb-2" htmlFor="workout-note">
                 Your Notes
               </label>
 
               {noteLoading ? (
                 <div className="flex justify-center items-center h-40">
-                  <div className="w-8 h-8 border-4 border-grip-secondary border-t-grip-primary rounded-full animate-spin" aria-label="Loading note" />
+                  <div className="w-8 h-8 border-4 border-mjg-border border-t-mjg-accent rounded-full animate-spin" aria-label="Loading note" />
                 </div>
               ) : (
                 <textarea
@@ -372,27 +372,27 @@ const WorkoutDetails = ({
                   maxLength={NOTE_MAX_LENGTH}
                   disabled={noteSaving}
                   placeholder="Add notes about this workout..."
-                  className="w-full min-h-[200px] border border-grip-secondary rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-grip-primary text-gray-800 resize-none overflow-y-auto"
+                  className="w-full min-h-[200px] border border-mjg-border rounded-mjg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-mjg-accent text-gray-800 resize-none overflow-y-auto"
                   aria-busy={noteSaving}
                 />
               )}
 
-              <div className="flex items-center justify-between mt-2 text-xs text-gray-500">
+              <div className="flex items-center justify-between mt-2 text-xs text-mjg-text-secondary">
                 <span>{noteContent.length}/{NOTE_MAX_LENGTH} characters</span>
                 <span>
                   {noteSaving ? 'Saving...' : noteLoading ? 'Loading note...' : 'Tap save to keep your note'}
                 </span>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-3 mt-6">
+              <div className="flex flex-col sm:flex-row gap-2 mt-6">
                 <button
                   type="button"
                   onClick={handleSave}
                   disabled={noteSaving || noteLoading}
-                  className={`flex-1 px-4 py-3 rounded-xl font-semibold text-white transition-colors ${
+                  className={`flex-1 px-4 py-3 rounded-mjg font-semibold text-white transition-colors ${
                     noteSaving || noteLoading
-                      ? 'bg-grip-primary/60 cursor-not-allowed'
-                      : 'bg-grip-primary hover:bg-grip-accent'
+                      ? 'bg-mjg-accent/60 cursor-not-allowed'
+                      : 'bg-mjg-accent hover:bg-mjg-accent'
                   }`}
                   style={{ minHeight: 48 }}
                 >
@@ -401,7 +401,7 @@ const WorkoutDetails = ({
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="flex-1 px-4 py-3 rounded-xl font-semibold border border-grip-secondary text-grip-primary hover:bg-grip-secondary/30 transition-colors"
+                  className="flex-1 px-4 py-3 rounded-mjg font-semibold border border-mjg-border text-mjg-text-primary hover:bg-mjg-bg-secondary/30 transition-colors"
                   style={{ minHeight: 48 }}
                 >
                   Cancel
@@ -413,7 +413,7 @@ const WorkoutDetails = ({
 
         {/* Time Slots */}
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-grip-primary">Available Times</h3>
+          <h3 className="text-lg font-semibold text-mjg-text-primary">Available Times</h3>
           {relatedEvents.map((slot) => {
             const regs = getRegistrationsForEvent(slot.id);
             const userRegistered = isUserRegistered(slot.id);
@@ -422,25 +422,25 @@ const WorkoutDetails = ({
             const isPastWorkout = slotDate < today;
 
             return (
-              <div key={slot.id} className="bg-white rounded-xl shadow-lg p-6">
+              <div key={slot.id} className="bg-mjg-card rounded-mjg shadow-mjg border border-mjg-border p-4">
                 <div className="flex justify-between items-center mb-4">
                   <div>
-                    <p className="text-xl font-bold text-grip-primary">
+                    <p className="text-xl font-bold text-mjg-text-primary">
                       {formatTime(slot.time)}
                     </p>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-mjg-text-secondary">
                       {regs.length}/15 registered
                     </p>
                   </div>
                   <div>
                     {isPastWorkout ? (
-                      <span className="inline-flex items-center px-4 py-2 rounded-full text-xs font-semibold bg-gray-100 text-gray-600 border border-gray-200">
+                      <span className="inline-flex items-center px-4 py-2 rounded-full text-xs font-semibold bg-mjg-bg-secondary text-mjg-text-secondary border border-mjg-border">
                         Past Workout
                       </span>
                     ) : userRegistered ? (
                       <button
                         onClick={() => onCancelRegistration(slot.id)}
-                        className="bg-grip-accent text-white px-6 py-2 rounded-full font-semibold hover:shadow-lg transition-all"
+                        className="bg-mjg-accent text-white px-4 py-2 rounded-full font-semibold hover:shadow-mjg transition-all"
                         style={{ minHeight: 44, minWidth: 120 }}
                       >
                         Cancel
@@ -449,10 +449,10 @@ const WorkoutDetails = ({
                       <button
                         onClick={() => onRegister(slot.id)}
                         disabled={isFull}
-                        className={`px-6 py-2 rounded-full font-semibold transition-all
+                        className={`px-4 py-2 rounded-full font-semibold transition-all
                           ${isFull 
-                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
-                            : 'bg-grip-primary text-white hover:shadow-lg'}`}
+                            ? 'bg-mjg-bg-secondary text-mjg-text-secondary cursor-not-allowed' 
+                            : 'bg-mjg-accent text-white hover:shadow-mjg'}`}
                         style={{ minHeight: 44, minWidth: 120 }}
                       >
                         {isFull ? 'FULL' : 'Register'}
@@ -463,13 +463,13 @@ const WorkoutDetails = ({
 
                 {/* Registered Users List */}
                 {regs.length > 0 && (
-                  <div className="pt-4 border-t border-grip-secondary">
-                    <p className="font-semibold text-grip-primary mb-2">
+                  <div className="pt-4 border-t border-mjg-border">
+                    <p className="font-semibold text-white mb-2">
                       Registered Participants ({regs.length}):
                     </p>
                     <div className="space-y-2">
                       {regs.map(reg => (
-                        <div key={reg.id} className="text-sm text-gray-700">
+                        <div key={reg.id} className="text-sm text-mjg-text-primary">
                           • {reg.user_name}
                         </div>
                       ))}

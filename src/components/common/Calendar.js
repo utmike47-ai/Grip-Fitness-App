@@ -29,22 +29,22 @@ const Calendar = ({ events, onDateSelect }) => {
     "July", "August", "September", "October", "November", "December"];
 
   return (
-    <div className="bg-white p-6 rounded-2xl shadow-lg">
+    <div className="bg-mjg-card p-4 rounded-mjg shadow-mjg border border-mjg-border">
       <div className="flex justify-between items-center mb-6">
         <button
           onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))}
-          className="p-2 text-grip-primary hover:bg-grip-secondary/20 rounded-lg transition-colors"
+          className="p-2 text-mjg-text-card hover:bg-gray-100 rounded-mjg transition-colors"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
-        <h2 className="text-xl font-montserrat font-bold text-grip-primary">
+        <h2 className="text-xl font-poppins font-semibold text-mjg-text-card">
           {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
         </h2>
         <button
           onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))}
-          className="p-2 text-grip-primary hover:bg-grip-secondary/20 rounded-lg transition-colors"
+          className="p-2 text-mjg-text-card hover:bg-gray-100 rounded-mjg transition-colors"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -52,15 +52,15 @@ const Calendar = ({ events, onDateSelect }) => {
         </button>
       </div>
       
-      <div className="grid grid-cols-7 gap-1 mb-2">
+      <div className="grid grid-cols-7 gap-2 mb-2">
         {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-          <div key={day} className="p-2 text-center font-semibold text-grip-primary text-sm opacity-70">
+          <div key={day} className="p-2 text-center font-semibold text-mjg-text-primary text-sm opacity-70">
             {day}
           </div>
         ))}
       </div>
       
-      <div className="grid grid-cols-7 gap-1">
+      <div className="grid grid-cols-7 gap-2">
         {days.map((day, index) => {
           const dayEvents = getEventsForDate(day);
           const isCurrentMonth = day.getMonth() === currentMonth.getMonth();
@@ -70,18 +70,18 @@ const Calendar = ({ events, onDateSelect }) => {
             <button
               key={index}
               onClick={() => onDateSelect(day)}
-              className={`p-3 h-14 text-sm relative rounded-lg transition-all
-                ${isCurrentMonth ? 'text-grip-primary' : 'text-gray-400'} 
-                ${isToday ? 'bg-grip-accent text-white font-bold' : 'hover:bg-grip-secondary/20'}`}
+              className={`p-3 h-14 text-base relative rounded-lg transition-all font-semibold
+                ${isCurrentMonth ? 'text-mjg-text-card' : 'text-mjg-text-secondary opacity-50'} 
+                ${isToday ? 'bg-mjg-accent text-white font-extrabold ring-2 ring-white ring-offset-2' : 'hover:bg-gray-100'}`}
             >
               {day.getDate()}
               {dayEvents.length > 0 && (
                 <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 flex gap-1">
                   {dayEvents.some(e => e.type === 'workout') && (
-                    <div className="w-2 h-2 bg-grip-primary rounded-full"></div>
+                    <div className="w-2 h-2 bg-mjg-accent rounded-full"></div>
                   )}
                   {dayEvents.some(e => e.type === 'social') && (
-                    <div className="w-2 h-2 bg-grip-accent rounded-full"></div>
+                    <div className="w-2 h-2 bg-mjg-accent rounded-full"></div>
                   )}
                 </div>
               )}

@@ -5,7 +5,7 @@ const BottomNav = ({ userRole, currentView, onNavigate }) => {
   const isStudent = userRole === 'student';
   
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-40">
+    <div className="fixed bottom-0 left-0 right-0 bg-mjg-bg-secondary border-t border-mjg-border z-40">
       <div className="flex justify-around items-center h-16 max-w-lg mx-auto">
         {/* Home Button */}
         <button
@@ -14,7 +14,7 @@ const BottomNav = ({ userRole, currentView, onNavigate }) => {
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
           className={`flex flex-col items-center justify-center flex-1 py-2 ${
-            currentView === 'dashboard' ? 'text-grip-primary' : 'text-gray-500'
+            currentView === 'dashboard' ? 'text-mjg-accent' : 'text-mjg-text-secondary'
           }`}
         >
           <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -29,7 +29,7 @@ const BottomNav = ({ userRole, currentView, onNavigate }) => {
           <button
             onClick={() => onNavigate('createEvent')}
             className={`flex flex-col items-center justify-center flex-1 py-2 ${
-              currentView === 'createEvent' ? 'text-grip-primary' : 'text-gray-500'
+              currentView === 'createEvent' ? 'text-white' : 'text-mjg-text-secondary'
             }`}
           >
             <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -57,7 +57,7 @@ const BottomNav = ({ userRole, currentView, onNavigate }) => {
                 }, 100);
               }
             }}
-            className="flex flex-col items-center justify-center flex-1 py-2 text-gray-500"
+            className="flex flex-col items-center justify-center flex-1 py-2 text-mjg-text-secondary"
           >
             <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
@@ -75,7 +75,7 @@ const BottomNav = ({ userRole, currentView, onNavigate }) => {
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
             className={`flex flex-col items-center justify-center flex-1 py-2 ${
-              currentView === 'adminDashboard' ? 'text-grip-primary' : 'text-gray-500'
+              currentView === 'adminDashboard' ? 'text-white' : 'text-mjg-text-secondary'
             }`}
           >
             <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">

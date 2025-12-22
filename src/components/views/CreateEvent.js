@@ -44,11 +44,11 @@ const CreateEvent = ({ user, onBack, onCreateEvent, editMode = false, existingEv
   };
 
   return (
-    <div className="min-h-screen bg-grip-light pb-20">
+    <div className="min-h-screen bg-mjg-bg-primary pb-20">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-grip-secondary">
+      <div className="bg-mjg-bg-secondary shadow-mjg border-b border-mjg-border">
         <div className="max-w-7xl mx-auto px-4 py-4">
-          <h1 className="text-2xl font-montserrat font-bold text-grip-primary">
+          <h1 className="text-2xl font-poppins font-semibold text-mjg-text-primary">
             {editMode ? 'Edit Event' : 'Create Event'}
           </h1>
         </div>
@@ -56,27 +56,27 @@ const CreateEvent = ({ user, onBack, onCreateEvent, editMode = false, existingEv
 
       {/* Form */}
       <div className="max-w-3xl mx-auto px-4 py-6">
-        <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-lg p-8">
+        <form onSubmit={handleSubmit} className="bg-mjg-card rounded-mjg shadow-mjg border border-mjg-border p-4">
           {/* Event Type */}
-          <div className="mb-6">
-            <label className="block text-sm font-semibold text-grip-primary mb-3">
+          <div className="mb-8">
+            <label className="block text-sm font-semibold text-mjg-text-primary mb-3">
               Event Type
             </label>
             <div className="flex gap-4">
               <button
                 type="button"
                 onClick={() => setEventData(prev => ({ ...prev, type: 'workout' }))}
-                className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-all
+                className={`flex-1 py-3 px-4 rounded-mjg font-semibold transition-all
                   ${eventData.type === 'workout'
-                    ? 'bg-grip-primary text-white'
-                    : 'bg-grip-secondary text-grip-primary hover:bg-grip-secondary/70'}`}
+                    ? 'bg-mjg-accent text-white'
+                    : 'bg-mjg-bg-secondary text-mjg-text-primary hover:bg-mjg-bg-secondary/70'}`}
               >
                 💪 Workout
               </button>
               <button
                 type="button"
                 onClick={() => setEventData(prev => ({ ...prev, type: 'social' }))}
-                className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-all
+                className={`flex-1 py-3 px-4 rounded-mjg font-semibold transition-all
                   ${eventData.type === 'social'
                     ? 'bg-green-600 text-white'
                     : 'bg-green-100 text-green-800 hover:bg-green-200'}`}
@@ -87,8 +87,8 @@ const CreateEvent = ({ user, onBack, onCreateEvent, editMode = false, existingEv
           </div>
 
           {/* Title */}
-          <div className="mb-6">
-            <label className="block text-sm font-semibold text-grip-primary mb-2">
+          <div className="mb-8">
+            <label className="block text-sm font-semibold text-white mb-2">
               Event Title *
             </label>
             <input
@@ -96,40 +96,40 @@ const CreateEvent = ({ user, onBack, onCreateEvent, editMode = false, existingEv
               value={eventData.title}
               onChange={(e) => setEventData(prev => ({ ...prev, title: e.target.value }))}
               placeholder="e.g., Monday Morning HIIT"
-              className="w-full px-4 py-3 border border-grip-secondary rounded-lg focus:outline-none focus:border-grip-primary transition-colors"
+              className="w-full px-4 py-3 border border-mjg-border rounded-mjg focus:outline-none focus:ring-2 focus:ring-mjg-accent focus:border-transparent transition-colors"
               required
             />
           </div>
 
           {/* Date */}
-          <div className="mb-6">
-            <label className="block text-sm font-semibold text-grip-primary mb-2">
+          <div className="mb-8">
+            <label className="block text-sm font-semibold text-white mb-2">
               Date *
             </label>
             <input
               type="date"
               value={eventData.date}
               onChange={(e) => setEventData(prev => ({ ...prev, date: e.target.value }))}
-              className="w-full px-4 py-3 border border-grip-secondary rounded-lg focus:outline-none focus:border-grip-primary transition-colors"
+              className="w-full px-4 py-3 border border-mjg-border rounded-mjg focus:outline-none focus:ring-2 focus:ring-mjg-accent focus:border-transparent transition-colors"
               required
             />
           </div>
 
           {/* Time Slots */}
-          <div className="mb-6">
-            <label className="block text-sm font-semibold text-grip-primary mb-3">
+          <div className="mb-8">
+            <label className="block text-sm font-semibold text-mjg-text-primary mb-3">
               Class Times * (Select one or more)
             </label>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {TIME_SLOTS.map(slot => (
                 <button
                   key={slot.value}
                   type="button"
                   onClick={() => toggleTimeSlot(slot.value)}
-                  className={`py-3 px-4 rounded-lg font-semibold transition-all
+                  className={`py-3 px-4 rounded-mjg font-semibold transition-all
                     ${eventData.times.includes(slot.value)
-                      ? 'bg-grip-primary text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                      ? 'bg-mjg-accent text-white'
+                      : 'bg-mjg-bg-secondary text-mjg-text-primary hover:bg-mjg-bg-secondary'}`}
                 >
                   {slot.display}
                 </button>
@@ -138,8 +138,8 @@ const CreateEvent = ({ user, onBack, onCreateEvent, editMode = false, existingEv
           </div>
 
           {/* Details */}
-          <div className="mb-6">
-            <label className="block text-sm font-semibold text-grip-primary mb-2">
+          <div className="mb-8">
+            <label className="block text-sm font-semibold text-white mb-2">
               Details (Optional)
             </label>
             <textarea
@@ -152,14 +152,14 @@ const CreateEvent = ({ user, onBack, onCreateEvent, editMode = false, existingEv
 12-15 DB Bench press
 20 Sit ups"
               rows="4"
-              className="w-full px-4 py-3 border border-grip-secondary rounded-lg focus:outline-none focus:border-grip-primary transition-colors resize-none"
+              className="w-full px-4 py-3 border border-mjg-border rounded-mjg focus:outline-none focus:ring-2 focus:ring-mjg-accent focus:border-transparent transition-colors resize-none"
             />
           </div>
 
           {/* Social Event Capacity */}
           {eventData.type === 'social' && (
-            <div className="mb-6">
-              <label className="block text-sm font-semibold text-grip-primary mb-2">
+            <div className="mb-8">
+              <label className="block text-sm font-semibold text-white mb-2">
                 Maximum Capacity
               </label>
               <input
@@ -168,9 +168,9 @@ const CreateEvent = ({ user, onBack, onCreateEvent, editMode = false, existingEv
                 onChange={(e) => setEventData(prev => ({ ...prev, maxCapacity: parseInt(e.target.value) }))}
                 min="1"
                 max="100"
-                className="w-full px-4 py-3 border border-grip-secondary rounded-lg focus:outline-none focus:border-grip-primary transition-colors"
+                className="w-full px-4 py-3 border border-mjg-border rounded-mjg focus:outline-none focus:ring-2 focus:ring-mjg-accent focus:border-transparent transition-colors"
               />
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-mjg-text-secondary mt-1">
                 Workouts are automatically limited to 15 participants
               </p>
             </div>
@@ -181,13 +181,13 @@ const CreateEvent = ({ user, onBack, onCreateEvent, editMode = false, existingEv
             <button
               type="button"
               onClick={onBack}
-              className="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-all"
+              className="flex-1 bg-mjg-bg-secondary text-mjg-text-primary py-3 rounded-mjg font-semibold hover:bg-mjg-bg-secondary transition-all"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-1 bg-grip-primary text-white py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all"
+              className="flex-1 bg-mjg-accent text-white py-3 rounded-mjg font-semibold hover:opacity-90 transform hover:-translate-y-0.5 transition-all"
             >
               {editMode ? 'Update Event' : 'Create Event'}
             </button>

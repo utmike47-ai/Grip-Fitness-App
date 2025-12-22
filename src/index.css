@@ -1,36 +1,73 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   body {
-    @apply bg-grip-light text-grip-dark font-inter;
+    @apply text-mjg-text-primary font-poppins;
+    font-weight: 400;
+    /* Dark textured background inspired by cast iron kettlebell */
+    background: 
+      radial-gradient(circle at 20% 50%, #1a1a1a 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, #0f0f0f 0%, transparent 50%),
+      radial-gradient(circle at 40% 20%, #1a1a1a 0%, transparent 50%),
+      #0a0a0a;
+    background-size: 100% 100%;
+    min-height: 100vh;
+    /* Subtle noise texture */
+    position: relative;
+  }
+  
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+      repeating-linear-gradient(0deg, rgba(255,255,255,.02), transparent 1px, transparent 2px, rgba(255,255,255,.02) 3px),
+      repeating-linear-gradient(90deg, rgba(255,255,255,.02), transparent 1px, transparent 2px, rgba(255,255,255,.02) 3px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  
+  #root {
+    position: relative;
+    z-index: 1;
   }
   
   h1, h2, h3, h4, h5, h6 {
-    @apply font-montserrat font-bold text-grip-primary;
+    @apply font-poppins font-semibold;
+    font-weight: 600;
+    color: #FFFFFF; /* White for headings on dark background */
   }
 }
 
 @layer components {
   .btn-primary {
-    @apply bg-grip-primary text-white px-6 py-3 rounded-lg font-semibold 
-           hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200;
+    @apply bg-white text-mjg-accent px-6 py-3 rounded-mjg font-medium
+           hover:bg-gray-100 transition-all duration-200 border-2 border-white;
+    min-height: 48px;
   }
   
   .btn-secondary {
-    @apply bg-grip-secondary text-grip-primary px-6 py-3 rounded-lg font-semibold
-           hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200;
+    @apply bg-mjg-accent border-2 border-white text-white px-6 py-3 rounded-mjg font-medium
+           hover:bg-mjg-bg-secondary hover:border-gray-400 transition-all duration-200;
+    min-height: 48px;
   }
   
   .card {
-    @apply bg-white rounded-2xl shadow-sm p-6;
+    @apply bg-mjg-card rounded-mjg shadow-mjg-lg p-4 border border-mjg-border-card mb-8;
+    color: #2d2d2d; /* Dark text inside white cards */
   }
   
   .input-field {
-    @apply w-full px-4 py-3 border border-grip-secondary rounded-lg
-           focus:outline-none focus:border-grip-primary transition-colors;
+    @apply w-full px-4 py-3 border border-mjg-border-card rounded-mjg bg-mjg-card
+           focus:outline-none focus:ring-2 focus:ring-mjg-accent focus:border-transparent transition-colors;
+    font-weight: 400;
+    color: #2d2d2d; /* Dark text in inputs */
   }
 
   @keyframes slide-in {

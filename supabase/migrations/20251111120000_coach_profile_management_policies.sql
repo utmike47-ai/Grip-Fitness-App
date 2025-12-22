@@ -36,3 +36,4 @@ create policy "Coaches can delete profiles"
         and profiles.role in ('coach', 'admin')
     )
   );
+

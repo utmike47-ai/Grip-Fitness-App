@@ -311,6 +311,7 @@ const DayView = ({
 
         if (error) {
           console.error('Failed to load students:', error);
+          // Error is silently handled - loading state will just show empty list
           return;
         }
 
@@ -431,13 +432,13 @@ const DayView = ({
   });
 
   return (
-    <div {...handlers} className="min-h-screen bg-grip-light pb-20">
+    <div {...handlers} className="min-h-screen bg-mjg-bg-primary pb-20">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-grip-secondary">
+      <div className="bg-mjg-bg-secondary shadow-mjg border-b border-mjg-border">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-center gap-2">
             <span className="text-gray-400 text-sm">←</span>
-            <h1 className="text-2xl font-montserrat font-bold text-grip-primary">
+            <h1 className="text-2xl font-poppins font-semibold text-mjg-text-primary">
               {selectedDate?.toLocaleDateString('en-US', { 
                 weekday: 'long', 
                 month: 'long', 
@@ -453,30 +454,30 @@ const DayView = ({
       {/* Events */}
       <div className="max-w-7xl mx-auto px-4 py-6">
         {Object.keys(groupedEvents).length === 0 ? (
-          <div className="text-center py-16 bg-white rounded-2xl shadow-lg">
+          <div className="text-center py-16 bg-mjg-card rounded-mjg shadow-mjg border border-mjg-border">
             <span className="text-6xl block mb-4">📅</span>
-            <p className="text-xl font-semibold text-grip-primary">No events scheduled</p>
-            <p className="text-gray-500 mt-2">Check back later for new workouts!</p>
+            <p className="text-xl font-semibold text-mjg-text-card">No classes scheduled for this day</p>
+            <p className="text-mjg-text-secondary mt-2">Check back later or browse other dates!</p>
           </div>
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-8">
             {eventGroupList.map((eventGroup, index) => {
               const primary = eventGroup.times[0];
               const hasNote = primary ? noteMap[primary.id]?.hasNote : false;
               const noteButtonLabel = hasNote ? 'VIEW/EDIT NOTES' : 'WORKOUT NOTES';
 
               return (
-              <div key={index} className="bg-white rounded-2xl shadow-lg p-6">
+              <div key={index} className="bg-mjg-card rounded-mjg shadow-mjg border border-mjg-border p-4">
                 <div className="mb-4">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 gap-3">
-  <h2 className="text-2xl font-montserrat font-bold text-grip-primary">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 gap-2">
+  <h2 className="text-2xl font-poppins font-semibold text-mjg-text-primary">
     {eventGroup.title}
   </h2>
   
   <div className="flex flex-col gap-2 w-full sm:w-auto max-w-xs">
     <span className={`w-full inline-flex items-center justify-center px-4 py-3 rounded-full text-sm font-semibold
       ${eventGroup.type === 'workout' 
-        ? 'bg-grip-primary text-white' 
+        ? 'bg-mjg-accent text-white' 
         : 'bg-green-100 text-green-800'}`}
       style={{ minHeight: 48 }}
     >
@@ -509,7 +510,7 @@ const DayView = ({
   </div>
 </div>
 {eventGroup.details && (
-  <div className="text-gray-700 leading-relaxed">
+  <div className="text-mjg-text-primary leading-relaxed">
     {eventGroup.details
       .split('\n')
       .filter(line => line.trim())
@@ -530,8 +531,8 @@ const DayView = ({
 )}
                 </div>
 
-                <div className="border-t border-grip-secondary pt-4">
-                  <h3 className="font-semibold text-grip-primary mb-4">Available Times:</h3>
+                <div className="border-t border-mjg-border pt-4">
+                  <h3 className="font-semibold text-mjg-text-primary mb-4">Available Times:</h3>
                   {isCoach && (
                     <button
                       type="button"
@@ -542,7 +543,7 @@ const DayView = ({
                       + Add Student to Class
                     </button>
                   )}
-                  <div className="flex flex-col gap-3">
+                  <div className="flex flex-col gap-2">
                     {eventGroup.times
                       .slice()
                       .sort((a, b) => {
@@ -554,13 +555,13 @@ const DayView = ({
                       const isFull = timeSlot.registrationCount >= 15;
                       
                       return (
-                        <div key={timeSlot.id} className="border border-grip-secondary rounded-lg p-4">
+                        <div key={timeSlot.id} className="border border-mjg-border rounded-mjg p-4">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-4">
-                              <span className="text-xl font-bold text-grip-primary">
+                              <span className="text-xl font-bold text-mjg-text-primary">
                                 {formatTimeDisplay(timeSlot.time)}
                               </span>
-                              <span className="text-sm text-gray-600">
+                              <span className="text-sm text-mjg-text-secondary">
                                 {timeSlot.registrationCount}/15 registered
                               </span>
                             </div>
@@ -569,7 +570,7 @@ const DayView = ({
   {timeSlot.userRegistered ? (
     <button
       onClick={() => onCancelRegistration(timeSlot.id)}
-      className="px-6 py-2.5 rounded-full text-sm font-semibold text-white bg-grip-accent hover:shadow-lg transition-all"
+      className="px-4 py-2.5 rounded-full text-sm font-semibold text-white bg-mjg-accent hover:shadow-mjg transition-all"
       style={{ minHeight: 44 }}
     >
       Cancel
@@ -578,10 +579,10 @@ const DayView = ({
     <button
       onClick={() => onRegister(timeSlot.id)}
       disabled={isFull}
-      className={`px-6 py-2.5 rounded-full text-sm font-semibold text-white transition-all
+      className={`px-4 py-2.5 rounded-full text-sm font-semibold text-white transition-all
         ${isFull 
-          ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
-          : 'bg-grip-primary hover:shadow-lg'}`}
+          ? 'bg-mjg-bg-secondary text-mjg-text-secondary cursor-not-allowed' 
+          : 'bg-mjg-accent hover:shadow-mjg'}`}
       style={{ minHeight: 44 }}
     >
       {isFull ? 'FULL' : 'Register'}
@@ -591,7 +592,7 @@ const DayView = ({
     <button
       type="button"
       onClick={() => openCancelClassModal(timeSlot)}
-      className="px-6 py-2.5 rounded-full text-sm font-semibold text-white bg-red-600 hover:bg-red-700 active:bg-red-800 transition-all hover:shadow-lg"
+      className="px-4 py-2.5 rounded-full text-sm font-semibold text-white bg-red-600 hover:bg-red-700 active:bg-red-800 transition-all hover:shadow-mjg"
       style={{ minHeight: 44 }}
       aria-label="Cancel this class time slot"
     >
@@ -603,13 +604,13 @@ const DayView = ({
 
                           {/* Show registered participants to everyone */}
                           {timeSlot.registeredUsers.length > 0 && (
-                            <div className="mt-4 pt-4 border-t border-grip-secondary">
-                              <p className="font-semibold text-grip-primary mb-2">
+                            <div className="mt-4 pt-4 border-t border-mjg-border">
+                              <p className="font-semibold text-white mb-2">
                                 Registered Participants ({timeSlot.registeredUsers.length}):
                               </p>
                               <div className="space-y-2">
                                 {timeSlot.registeredUsers.map(reg => (
-                                  <div key={reg.id} className="text-sm flex items-center justify-between gap-3">
+                                  <div key={reg.id} className="text-sm flex items-center justify-between gap-2">
                                     <span>{reg.user_name}</span>
                                     {isCoach && (
                                       <button
@@ -649,17 +650,17 @@ const DayView = ({
             role="dialog"
             aria-modal="true"
             aria-labelledby="day-view-notes-title"
-            className={`bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 sm:p-8 transition-all duration-200 transform ${
+            className={`bg-white rounded-2xl shadow-2xl w-full max-w-lg p-4 sm:p-4 transition-all duration-200 transform ${
               modalActive ? 'scale-100 translate-y-0' : 'scale-95 -translate-y-4'
             } max-h-[90vh] overflow-y-auto flex flex-col`}
           >
             <div className="flex items-start justify-between mb-4">
               <div>
-                <p className="text-xs uppercase tracking-wide text-grip-secondary font-semibold">Workout</p>
-                <h2 id="day-view-notes-title" className="text-2xl font-montserrat font-bold text-grip-primary">
+                <p className="text-xs uppercase tracking-wide text-mjg-text-secondary font-semibold">Workout</p>
+                <h2 id="day-view-notes-title" className="text-2xl font-poppins font-semibold text-mjg-text-primary">
                   {activeContext?.group?.title || 'Workout Notes'}
                 </h2>
-                <p className="text-sm text-gray-600 mt-1">
+                <p className="text-sm text-mjg-text-secondary mt-1">
                   {selectedDate?.toLocaleDateString('en-US', {
                     weekday: 'short',
                     month: 'short',
@@ -670,7 +671,7 @@ const DayView = ({
               <button
                 type="button"
                 onClick={closeModal}
-                className="text-gray-500 hover:text-grip-primary text-sm font-semibold"
+                className="text-mjg-text-secondary hover:text-mjg-text-primary text-sm font-semibold"
                 aria-label="Close notes modal"
                 style={{ minWidth: 44, minHeight: 44 }}
               >
@@ -682,7 +683,7 @@ const DayView = ({
               <div
                 role="status"
                 aria-live="polite"
-                className={`mb-4 rounded-xl px-4 py-3 text-sm font-semibold text-center ${
+                className={`mb-4 rounded-mjg px-4 py-3 text-sm font-semibold text-center ${
                   noteFeedback.type === 'success'
                     ? 'bg-green-100 text-green-700'
                     : 'bg-red-100 text-red-700'
@@ -692,13 +693,13 @@ const DayView = ({
               </div>
             )}
 
-            <label className="block text-sm font-semibold text-grip-primary mb-2" htmlFor="day-view-note">
+            <label className="block text-sm font-semibold text-white mb-2" htmlFor="day-view-note">
               Your Notes
             </label>
 
             {noteLoading ? (
               <div className="flex justify-center items-center h-40">
-                <div className="w-8 h-8 border-4 border-grip-secondary border-t-grip-primary rounded-full animate-spin" aria-label="Loading note" />
+                <div className="w-8 h-8 border-4 border-mjg-border border-t-mjg-accent rounded-full animate-spin" aria-label="Loading note" />
               </div>
             ) : (
               <textarea
@@ -710,25 +711,25 @@ const DayView = ({
                 maxLength={NOTE_MAX_LENGTH}
                 disabled={noteSaving}
                 placeholder="Add notes about this workout..."
-                className="w-full min-h-[200px] border border-grip-secondary rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-grip-primary text-gray-800 resize-none overflow-y-auto"
+                className="w-full min-h-[200px] border border-mjg-border rounded-mjg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-mjg-accent text-gray-800 resize-none overflow-y-auto"
                 aria-busy={noteSaving}
               />
             )}
 
-            <div className="flex items-center justify-between mt-2 text-xs text-gray-500">
+            <div className="flex items-center justify-between mt-2 text-xs text-mjg-text-secondary">
               <span>{noteContent.length}/{NOTE_MAX_LENGTH} characters</span>
               <span>{noteSaving ? 'Saving...' : noteLoading ? 'Loading note...' : 'Tap save to keep your note'}</span>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3 mt-6">
+            <div className="flex flex-col sm:flex-row gap-2 mt-6">
               <button
                 type="button"
                 onClick={handleSaveNote}
                 disabled={noteSaving || noteLoading}
-                className={`flex-1 px-4 py-3 rounded-xl font-semibold text-white transition-colors ${
+                className={`flex-1 px-4 py-3 rounded-mjg font-semibold text-white transition-colors ${
                   noteSaving || noteLoading
-                    ? 'bg-grip-primary/60 cursor-not-allowed'
-                    : 'bg-grip-primary hover:bg-grip-accent'
+                    ? 'bg-mjg-accent/60 cursor-not-allowed'
+                    : 'bg-mjg-accent hover:bg-mjg-accent'
                 }`}
                 style={{ minHeight: 48 }}
               >
@@ -737,7 +738,7 @@ const DayView = ({
               <button
                 type="button"
                 onClick={closeModal}
-                className="flex-1 px-4 py-3 rounded-xl font-semibold border border-grip-secondary text-grip-primary hover:bg-grip-secondary/30 transition-colors"
+                className="flex-1 px-4 py-3 rounded-mjg font-semibold border border-mjg-border text-mjg-text-primary hover:bg-mjg-bg-secondary/30 transition-colors"
                 style={{ minHeight: 48 }}
               >
                 Cancel
@@ -749,18 +750,18 @@ const DayView = ({
 
       {removeModal.isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6 bg-black/60">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 transition-all">
-            <h2 className="text-xl font-montserrat font-bold text-grip-primary mb-2">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-4 transition-all">
+            <h2 className="text-xl font-poppins font-semibold text-white mb-2">
               Remove Student
             </h2>
-            <p className="text-gray-700 mb-6">
+            <p className="text-mjg-text-primary mb-8">
               Remove {removeModal.studentName} from this class?
             </p>
-            <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex flex-col sm:flex-row gap-2">
               <button
                 type="button"
                 onClick={closeRemoveModal}
-                className="flex-1 px-4 py-3 rounded-xl font-semibold border border-grip-secondary text-grip-primary hover:bg-grip-secondary/30 transition-colors"
+                className="flex-1 px-4 py-3 rounded-mjg font-semibold border border-mjg-border text-mjg-text-primary hover:bg-mjg-bg-secondary/30 transition-colors"
                 style={{ minHeight: 48 }}
               >
                 Cancel
@@ -768,7 +769,7 @@ const DayView = ({
               <button
                 type="button"
                 onClick={handleConfirmRemove}
-                className="flex-1 px-4 py-3 rounded-xl font-semibold text-white transition-colors bg-red-500 hover:bg-red-600"
+                className="flex-1 px-4 py-3 rounded-mjg font-semibold text-white transition-colors bg-red-500 hover:bg-red-600"
                 style={{ minHeight: 48 }}
               >
                 Remove
@@ -783,13 +784,13 @@ const DayView = ({
           ref={addModalContainerRef}
           className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6 bg-black/60"
         >
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 sm:p-8 max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-4 sm:p-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-start justify-between mb-4">
-              <h2 className="text-2xl font-montserrat font-bold text-grip-primary">Add Student to Class</h2>
+              <h2 className="text-2xl font-poppins font-semibold text-mjg-text-primary">Add Student to Class</h2>
               <button
                 type="button"
                 onClick={closeAddStudentModal}
-                className="text-gray-500 hover:text-grip-primary text-sm font-semibold"
+                className="text-mjg-text-secondary hover:text-mjg-text-primary text-sm font-semibold"
                 aria-label="Close add student modal"
                 style={{ minWidth: 44, minHeight: 44 }}
               >
@@ -797,15 +798,15 @@ const DayView = ({
               </button>
             </div>
 
-            <div className="mb-6">
-              <label className="block text-sm font-semibold text-grip-primary mb-2" htmlFor="add-student-time">
+            <div className="mb-8">
+              <label className="block text-sm font-semibold text-white mb-2" htmlFor="add-student-time">
                 Select Time:
               </label>
               <select
                 id="add-student-time"
                 value={addStudentModal.selectedTimeId || ''}
                 onChange={(e) => setAddStudentModal(prev => ({ ...prev, selectedTimeId: e.target.value }))}
-                className="w-full border border-grip-secondary rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-grip-primary text-gray-800"
+                className="w-full border border-mjg-border rounded-mjg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-mjg-accent text-gray-800"
               >
                 {(addStudentModal.group?.times || [])
                   .slice()
@@ -822,28 +823,32 @@ const DayView = ({
               </select>
             </div>
 
-            <div className="mb-6">
-              <label className="block text-sm font-semibold text-grip-primary mb-2" htmlFor="add-student-search">
+            <div className="mb-8">
+              <label className="block text-sm font-semibold text-white mb-2" htmlFor="add-student-search">
                 Search Student:
               </label>
               <input
                 id="add-student-search"
                 type="text"
                 placeholder="Type student name..."
-                className="w-full border border-grip-secondary rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-grip-primary text-gray-800"
+                className="w-full border border-mjg-border rounded-mjg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-mjg-accent text-gray-800"
                 value={studentSearch}
                 onChange={(e) => {
                   setStudentSearch(e.target.value);
                   setSelectedStudentId(null);
                 }}
               />
-              <div className="mt-3 border border-grip-secondary rounded-xl max-h-64 overflow-y-auto">
+              <div className="mt-3 border border-mjg-border rounded-mjg max-h-64 overflow-y-auto">
                 {studentsLoading ? (
-                  <div className="py-6 text-center text-sm text-gray-500">Loading students...</div>
+                  <div className="py-6 text-center text-sm text-mjg-text-secondary">Loading students...</div>
                 ) : filteredStudents.length === 0 ? (
-                  <div className="py-6 text-center text-sm text-gray-500">No students found</div>
+                  <div className="py-6 text-center">
+                    <span className="text-2xl block mb-2">👥</span>
+                    <p className="text-sm text-mjg-text-secondary">No students found</p>
+                    <p className="text-xs text-mjg-text-secondary mt-1">Try a different search term</p>
+                  </div>
                 ) : (
-                  <ul className="divide-y divide-grip-secondary/40">
+                  <ul className="divide-y divide-mjg-border/40">
                     {filteredStudents.map((student) => {
                       const studentId = student.id;
                       const name = `${student.first_name || ''} ${student.last_name || ''}`.trim();
@@ -854,7 +859,7 @@ const DayView = ({
                             type="button"
                             onClick={() => setSelectedStudentId(studentId)}
                             className={`w-full text-left px-4 py-3 text-sm ${
-                              isSelected ? 'bg-grip-primary text-white' : 'hover:bg-grip-secondary/20'
+                              isSelected ? 'bg-mjg-accent text-white' : 'hover:bg-mjg-bg-secondary/20'
                             }`}
                           >
                             {name || 'Unnamed Student'}
@@ -867,7 +872,7 @@ const DayView = ({
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex flex-col sm:flex-row gap-2">
               <button
                 type="button"
                 onClick={async () => {
@@ -878,7 +883,7 @@ const DayView = ({
                   }
                 }}
                 disabled={!addStudentModal.selectedTimeId || !selectedStudentId}
-                className={`flex-1 px-4 py-3 rounded-xl font-semibold text-white transition-colors ${
+                className={`flex-1 px-4 py-3 rounded-mjg font-semibold text-white transition-colors ${
                   !addStudentModal.selectedTimeId || !selectedStudentId
                     ? 'bg-[#C67158]/60 cursor-not-allowed'
                     : 'bg-[#C67158] hover:bg-[#b2604b]'
@@ -890,7 +895,7 @@ const DayView = ({
               <button
                 type="button"
                 onClick={closeAddStudentModal}
-                className="flex-1 px-4 py-3 rounded-xl font-semibold border border-grip-secondary text-grip-primary hover:bg-grip-secondary/30 transition-colors"
+                className="flex-1 px-4 py-3 rounded-mjg font-semibold border border-mjg-border text-mjg-text-primary hover:bg-mjg-bg-secondary/30 transition-colors"
                 style={{ minHeight: 48 }}
               >
                 Cancel
@@ -905,17 +910,17 @@ const DayView = ({
           ref={cancelClassModalRef}
           className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6 bg-black/60"
         >
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 sm:p-8">
-            <h2 className="text-2xl font-montserrat font-bold text-grip-primary mb-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-4 sm:p-4">
+            <h2 className="text-2xl font-poppins font-semibold text-mjg-text-primary mb-4">
               Cancel {formatTimeDisplay(cancelClassModal.timeSlot.time)} Class?
             </h2>
             
             {(!cancelClassModal.timeSlot.registrationCount || cancelClassModal.timeSlot.registrationCount === 0) ? (
-              <p className="text-gray-700 mb-6">
+              <p className="text-mjg-text-primary mb-8">
                 This will <strong>permanently delete</strong> this time slot. No students are currently registered.
               </p>
             ) : (
-              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
+              <div className="mb-8 p-4 bg-red-50 border border-red-200 rounded-mjg">
                 <p className="text-red-800 mb-2 font-semibold">
                   ⚠️ Warning: {cancelClassModal.timeSlot.registrationCount} {cancelClassModal.timeSlot.registrationCount === 1 ? 'student is' : 'students are'} currently registered for this class.
                 </p>
@@ -928,12 +933,12 @@ const DayView = ({
               </div>
             )}
 
-            <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex flex-col sm:flex-row gap-2">
               <button
                 type="button"
                 onClick={closeCancelClassModal}
                 disabled={isCancelingClass}
-                className="flex-1 px-4 py-3 rounded-xl font-semibold border border-grip-secondary text-grip-primary hover:bg-grip-secondary/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 px-4 py-3 rounded-mjg font-semibold border border-mjg-border text-mjg-text-primary hover:bg-mjg-bg-secondary/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ minHeight: 48 }}
               >
                 Keep Class
@@ -956,7 +961,7 @@ const DayView = ({
                   }
                 }}
                 disabled={isCancelingClass}
-                className="flex-1 px-4 py-3 rounded-xl font-semibold text-white transition-colors bg-red-600 hover:bg-red-700 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="flex-1 px-4 py-3 rounded-mjg font-semibold text-white transition-colors bg-red-600 hover:bg-red-700 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 style={{ minHeight: 48 }}
               >
                 {isCancelingClass ? (

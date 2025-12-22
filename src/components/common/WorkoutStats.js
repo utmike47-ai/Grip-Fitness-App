@@ -106,29 +106,29 @@ const WorkoutStats = ({ attendance, registrations, events, user }) => {
   const weekPattern = getWeekPattern();
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-6 mb-4">
+    <div className="bg-mjg-card rounded-mjg shadow-mjg-lg border border-mjg-border-card p-4 mb-8">
       {/* Streak Counter */}
-      <div className="text-center mb-6">
+      <div className="text-center mb-4">
         <div className="flex items-center justify-center gap-2 mb-2">
           <span className="text-3xl">🔥</span>
-          <span className="text-2xl font-bold text-grip-primary">{streak}</span>
+          <span className="text-2xl font-bold text-mjg-text-primary">{streak}</span>
         </div>
-        <p className="text-gray-600">Day Streak</p>
+        <p className="text-mjg-text-secondary">Day Streak</p>
       </div>
 
       {/* Week Pattern */}
-      <div className="mb-6">
-        <p className="text-sm font-semibold text-gray-600 mb-3">This Week</p>
+      <div className="mb-4">
+        <p className="text-sm font-semibold text-mjg-text-secondary mb-2">This Week</p>
         <div className="flex justify-between">
           {weekPattern.map((day, index) => (
             <div
               key={index}
               className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm
                 ${day.worked 
-                  ? 'bg-grip-primary text-white' 
+                  ? 'bg-mjg-accent text-white' 
                   : day.isToday 
-                    ? 'bg-grip-accent text-white' 
-                    : 'bg-gray-100 text-gray-500'}`}
+                    ? 'bg-mjg-accent/50 text-white' 
+                    : 'bg-mjg-bg-secondary text-mjg-text-secondary'}`}
             >
               {day.day}
             </div>
@@ -138,9 +138,9 @@ const WorkoutStats = ({ attendance, registrations, events, user }) => {
 
       {/* Monthly Stats */}
       <div className="flex justify-center">
-        <div className="text-center p-3 bg-grip-secondary rounded-lg w-full max-w-xs">
-          <p className="text-2xl font-bold text-grip-primary">{monthlyCount}</p>
-          <p className="text-xs text-gray-600">This Month</p>
+        <div className="text-center p-4 bg-mjg-bg-secondary rounded-mjg w-full max-w-xs">
+          <p className="text-2xl font-bold text-mjg-text-primary">{monthlyCount}</p>
+          <p className="text-xs text-mjg-text-secondary">This Month</p>
         </div>
       </div>
     </div>

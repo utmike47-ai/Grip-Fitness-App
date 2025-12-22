@@ -262,14 +262,14 @@ const AdminDashboard = ({ user, events, registrations, profiles = [], attendance
   // Block unauthorized access
   if (!isAuthorized) {
     return (
-      <div className="min-h-screen bg-grip-light pb-20 flex items-center justify-center px-4">
-        <div className="bg-white rounded-xl shadow-md p-8 text-center max-w-md w-full">
+      <div className="min-h-screen bg-mjg-bg-primary pb-20 flex items-center justify-center px-4">
+        <div className="bg-mjg-card rounded-mjg shadow-mjg border border-mjg-border p-4 text-center max-w-md w-full">
           <div className="text-6xl mb-4">🔒</div>
-          <h2 className="text-2xl font-semibold text-grip-primary mb-2">Access Denied</h2>
-          <p className="text-gray-600 mb-6">You don't have permission to access the admin dashboard.</p>
+          <h2 className="text-2xl font-semibold text-white mb-2">Access Denied</h2>
+          <p className="text-mjg-text-secondary mb-8">You don't have permission to access the admin dashboard.</p>
           <button
             onClick={() => onNavigate('dashboard')}
-            className="bg-grip-primary text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-all min-h-[48px]"
+            className="bg-mjg-accent text-white px-4 py-3 rounded-mjg font-medium hover:opacity-90 transition-all min-h-[48px]"
           >
             Go to Dashboard
           </button>
@@ -279,73 +279,75 @@ const AdminDashboard = ({ user, events, registrations, profiles = [], attendance
   }
 
   return (
-    <div className="min-h-screen bg-grip-light pb-20">
+    <div className="min-h-screen bg-mjg-bg-primary pb-20">
       <div className="max-w-4xl mx-auto px-4 py-6">
         {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-3xl font-montserrat font-bold text-grip-primary mb-2">
+        <div className="mb-8">
+          <h1 className="text-3xl font-poppins font-semibold text-white mb-2">
             Admin Dashboard
           </h1>
-          <p className="text-gray-600">Manage gym members and view analytics</p>
+          <p className="text-mjg-text-secondary">Manage gym members and view analytics</p>
         </div>
 
         {/* Quick Stats Section */}
         <div className="mb-8">
-          <h2 className="text-xl font-montserrat font-bold text-grip-primary mb-4">
+          <h2 className="text-xl font-poppins font-semibold text-mjg-text-primary mb-4">
             Quick Stats
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {/* Total Members */}
-            <div className="bg-white rounded-xl shadow-md p-6 border border-grip-secondary">
-              <div className="text-sm text-gray-600 mb-2">Total Members</div>
-              <div className="text-3xl font-bold text-grip-primary">{stats.totalMembers}</div>
+            <div className="bg-mjg-card rounded-mjg shadow-mjg p-4 border border-mjg-border">
+              <div className="text-sm text-mjg-text-secondary mb-2">Total Members</div>
+              <div className="text-3xl font-bold text-mjg-text-primary">{stats.totalMembers}</div>
             </div>
 
             {/* Active This Week */}
-            <div className="bg-white rounded-xl shadow-md p-6 border border-grip-secondary">
-              <div className="text-sm text-gray-600 mb-2">Active This Week</div>
-              <div className="text-3xl font-bold text-grip-primary">{stats.activeThisWeek}</div>
+            <div className="bg-mjg-card rounded-mjg shadow-mjg p-4 border border-mjg-border">
+              <div className="text-sm text-mjg-text-secondary mb-2">Active This Week</div>
+              <div className="text-3xl font-bold text-mjg-text-primary">{stats.activeThisWeek}</div>
             </div>
 
             {/* Total Classes This Week */}
-            <div className="bg-white rounded-xl shadow-md p-6 border border-grip-secondary">
-              <div className="text-sm text-gray-600 mb-2">Classes This Week</div>
-              <div className="text-3xl font-bold text-grip-primary">{stats.classesThisWeek}</div>
+            <div className="bg-mjg-card rounded-mjg shadow-mjg p-4 border border-mjg-border">
+              <div className="text-sm text-mjg-text-secondary mb-2">Classes This Week</div>
+              <div className="text-3xl font-bold text-mjg-text-primary">{stats.classesThisWeek}</div>
             </div>
 
             {/* Today's Classes */}
-            <div className="bg-white rounded-xl shadow-md p-6 border border-grip-secondary">
-              <div className="text-sm text-gray-600 mb-2">Today's Classes</div>
-              <div className="text-3xl font-bold text-grip-primary">{stats.todaysClasses}</div>
+            <div className="bg-mjg-card rounded-mjg shadow-mjg p-4 border border-mjg-border">
+              <div className="text-sm text-mjg-text-secondary mb-2">Today's Classes</div>
+              <div className="text-3xl font-bold text-mjg-text-primary">{stats.todaysClasses}</div>
             </div>
           </div>
         </div>
 
         {/* Today's Classes Section */}
         <div className="mb-8">
-          <h2 className="text-xl font-montserrat font-bold text-grip-primary mb-4">
+          <h2 className="text-xl font-poppins font-semibold text-mjg-text-primary mb-4">
             Today's Classes
           </h2>
           {todaysClassesWithCounts.length === 0 ? (
-            <div className="bg-white rounded-xl shadow-md p-8 border border-grip-secondary text-center">
-              <p className="text-gray-600 text-lg">No classes scheduled for today</p>
+            <div className="bg-mjg-card rounded-mjg shadow-mjg p-4 border border-mjg-border text-center">
+              <span className="text-4xl block mb-2">📅</span>
+              <p className="text-mjg-text-card text-lg font-medium">No classes scheduled for today</p>
+              <p className="text-mjg-text-secondary text-sm mt-2">Click "Create Workout" to schedule one</p>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2">
               {todaysClassesWithCounts.map((event) => (
                 <div
                   key={event.id}
                   onClick={() => handleClassClick(event)}
-                  className={`bg-white rounded-xl shadow-md p-4 border-2 cursor-pointer transition-all hover:shadow-lg min-h-[80px] flex items-center ${
+                  className={`bg-mjg-card rounded-mjg shadow-mjg p-4 border-2 cursor-pointer transition-all hover:shadow-mjg-lg min-h-[80px] flex items-center ${
                     event.isFull 
-                      ? 'border-red-300 bg-red-50' 
-                      : 'border-grip-secondary hover:border-grip-primary'
+                      ? 'border-mjg-error bg-red-50' 
+                      : 'border-mjg-border hover:border-mjg-accent'
                   }`}
                 >
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h3 className="font-semibold text-lg text-grip-primary">
+                      <div className="flex items-center gap-2 mb-2">
+                        <h3 className="font-semibold text-lg text-mjg-text-primary">
                           {event.title}
                         </h3>
                         {event.isFull && (
@@ -354,13 +356,13 @@ const AdminDashboard = ({ user, events, registrations, profiles = [], attendance
                           </span>
                         )}
                       </div>
-                      <p className="text-gray-600 text-sm">{formatTime(event.time)}</p>
+                      <p className="text-mjg-text-secondary text-sm">{formatTime(event.time)}</p>
                     </div>
                     <div className="text-right">
-                      <div className="text-2xl font-bold text-grip-primary">
+                      <div className="text-2xl font-bold text-mjg-text-primary">
                         {event.registrationCount}/{event.maxCapacity}
                       </div>
-                      <p className="text-xs text-gray-500 mt-1">registered</p>
+                      <p className="text-xs text-mjg-text-secondary mt-1">registered</p>
                     </div>
                   </div>
                 </div>
@@ -371,29 +373,32 @@ const AdminDashboard = ({ user, events, registrations, profiles = [], attendance
 
         {/* Member Activity Section */}
         <div className="mb-8">
-          <h2 className="text-xl font-montserrat font-bold text-grip-primary mb-4">
+          <h2 className="text-xl font-poppins font-semibold text-mjg-text-primary mb-4">
             Member Activity
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Most Active This Month */}
-            <div className="bg-white rounded-xl shadow-md p-6 border border-grip-secondary">
-              <h3 className="text-lg font-semibold text-grip-primary mb-4">
+            <div className="bg-mjg-card rounded-mjg shadow-mjg p-4 border border-mjg-border">
+              <h3 className="text-lg font-semibold text-mjg-text-primary mb-4">
                 🏆 Most Active This Month
               </h3>
               {memberActivity.mostActive.length === 0 ? (
-                <p className="text-gray-500 text-sm">No activity this month</p>
+                <div className="text-center py-4">
+                  <span className="text-2xl block mb-2">📊</span>
+                  <p className="text-mjg-text-secondary text-sm">No activity this month</p>
+                </div>
               ) : (
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {memberActivity.mostActive.map((member, index) => (
                     <div key={member.id} className="flex justify-between items-center">
                       <div className="flex items-center gap-2">
                         {index === 0 && <span className="text-lg">🏆</span>}
-                        <span className="text-sm text-gray-900 font-medium">
+                        <span className="text-sm text-mjg-text-primary font-medium">
                           {member.name}
                         </span>
                       </div>
-                      <span className="text-sm font-semibold text-grip-primary">
+                      <span className="text-sm font-semibold text-mjg-text-primary">
                         {member.count} {member.count === 1 ? 'class' : 'classes'}
                       </span>
                     </div>
@@ -403,22 +408,25 @@ const AdminDashboard = ({ user, events, registrations, profiles = [], attendance
             </div>
 
             {/* Need Attention */}
-            <div className="bg-white rounded-xl shadow-md p-6 border border-grip-secondary">
-              <h3 className="text-lg font-semibold text-grip-primary mb-4">
+            <div className="bg-mjg-card rounded-mjg shadow-mjg p-4 border border-mjg-border">
+              <h3 className="text-lg font-semibold text-mjg-text-primary mb-4">
                 ⚠️ Need Attention
               </h3>
               {memberActivity.inactive.length === 0 ? (
                 <div className="text-center py-4">
-                  <p className="text-gray-600 text-sm font-medium">All members active! 🎉</p>
+                  <div className="text-center py-4">
+                    <span className="text-2xl block mb-2">🎉</span>
+                    <p className="text-mjg-text-card text-sm font-medium">All members active!</p>
+                  </div>
                 </div>
               ) : (
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {memberActivity.inactive.map((member) => (
                     <div key={member.id} className="flex justify-between items-center">
-                      <span className="text-sm text-gray-900 font-medium">
+                      <span className="text-sm text-mjg-text-primary font-medium">
                         {member.name}
                       </span>
-                      <span className="text-xs text-gray-600">
+                      <span className="text-xs text-mjg-text-secondary">
                         Last class: {member.daysAgo === 999 ? 'Never' : `${member.daysAgo} days ago`}
                       </span>
                     </div>
@@ -428,20 +436,23 @@ const AdminDashboard = ({ user, events, registrations, profiles = [], attendance
             </div>
 
             {/* Current Streaks */}
-            <div className="bg-white rounded-xl shadow-md p-6 border border-grip-secondary">
-              <h3 className="text-lg font-semibold text-grip-primary mb-4">
+            <div className="bg-mjg-card rounded-mjg shadow-mjg p-4 border border-mjg-border">
+              <h3 className="text-lg font-semibold text-mjg-text-primary mb-4">
                 🔥 Current Streaks
               </h3>
               {memberActivity.streaks.length === 0 ? (
-                <p className="text-gray-500 text-sm">No active streaks</p>
+                <div className="text-center py-4">
+                  <span className="text-2xl block mb-2">🔥</span>
+                  <p className="text-mjg-text-secondary text-sm">No active streaks</p>
+                </div>
               ) : (
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {memberActivity.streaks.map((member) => (
                     <div key={member.id} className="flex justify-between items-center">
-                      <span className="text-sm text-gray-900 font-medium">
+                      <span className="text-sm text-mjg-text-primary font-medium">
                         {member.name}
                       </span>
-                      <span className="text-sm font-semibold text-grip-primary">
+                      <span className="text-sm font-semibold text-mjg-text-primary">
                         🔥 {member.streak} {member.streak === 1 ? 'day' : 'days'}
                       </span>
                     </div>
@@ -454,40 +465,40 @@ const AdminDashboard = ({ user, events, registrations, profiles = [], attendance
 
         {/* Quick Actions Section */}
         <div>
-          <h2 className="text-xl font-montserrat font-bold text-grip-primary mb-4">
+          <h2 className="text-xl font-poppins font-semibold text-mjg-text-primary mb-4">
             Quick Actions
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <button
               onClick={() => onNavigate('manageMembers')}
-              className="bg-white rounded-xl shadow-md p-6 border-2 border-grip-secondary hover:border-grip-primary transition-all hover:shadow-lg text-left min-h-[48px]"
+              className="bg-white rounded-mjg shadow-mjg p-4 border-2 border-mjg-border hover:border-mjg-accent transition-all hover:shadow-mjg text-left min-h-[48px]"
             >
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-grip-secondary rounded-lg flex items-center justify-center">
-                  <svg className="w-6 h-6 text-grip-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-12 h-12 bg-mjg-bg-secondary rounded-mjg flex items-center justify-center">
+                  <svg className="w-6 h-6 text-mjg-text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-lg text-grip-primary">Manage Members</h3>
-                  <p className="text-sm text-gray-600 mt-1">View and manage gym members</p>
+                  <h3 className="font-semibold text-lg text-mjg-text-primary">Manage Members</h3>
+                  <p className="text-sm text-mjg-text-secondary mt-1">View and manage gym members</p>
                 </div>
               </div>
             </button>
 
             <button
               onClick={() => onNavigate('createEvent')}
-              className="bg-white rounded-xl shadow-md p-6 border-2 border-grip-secondary hover:border-grip-primary transition-all hover:shadow-lg text-left min-h-[48px]"
+              className="bg-white rounded-mjg shadow-mjg p-4 border-2 border-mjg-border hover:border-mjg-accent transition-all hover:shadow-mjg text-left min-h-[48px]"
             >
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-grip-secondary rounded-lg flex items-center justify-center">
-                  <svg className="w-6 h-6 text-grip-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-12 h-12 bg-mjg-bg-secondary rounded-mjg flex items-center justify-center">
+                  <svg className="w-6 h-6 text-mjg-text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-lg text-grip-primary">Create Workout</h3>
-                  <p className="text-sm text-gray-600 mt-1">Schedule a new workout class</p>
+                  <h3 className="font-semibold text-lg text-mjg-text-primary">Create Workout</h3>
+                  <p className="text-sm text-mjg-text-secondary mt-1">Schedule a new workout class</p>
                 </div>
               </div>
             </button>
@@ -499,3 +510,4 @@ const AdminDashboard = ({ user, events, registrations, profiles = [], attendance
 };
 
 export default AdminDashboard;
+

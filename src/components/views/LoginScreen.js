@@ -108,18 +108,18 @@ const LoginScreen = ({ onLogin, loading }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-grip-primary to-grip-accent flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
+    <div className="min-h-screen bg-mjg-bg-primary flex items-center justify-center p-4">
+      <div className="bg-mjg-card rounded-mjg shadow-mjg-lg border border-mjg-border-card p-4 w-full max-w-md">
         <div className="text-center mb-8">
           <Logo size="large" />
         </div>
         
-        <div className="flex gap-2 mb-6">
+        <div className="flex gap-2 mb-4">
           <button
             type="button"
             onClick={() => setIsSignUp(false)}
-            className={`flex-1 py-2 rounded-lg font-semibold transition-all ${
-              !isSignUp ? 'bg-grip-primary text-white' : 'bg-gray-200 text-gray-600'
+            className={`flex-1 py-2 rounded-mjg font-medium transition-all ${
+              !isSignUp ? 'bg-mjg-accent text-white' : 'bg-mjg-bg-secondary text-mjg-text-secondary'
             }`}
           >
             Login
@@ -127,8 +127,8 @@ const LoginScreen = ({ onLogin, loading }) => {
           <button
             type="button"
             onClick={() => setIsSignUp(true)}
-            className={`flex-1 py-2 rounded-lg font-semibold transition-all ${
-              isSignUp ? 'bg-grip-primary text-white' : 'bg-gray-200 text-gray-600'
+            className={`flex-1 py-2 rounded-mjg font-medium transition-all ${
+              isSignUp ? 'bg-mjg-accent text-white' : 'bg-mjg-bg-secondary text-mjg-text-secondary'
             }`}
           >
             Sign Up
@@ -138,43 +138,43 @@ const LoginScreen = ({ onLogin, loading }) => {
         <form onSubmit={handleSubmit} className="space-y-4">
           {isSignUp && (
             <>
-              <div className="flex gap-3">
+              <div className="flex gap-2">
                 <div className="flex-1">
-                  <label className="block text-sm font-medium text-grip-primary mb-2">
+                  <label className="block text-sm font-medium text-white mb-2">
                     First Name
                   </label>
                   <input
                     type="text"
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
-                    className="w-full px-4 py-3 border border-grip-secondary rounded-lg focus:outline-none focus:border-grip-primary transition-colors"
+                    className="w-full px-4 py-3 border border-mjg-border rounded-mjg bg-mjg-card focus:outline-none focus:ring-2 focus:ring-mjg-accent focus:border-transparent transition-colors"
                     required
                   />
                 </div>
                 <div className="flex-1">
-                  <label className="block text-sm font-medium text-grip-primary mb-2">
+                  <label className="block text-sm font-medium text-white mb-2">
                     Last Name
                   </label>
                   <input
                     type="text"
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
-                    className="w-full px-4 py-3 border border-grip-secondary rounded-lg focus:outline-none focus:border-grip-primary transition-colors"
+                    className="w-full px-4 py-3 border border-mjg-border rounded-mjg bg-mjg-card focus:outline-none focus:ring-2 focus:ring-mjg-accent focus:border-transparent transition-colors"
                     required
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-grip-primary mb-2">
+                <label className="block text-sm font-medium text-white mb-2">
                   I am a...
                 </label>
-                <div className="flex gap-3">
+                <div className="flex gap-2">
                   <button
                     type="button"
                     onClick={() => setRole('student')}
-                    className={`flex-1 py-2 rounded-lg font-semibold transition-all ${
-                      role === 'student' ? 'bg-grip-secondary text-grip-primary' : 'bg-gray-100 text-gray-600'
+                    className={`flex-1 py-2 rounded-mjg font-semibold transition-all ${
+                      role === 'student' ? 'bg-mjg-accent text-white' : 'bg-mjg-bg-secondary text-mjg-text-secondary'
                     }`}
                   >
                     Student
@@ -182,8 +182,8 @@ const LoginScreen = ({ onLogin, loading }) => {
                   <button
                     type="button"
                     onClick={() => setRole('coach')}
-                    className={`flex-1 py-2 rounded-lg font-semibold transition-all ${
-                      role === 'coach' ? 'bg-grip-secondary text-grip-primary' : 'bg-gray-100 text-gray-600'
+                    className={`flex-1 py-2 rounded-mjg font-semibold transition-all ${
+                      role === 'coach' ? 'bg-mjg-accent text-white' : 'bg-mjg-bg-secondary text-mjg-text-secondary'
                     }`}
                   >
                     Coach
@@ -195,39 +195,39 @@ const LoginScreen = ({ onLogin, loading }) => {
 
           {isSignUp && (
             <div>
-              <label className="block text-sm font-semibold text-grip-primary mb-2">
+              <label className="block text-sm font-semibold text-white mb-2">
                 Access Code *
               </label>
               <input
                 type="password"
-                placeholder="Enter your access code from Grip Fitness"
+                placeholder="Enter your access code from MJG Fitness"
                 value={accessCode}
                 onChange={(e) => setAccessCode(e.target.value)}
-                className="w-full px-4 py-3 border border-grip-secondary rounded-lg focus:outline-none focus:border-grip-primary transition-colors"
+                className="w-full px-4 py-3 border border-mjg-border rounded-mjg focus:outline-none focus:ring-2 focus:ring-mjg-accent focus:border-transparent transition-colors"
                 required
               />
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-mjg-text-secondary mt-1">
                 {role === 'coach' ? 'Enter coach access code' : 'Enter member access code'}
               </p>
             </div>
           )}
 
           <div>
-            <label className="block text-sm font-medium text-grip-primary mb-2">
+            <label className="block text-sm font-medium text-white mb-2">
               Email Address
             </label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 border border-grip-secondary rounded-lg focus:outline-none focus:border-grip-primary transition-colors"
+              className="w-full px-4 py-3 border border-mjg-border rounded-mjg focus:outline-none focus:ring-2 focus:ring-mjg-accent focus:border-transparent transition-colors"
               placeholder="Enter your email"
               required
             />
           </div>
           
           <div className="mb-4">
-            <label className="block text-sm font-semibold text-grip-primary mb-2">
+            <label className="block text-sm font-semibold text-white mb-2">
               Password {isSignUp && '*'}
             </label>
             <input
@@ -247,33 +247,33 @@ const LoginScreen = ({ onLogin, loading }) => {
                 }
               }}
               onFocus={() => isSignUp && setShowRequirements(true)}
-              className={`w-full px-4 py-3 border rounded-lg focus:outline-none transition-colors
-                ${passwordError ? 'border-red-500' : 'border-grip-secondary focus:border-grip-primary'}`}
+              className={`w-full px-4 py-3 border rounded-mjg focus:outline-none transition-colors
+                ${passwordError ? 'border-mjg-error' : 'border-mjg-border focus:ring-2 focus:ring-mjg-accent focus:border-transparent'}`}
               required
             />
             
             {/* Password Requirements Checklist */}
             {isSignUp && showRequirements && (
-              <div className="mt-2 p-3 bg-gray-50 rounded-lg text-sm">
-                <p className="font-semibold text-gray-700 mb-2">Password must have:</p>
+              <div className="mt-2 p-3 bg-gray-50 rounded-mjg text-sm">
+                <p className="font-semibold text-white mb-2">Password must have:</p>
                 <ul className="space-y-1">
-                  <li className={`flex items-center ${validatePassword(password).requirements.minLength ? 'text-green-600' : 'text-gray-500'}`}>
+                  <li className={`flex items-center ${validatePassword(password).requirements.minLength ? 'text-green-600' : 'text-mjg-text-secondary'}`}>
                     <span className="mr-2">{validatePassword(password).requirements.minLength ? '✓' : '○'}</span>
                     At least 8 characters
                   </li>
-                  <li className={`flex items-center ${validatePassword(password).requirements.hasUpperCase ? 'text-green-600' : 'text-gray-500'}`}>
+                  <li className={`flex items-center ${validatePassword(password).requirements.hasUpperCase ? 'text-green-600' : 'text-mjg-text-secondary'}`}>
                     <span className="mr-2">{validatePassword(password).requirements.hasUpperCase ? '✓' : '○'}</span>
                     One uppercase letter
                   </li>
-                  <li className={`flex items-center ${validatePassword(password).requirements.hasLowerCase ? 'text-green-600' : 'text-gray-500'}`}>
+                  <li className={`flex items-center ${validatePassword(password).requirements.hasLowerCase ? 'text-green-600' : 'text-mjg-text-secondary'}`}>
                     <span className="mr-2">{validatePassword(password).requirements.hasLowerCase ? '✓' : '○'}</span>
                     One lowercase letter
                   </li>
-                  <li className={`flex items-center ${validatePassword(password).requirements.hasNumber ? 'text-green-600' : 'text-gray-500'}`}>
+                  <li className={`flex items-center ${validatePassword(password).requirements.hasNumber ? 'text-green-600' : 'text-mjg-text-secondary'}`}>
                     <span className="mr-2">{validatePassword(password).requirements.hasNumber ? '✓' : '○'}</span>
                     One number
                   </li>
-                  <li className={`flex items-center ${validatePassword(password).requirements.hasSpecial ? 'text-green-600' : 'text-gray-500'}`}>
+                  <li className={`flex items-center ${validatePassword(password).requirements.hasSpecial ? 'text-green-600' : 'text-mjg-text-secondary'}`}>
                     <span className="mr-2">{validatePassword(password).requirements.hasSpecial ? '✓' : '○'}</span>
                     One special character (!@#$%^&*)
                   </li>
@@ -286,7 +286,7 @@ const LoginScreen = ({ onLogin, loading }) => {
             <button
               type="button"
               onClick={() => setShowReset(true)}
-              className="text-sm text-grip-primary hover:underline mt-1"
+              className="text-sm text-mjg-accent hover:underline mt-1"
             >
               Forgot Password?
             </button>
@@ -294,7 +294,7 @@ const LoginScreen = ({ onLogin, loading }) => {
           
           <button 
             type="submit"
-            className="w-full bg-grip-primary text-white py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200"
+            className="w-full bg-mjg-accent text-white py-3 rounded-mjg font-medium hover:opacity-90 transition-all duration-200 min-h-[48px]"
             disabled={loading}
           >
             {loading ? (isSignUp ? 'Creating Account...' : 'Signing in...') : (isSignUp ? 'Create Account' : 'Sign In')}
@@ -305,7 +305,7 @@ const LoginScreen = ({ onLogin, loading }) => {
               <button
                 type="button"
                 onClick={() => setShowResend(true)}
-                className="mt-3 text-sm text-grip-primary hover:underline"
+                className="mt-3 text-sm text-mjg-text-primary hover:underline"
               >
                 Didn't receive verification email?
               </button>
@@ -317,9 +317,9 @@ const LoginScreen = ({ onLogin, loading }) => {
       {/* Password Reset Modal */}
       {showReset && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl p-8 max-w-md w-full">
-            <h2 className="text-2xl font-bold text-grip-primary mb-4">Reset Password</h2>
-            <p className="text-gray-600 mb-4">
+          <div className="bg-white rounded-2xl p-4 max-w-md w-full">
+            <h2 className="text-2xl font-semibold text-mjg-text-primary mb-4">Reset Password</h2>
+            <p className="text-mjg-text-secondary mb-4">
               Enter your email address and we'll send you a link to reset your password.
             </p>
             
@@ -329,7 +329,7 @@ const LoginScreen = ({ onLogin, loading }) => {
                 placeholder="Enter your email"
                 value={resetEmail}
                 onChange={(e) => setResetEmail(e.target.value)}
-                className="w-full px-4 py-3 border border-grip-secondary rounded-lg focus:outline-none focus:border-grip-primary transition-colors mb-4"
+                className="w-full px-4 py-3 border border-mjg-border rounded-mjg focus:outline-none focus:ring-2 focus:ring-mjg-accent focus:border-transparent transition-colors mb-4"
                 required
               />
               
@@ -340,13 +340,13 @@ const LoginScreen = ({ onLogin, loading }) => {
                     setShowReset(false);
                     setResetEmail('');
                   }}
-                  className="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg font-semibold"
+                  className="flex-1 bg-mjg-bg-secondary text-mjg-text-primary py-3 rounded-mjg font-semibold"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 bg-grip-primary text-white py-3 rounded-lg font-semibold"
+                  className="flex-1 bg-mjg-accent text-white py-3 rounded-mjg font-semibold"
                 >
                   Send Reset Email
                 </button>
@@ -359,25 +359,25 @@ const LoginScreen = ({ onLogin, loading }) => {
       {/* Resend Verification Modal */}
       {showResend && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl p-8 max-w-md w-full">
-            <h3 className="text-xl font-bold text-grip-primary mb-4">Resend Verification Email</h3>
+          <div className="bg-white rounded-2xl p-4 max-w-md w-full">
+            <h3 className="text-xl font-semibold text-mjg-text-primary mb-4">Resend Verification Email</h3>
             <input
               type="email"
               placeholder="Enter your email address"
               value={resendEmail}
               onChange={(e) => setResendEmail(e.target.value)}
-              className="w-full px-4 py-3 border border-grip-secondary rounded-lg mb-4"
+              className="w-full px-4 py-3 border border-mjg-border rounded-mjg mb-4"
             />
             <div className="flex gap-4">
               <button
                 onClick={() => setShowResend(false)}
-                className="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg font-semibold"
+                className="flex-1 bg-mjg-bg-secondary text-mjg-text-primary py-3 rounded-mjg font-semibold"
               >
                 Cancel
               </button>
               <button
                 onClick={handleResendVerification}
-                className="flex-1 bg-grip-primary text-white py-3 rounded-lg font-semibold"
+                className="flex-1 bg-mjg-accent text-white py-3 rounded-mjg font-semibold"
               >
                 Resend Email
               </button>
