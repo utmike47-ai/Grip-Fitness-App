@@ -106,7 +106,7 @@ const WorkoutStats = ({ attendance, registrations, events, user }) => {
   const weekPattern = getWeekPattern();
 
   return (
-    <div className="bg-white rounded-grip shadow-gym-lg border border-gray-300-card p-4 mb-8">
+    <div className="bg-white rounded-[12px] shadow-gym p-4 mb-8">
       {/* Streak Counter */}
       <div className="text-center mb-4">
         <div className="flex items-center justify-center gap-2 mb-2">
