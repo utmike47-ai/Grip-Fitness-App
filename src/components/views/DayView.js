@@ -751,7 +751,7 @@ const DayView = ({
       {removeModal.isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6 bg-black/60">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-4 transition-all">
-            <h2 className="text-xl font-poppins font-semibold text-white mb-2">
+            <h2 className="text-xl font-poppins font-semibold text-mjg-text-card mb-2">
               Remove Student
             </h2>
             <p className="text-mjg-text-card mb-8">
