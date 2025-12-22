@@ -136,9 +136,9 @@ const Dashboard = ({ user, events, registrations, attendance, onSignOut, onViewC
   }, [user, registrations, events]);
 
   return (
-    <div className="min-h-screen bg-grip-light pb-20">
+    <div className="min-h-screen pb-20">
       {/* Header */}
-      <div className="bg-grip-secondary shadow-grip border-b border-gray-300">
+      <div className="bg-gym-secondary shadow-lg border-b border-gym-secondary">
         <div className="max-w-7xl mx-auto px-4 py-4 h-18 flex items-center">
           <div className="flex justify-between items-center w-full">
             <Logo size="medium" />
@@ -146,14 +146,14 @@ const Dashboard = ({ user, events, registrations, attendance, onSignOut, onViewC
               {userRole === 'coach' && (
                 <button
                   onClick={() => onViewChange('createEvent')}
-                  className="bg-white text-grip-primary px-4 py-2 rounded-grip hover:bg-gray-100 transition-all font-semibold border-2 border-white"
+                  className="bg-gym-primary text-white px-4 py-2 rounded-grip hover:bg-[#ff8555] transition-all font-semibold"
                 >
                   + Create Event
                 </button>
               )}
               <button
                 onClick={onSignOut}
-                className="bg-grip-primary text-white px-4 py-2 rounded-grip hover:opacity-90 transition-all min-h-[48px]"
+                className="bg-gym-primary text-white px-4 py-2 rounded-grip hover:bg-[#ff8555] transition-all min-h-[48px] font-semibold"
               >
                 Logout
               </button>
@@ -165,10 +165,10 @@ const Dashboard = ({ user, events, registrations, attendance, onSignOut, onViewC
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 pt-8 pb-6">
         <div className="mb-8">
-          <h1 className="text-3xl font-montserrat font-semibold text-white mb-2">
+          <h1 className="text-3xl font-poppins font-bold text-white mb-2">
           Welcome back, {user?.user_metadata?.first_name || user?.email?.split('@')[0]}!
           </h1>
-          <span className="inline-block bg-white text-grip-dark px-4 py-2 rounded-full text-sm font-medium mt-2">
+          <span className="inline-block bg-white text-gym-text-dark px-4 py-2 rounded-full text-sm font-medium mt-2">
             {userRole === 'coach' ? '👨‍🏫 Coach' : '🏋️‍♂️ Student'} Account
           </span>
           
@@ -192,7 +192,7 @@ const Dashboard = ({ user, events, registrations, attendance, onSignOut, onViewC
           <div className="mt-2">
             <button
               onClick={() => onViewChange('profileEdit')}
-              className="text-sm text-grip-primary underline hover:text-grip-primary transition-colors"
+              className="text-sm text-gym-accent underline hover:text-[#00b8e6] transition-colors font-semibold"
             >
               Edit Profile
             </button>
@@ -226,13 +226,13 @@ const Dashboard = ({ user, events, registrations, attendance, onSignOut, onViewC
           {/* Calendar Section */}
           <div className="lg:col-span-2">
             {loadingEvents ? (
-              <div className="bg-white rounded-grip shadow-grip-lg border border-gray-300-card p-8 flex items-center justify-center">
+              <div className="bg-white rounded-[12px] shadow-gym p-8 flex items-center justify-center">
                 <LoadingSpinner size="lg" />
               </div>
             ) : events.length === 0 ? (
-              <div className="bg-white rounded-grip shadow-grip-lg border border-gray-300-card p-8 text-center">
+              <div className="bg-white rounded-[12px] shadow-gym p-8 text-center">
                 <span className="text-6xl block mb-4">📅</span>
-                <p className="text-xl font-semibold text-grip-dark mb-2">No classes scheduled yet</p>
+                <p className="text-xl font-semibold text-gym-text-dark mb-2">No classes scheduled yet</p>
                 <p className="text-gray-600 mb-4">Click + to create one</p>
               </div>
             ) : (
@@ -243,8 +243,8 @@ const Dashboard = ({ user, events, registrations, attendance, onSignOut, onViewC
           {/* Side Panel */}
           <div className="space-y-8">
             {userRole === 'student' && (
-              <div id="my-classes-section" className="bg-white rounded-grip shadow-grip-lg border border-gray-300-card p-4">
-                <h2 className="text-xl font-montserrat font-semibold text-grip-dark mb-4">
+              <div id="my-classes-section" className="bg-white rounded-[12px] shadow-gym p-4">
+                <h2 className="text-xl font-poppins font-bold text-gym-text-dark mb-4">
                   My Upcoming Classes
                 </h2>
                 {loadingRegistrations ? (
@@ -254,7 +254,7 @@ const Dashboard = ({ user, events, registrations, attendance, onSignOut, onViewC
                 ) : userRegs.length === 0 ? (
                   <div className="text-center py-8">
                     <span className="text-5xl block mb-2">💪</span>
-                    <p className="text-grip-dark font-medium">You haven't registered for any classes yet</p>
+                    <p className="text-gym-text-dark font-medium">You haven't registered for any classes yet</p>
                     <p className="text-sm text-gray-600 mt-2">
                       Click on calendar dates to find workouts
                     </p>
@@ -264,10 +264,10 @@ const Dashboard = ({ user, events, registrations, attendance, onSignOut, onViewC
                     {userRegs.slice(0, 3).map(reg => (
                       <div 
                       key={reg.id} 
-                      className="border border-gray-300-card rounded-grip p-4 hover:shadow-grip-lg transition-all cursor-pointer"
+                      className="border border-gray-200 rounded-grip p-4 hover:shadow-gym-lg transition-all cursor-pointer"
                       onClick={() => onEventSelect?.(reg.event)} 
                       >
-                        <h3 className="font-semibold text-grip-dark">{reg.event.title}</h3>
+                        <h3 className="font-semibold text-gym-text-dark">{reg.event.title}</h3>
                         <p className="text-sm text-gray-600 mt-2">
                           {new Date(reg.event.date + 'T12:00:00').toLocaleDateString('en-US', { 
                             weekday: 'short', 
@@ -278,12 +278,12 @@ const Dashboard = ({ user, events, registrations, attendance, onSignOut, onViewC
                         <div className="flex justify-between items-center mt-2">
                           <span className={`px-2 py-1 rounded text-xs font-semibold
                             ${reg.event.type === 'workout' 
-                              ? 'bg-grip-primary text-white' 
+                              ? 'bg-gym-primary text-white' 
                               : 'bg-green-100 text-green-800'}`}
                           >
                             {reg.event.type.toUpperCase()}
                           </span>
-                          <span className="text-grip-primary text-sm font-semibold">
+                          <span className="text-gym-accent text-sm font-semibold">
   View →
 </span>
                         </div>
@@ -292,7 +292,7 @@ const Dashboard = ({ user, events, registrations, attendance, onSignOut, onViewC
                     {userRegs.length > 3 && (
                       <button
                         onClick={() => onViewChange('myClasses')}
-                        className="w-full text-grip-primary font-semibold py-2 hover:bg-grip-secondary/20 rounded-grip transition-all"
+                        className="w-full text-gym-accent font-semibold py-2 hover:bg-gym-accent/10 rounded-grip transition-all"
                       >
                         View All ({userRegs.length} classes)
                       </button>
@@ -304,12 +304,12 @@ const Dashboard = ({ user, events, registrations, attendance, onSignOut, onViewC
 
             {/* Quick Stats */}
             {loadingEvents || loadingRegistrations ? (
-              <div className="bg-white rounded-grip shadow-grip-lg border border-gray-300-card p-8 flex items-center justify-center">
+              <div className="bg-white rounded-[12px] shadow-gym p-8 flex items-center justify-center">
                 <LoadingSpinner size="md" />
               </div>
             ) : (
-              <div className="bg-white rounded-grip shadow-grip-lg border border-gray-300-card p-4">
-                <h2 className="text-xl font-montserrat font-semibold text-grip-dark mb-4">
+              <div className="bg-white rounded-[12px] shadow-gym p-4">
+                <h2 className="text-xl font-poppins font-bold text-gym-text-dark mb-4">
                   Quick Stats
                 </h2>
               <div className="space-y-2">
@@ -354,7 +354,7 @@ const Dashboard = ({ user, events, registrations, attendance, onSignOut, onViewC
         <div className="max-w-md mx-auto px-4 py-2">
           <div className="flex justify-around">
             <button
-              className="flex flex-col items-center py-2 px-4 text-grip-primary"
+              className="flex flex-col items-center py-2 px-4 text-gym-primary"
             >
               <span className="text-xl mb-1">🏠</span>
               <span className="text-xs font-semibold">Home</span>
@@ -363,7 +363,7 @@ const Dashboard = ({ user, events, registrations, attendance, onSignOut, onViewC
             {userRole === 'student' && (
               <button
                 onClick={() => onViewChange('myClasses')}
-                className="flex flex-col items-center py-2 px-4 text-gray-600 hover:text-grip-primary"
+                className="flex flex-col items-center py-2 px-4 text-gym-gray hover:text-gym-primary"
               >
                 <span className="text-xl mb-1">💪</span>
                 <span className="text-xs font-semibold">My Classes</span>
@@ -373,7 +373,7 @@ const Dashboard = ({ user, events, registrations, attendance, onSignOut, onViewC
             {userRole === 'coach' && (
               <button
                 onClick={() => onViewChange('createEvent')}
-                className="flex flex-col items-center py-2 px-4 text-gray-600 hover:text-grip-primary"
+                className="flex flex-col items-center py-2 px-4 text-gym-gray hover:text-gym-primary"
               >
                 <span className="text-xl mb-1">➕</span>
                 <span className="text-xs font-semibold">Create</span>

@@ -6,21 +6,37 @@ module.exports = {
     theme: {
       extend: {
         colors: {
-          'grip-primary': '#0F3B37',
-          'grip-secondary': '#e3d8c5', 
-          'grip-accent': '#B86450',
-          'grip-dark': '#2d2d2d',
-          'grip-light': '#F5F0E8',
+          // Bold Gym Vibes Color Palette
+          'gym-primary': '#ff6b35', // Deep Orange
+          'gym-secondary': '#2d3142', // Charcoal
+          'gym-accent': '#00d9ff', // Electric Blue
+          'gym-bg-dark': '#1a1d2e', // Dark Navy
+          'gym-card': '#252b42', // Lighter Navy
+          'gym-text-dark': '#2d3142', // Charcoal
+          'gym-text-light': '#ffffff', // White
+          'gym-success': '#10b981', // Green
+          'gym-error': '#ef4444', // Red
+          'gym-gray': '#9ca3af', // Light gray for inactive
+          // Legacy support
+          'grip-primary': '#ff6b35',
+          'grip-secondary': '#2d3142',
+          'grip-accent': '#00d9ff',
+          'grip-dark': '#2d3142',
+          'grip-light': '#1a1d2e',
         },
         fontFamily: {
-          'montserrat': ['Montserrat', 'sans-serif'],
-          'inter': ['Inter', 'sans-serif'],
+          'poppins': ['Poppins', 'sans-serif'],
+          'montserrat': ['Poppins', 'sans-serif'], // Legacy support
+          'inter': ['Poppins', 'sans-serif'], // Legacy support
         },
         borderRadius: {
           'grip': '8px',
+          'gym': '8px',
         },
         boxShadow: {
-          'grip': '0 2px 8px rgba(0, 0, 0, 0.1)',
+          'grip': '0 4px 20px rgba(0, 0, 0, 0.3)',
+          'gym': '0 4px 20px rgba(0, 0, 0, 0.3)',
+          'gym-lg': '0 8px 30px rgba(0, 0, 0, 0.4)',
         }
       },
     },

@@ -108,8 +108,8 @@ const LoginScreen = ({ onLogin, loading }) => {
   };
 
   return (
-    <div className="min-h-screen bg-grip-light flex items-center justify-center p-4">
-      <div className="bg-white rounded-grip shadow-grip-lg border border-gray-300-card p-4 w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="bg-white rounded-[12px] shadow-gym p-4 w-full max-w-md">
         <div className="text-center mb-8">
           <Logo size="large" />
         </div>
@@ -119,7 +119,7 @@ const LoginScreen = ({ onLogin, loading }) => {
             type="button"
             onClick={() => setIsSignUp(false)}
             className={`flex-1 py-2 rounded-grip font-medium transition-all ${
-              !isSignUp ? 'bg-grip-primary text-white' : 'bg-grip-secondary text-gray-600'
+              !isSignUp ? 'bg-gym-primary text-white' : 'bg-gray-200 text-gym-text-dark'
             }`}
           >
             Login
@@ -140,26 +140,26 @@ const LoginScreen = ({ onLogin, loading }) => {
             <>
               <div className="flex gap-2">
                 <div className="flex-1">
-                  <label className="block text-sm font-semibold text-grip-dark mb-2">
+                  <label className="block text-sm font-semibold text-gym-text-dark mb-2">
                     First Name
                   </label>
                   <input
                     type="text"
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-grip bg-white focus:outline-none focus:ring-2 focus:ring-grip-primary focus:border-transparent transition-colors"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-grip bg-white focus:outline-none focus:ring-2 focus:ring-gym-primary focus:border-transparent transition-colors"
                     required
                   />
                 </div>
                 <div className="flex-1">
-                  <label className="block text-sm font-semibold text-grip-dark mb-2">
+                  <label className="block text-sm font-semibold text-gym-text-dark mb-2">
                     Last Name
                   </label>
                   <input
                     type="text"
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-grip bg-white focus:outline-none focus:ring-2 focus:ring-grip-primary focus:border-transparent transition-colors"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-grip bg-white focus:outline-none focus:ring-2 focus:ring-gym-primary focus:border-transparent transition-colors"
                     required
                   />
                 </div>
@@ -174,7 +174,7 @@ const LoginScreen = ({ onLogin, loading }) => {
                     type="button"
                     onClick={() => setRole('student')}
                     className={`flex-1 py-2 rounded-grip font-semibold transition-all ${
-                      role === 'student' ? 'bg-grip-primary text-white' : 'bg-grip-secondary text-gray-600'
+                      role === 'student' ? 'bg-gym-primary text-white' : 'bg-gray-200 text-gym-text-dark'
                     }`}
                   >
                     Student
@@ -183,7 +183,7 @@ const LoginScreen = ({ onLogin, loading }) => {
                     type="button"
                     onClick={() => setRole('coach')}
                     className={`flex-1 py-2 rounded-grip font-semibold transition-all ${
-                      role === 'coach' ? 'bg-grip-primary text-white' : 'bg-grip-secondary text-gray-600'
+                      role === 'coach' ? 'bg-gym-primary text-white' : 'bg-gray-200 text-gym-text-dark'
                     }`}
                   >
                     Coach
@@ -248,14 +248,14 @@ const LoginScreen = ({ onLogin, loading }) => {
               }}
               onFocus={() => isSignUp && setShowRequirements(true)}
               className={`w-full px-4 py-3 border rounded-grip focus:outline-none transition-colors
-                ${passwordError ? 'border-mjg-error' : 'border-gray-300 focus:ring-2 focus:ring-grip-primary focus:border-transparent'}`}
+                ${passwordError ? 'border-gym-error' : 'border-gray-200 focus:ring-2 focus:ring-gym-primary focus:border-transparent'}`}
               required
             />
             
             {/* Password Requirements Checklist */}
             {isSignUp && showRequirements && (
               <div className="mt-2 p-3 bg-gray-50 rounded-grip text-sm">
-                <p className="font-semibold text-grip-dark mb-2">Password must have:</p>
+                <p className="font-semibold text-gym-text-dark mb-2">Password must have:</p>
                 <ul className="space-y-1">
                   <li className={`flex items-center ${validatePassword(password).requirements.minLength ? 'text-green-600' : 'text-gray-600'}`}>
                     <span className="mr-2">{validatePassword(password).requirements.minLength ? '✓' : '○'}</span>
@@ -286,7 +286,7 @@ const LoginScreen = ({ onLogin, loading }) => {
             <button
               type="button"
               onClick={() => setShowReset(true)}
-              className="text-sm text-grip-primary hover:underline mt-1"
+              className="text-sm text-gym-accent hover:underline mt-1"
             >
               Forgot Password?
             </button>
@@ -294,7 +294,7 @@ const LoginScreen = ({ onLogin, loading }) => {
           
           <button 
             type="submit"
-            className="w-full bg-grip-primary text-white py-3 rounded-grip font-medium hover:opacity-90 transition-all duration-200 min-h-[48px]"
+            className="w-full bg-gym-primary text-white py-3 rounded-grip font-semibold hover:bg-[#ff8555] transition-all duration-200 min-h-[48px]"
             disabled={loading}
           >
             {loading ? (isSignUp ? 'Creating Account...' : 'Signing in...') : (isSignUp ? 'Create Account' : 'Sign In')}
@@ -305,7 +305,7 @@ const LoginScreen = ({ onLogin, loading }) => {
               <button
                 type="button"
                 onClick={() => setShowResend(true)}
-                className="mt-3 text-sm text-grip-primary hover:underline"
+                className="mt-3 text-sm text-gym-accent hover:underline"
               >
                 Didn't receive verification email?
               </button>
@@ -318,7 +318,7 @@ const LoginScreen = ({ onLogin, loading }) => {
       {showReset && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl p-4 max-w-md w-full">
-            <h2 className="text-2xl font-semibold text-grip-primary mb-4">Reset Password</h2>
+            <h2 className="text-2xl font-semibold text-gym-text-dark mb-4">Reset Password</h2>
             <p className="text-gray-600 mb-4">
               Enter your email address and we'll send you a link to reset your password.
             </p>
@@ -329,7 +329,7 @@ const LoginScreen = ({ onLogin, loading }) => {
                 placeholder="Enter your email"
                 value={resetEmail}
                 onChange={(e) => setResetEmail(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-grip focus:outline-none focus:ring-2 focus:ring-grip-primary focus:border-transparent transition-colors mb-4"
+                className="w-full px-4 py-3 border border-gray-200 rounded-grip focus:outline-none focus:ring-2 focus:ring-gym-primary focus:border-transparent transition-colors mb-4"
                 required
               />
               
@@ -340,13 +340,13 @@ const LoginScreen = ({ onLogin, loading }) => {
                     setShowReset(false);
                     setResetEmail('');
                   }}
-                  className="flex-1 bg-grip-secondary text-grip-primary py-3 rounded-grip font-semibold"
+                  className="flex-1 border-2 border-gym-accent text-gym-accent bg-transparent py-3 rounded-grip font-semibold hover:bg-gym-accent hover:text-white"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 bg-grip-primary text-white py-3 rounded-grip font-semibold"
+                  className="flex-1 bg-gym-primary text-white py-3 rounded-grip font-semibold hover:bg-[#ff8555]"
                 >
                   Send Reset Email
                 </button>
@@ -360,13 +360,13 @@ const LoginScreen = ({ onLogin, loading }) => {
       {showResend && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl p-4 max-w-md w-full">
-            <h3 className="text-xl font-semibold text-grip-primary mb-4">Resend Verification Email</h3>
+            <h3 className="text-xl font-semibold text-gym-text-dark mb-4">Resend Verification Email</h3>
             <input
               type="email"
               placeholder="Enter your email address"
               value={resendEmail}
               onChange={(e) => setResendEmail(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-grip mb-4"
+              className="w-full px-4 py-3 border border-gray-200 rounded-grip focus:outline-none focus:ring-2 focus:ring-gym-primary focus:border-transparent mb-4"
             />
             <div className="flex gap-4">
               <button

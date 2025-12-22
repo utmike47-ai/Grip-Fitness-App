@@ -226,19 +226,19 @@ const WorkoutDetails = ({
   const noteButtonLabel = hasWorkoutNote ? 'VIEW/EDIT NOTES' : 'WORKOUT NOTES';
 
   return (
-    <div className="min-h-screen bg-grip-light pb-20">
+    <div className="min-h-screen pb-20">
       {/* Header */}
-      <div className="bg-grip-primary shadow-grip border-b border-grip-primary">
+      <div className="bg-gym-secondary shadow-lg border-b border-gym-secondary">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <button
             type="button"
             onClick={onBack}
-            className="text-white hover:text-grip-secondary font-semibold"
+            className="text-white hover:text-gym-accent font-semibold"
             style={{ minWidth: 44, minHeight: 44 }}
           >
             ← Back
           </button>
-          <h1 className="text-2xl font-montserrat font-semibold text-white">
+          <h1 className="text-2xl font-poppins font-bold text-white">
             {event.title}
           </h1>
           <span className="w-16" />
@@ -248,10 +248,10 @@ const WorkoutDetails = ({
       {/* Content */}
       <div className="max-w-4xl mx-auto px-4 py-6">
         {/* Workout Info */}
-        <div className="bg-white rounded-grip shadow-grip border border-gray-200 p-4 mb-8">
+        <div className="bg-white rounded-[12px] shadow-gym p-4 mb-8">
           <div className="flex justify-between items-start mb-4">
             <div className="flex-1 pr-6">
-              <h2 className="text-xl font-bold text-grip-dark mb-2">
+              <h2 className="text-xl font-bold text-gym-text-dark mb-2">
                 {new Date(event.date + 'T12:00:00').toLocaleDateString('en-US', { 
                   weekday: 'long', 
                   month: 'long', 
@@ -259,7 +259,7 @@ const WorkoutDetails = ({
                 })}
               </h2>
               {event.details && (
-                <div className="text-grip-dark leading-relaxed">
+                <div className="text-gym-text-dark leading-relaxed">
                   {event.details
                     .split('\n')
                     .filter(line => line.trim())
@@ -284,7 +284,7 @@ const WorkoutDetails = ({
                 <span
                   className={`w-full inline-flex items-center justify-center px-4 py-3 rounded-full text-sm font-semibold ${
                     event.type === 'workout'
-                      ? 'bg-grip-accent text-white'
+                      ? 'bg-gym-primary text-white'
                       : 'bg-green-100 text-green-800'
                   }`}
                   style={{ minHeight: 48 }}
@@ -294,7 +294,7 @@ const WorkoutDetails = ({
                 <button
                   type="button"
                   onClick={() => openModal(event)}
-                  className="w-full px-4 py-3 rounded-full font-semibold text-white transition-all shadow-sm bg-grip-accent hover:bg-opacity-90"
+                  className="w-full px-4 py-3 rounded-full font-semibold text-white transition-all shadow-sm bg-gym-primary hover:bg-[#ff8555]"
                   style={{ minHeight: 48 }}
                 >
                   {noteButtonLabel}
@@ -316,14 +316,14 @@ const WorkoutDetails = ({
               role="dialog"
               aria-modal="true"
               aria-labelledby={modalTitleId}
-              className={`bg-white rounded-grip shadow-grip border border-gray-200 w-full max-w-lg p-4 sm:p-4 transition-all duration-200 transform ${
+              className={`bg-white rounded-[12px] shadow-gym w-full max-w-lg p-4 sm:p-4 transition-all duration-200 transform ${
                 modalActive ? 'scale-100 translate-y-0' : 'scale-95 -translate-y-4'
               } max-h-[90vh] overflow-y-auto flex flex-col`}
             >
               <div className="flex items-start justify-between mb-4">
                 <div>
                   <p className="text-xs uppercase tracking-wide text-gray-600 font-semibold">Workout</p>
-                  <h2 id={modalTitleId} className="text-2xl font-montserrat font-semibold text-grip-dark">
+                  <h2 id={modalTitleId} className="text-2xl font-poppins font-bold text-gym-text-dark">
                     {event.title}
                   </h2>
                   {activeEvent && (
@@ -339,7 +339,7 @@ const WorkoutDetails = ({
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="text-gray-600 hover:text-grip-primary text-sm font-semibold"
+                  className="text-gray-600 hover:text-gym-accent text-sm font-semibold"
                   aria-label="Close notes modal"
                   style={{ minWidth: 44, minHeight: 44 }}
                 >
@@ -398,8 +398,8 @@ const WorkoutDetails = ({
                   disabled={noteSaving || noteLoading}
                   className={`flex-1 px-4 py-3 rounded-grip font-semibold text-white transition-colors ${
                     noteSaving || noteLoading
-                      ? 'bg-grip-primary/60 cursor-not-allowed'
-                      : 'bg-grip-primary hover:bg-opacity-90'
+                      ? 'bg-gym-primary/60 cursor-not-allowed'
+                      : 'bg-gym-primary hover:bg-[#ff8555]'
                   }`}
                   style={{ minHeight: 48 }}
                 >
@@ -408,7 +408,7 @@ const WorkoutDetails = ({
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="flex-1 px-4 py-3 rounded-grip font-semibold border border-gray-300 text-grip-dark hover:bg-gray-100 transition-colors"
+                  className="flex-1 px-4 py-3 rounded-grip font-semibold border-2 border-gym-accent text-gym-accent bg-transparent hover:bg-gym-accent hover:text-white transition-colors"
                   style={{ minHeight: 48 }}
                 >
                   Cancel
@@ -429,10 +429,10 @@ const WorkoutDetails = ({
             const isPastWorkout = slotDate < today;
 
             return (
-              <div key={slot.id} className="bg-white rounded-grip shadow-grip border border-gray-200 p-4">
+              <div key={slot.id} className="bg-white rounded-[12px] shadow-gym p-4">
                 <div className="flex justify-between items-center mb-4">
                   <div className="flex-1">
-                    <p className="text-4xl font-extrabold mb-1" style={{ color: '#0F3B37' }}>
+                    <p className="text-4xl font-extrabold mb-1" style={{ color: '#2d3142' }}>
                       {formatTime(slot.time) || 'Time TBD'}
                     </p>
                     <p className="text-sm text-gray-600">
@@ -447,7 +447,7 @@ const WorkoutDetails = ({
                     ) : userRegistered ? (
                       <button
                         onClick={() => onCancelRegistration(slot.id)}
-                        className="bg-grip-accent text-white px-4 py-2 rounded-full font-semibold hover:bg-opacity-90 transition-all"
+                        className="bg-gym-primary text-white px-4 py-2 rounded-full font-semibold hover:bg-[#ff8555] transition-all"
                         style={{ minHeight: 44, minWidth: 120 }}
                       >
                         Cancel
@@ -459,7 +459,7 @@ const WorkoutDetails = ({
                         className={`px-4 py-2 rounded-full font-semibold transition-all
                           ${isFull 
                             ? 'bg-gray-200 text-gray-600 cursor-not-allowed' 
-                            : 'bg-grip-primary text-white hover:bg-opacity-90'}`}
+                            : 'bg-gym-primary text-white hover:bg-[#ff8555]'}`}
                         style={{ minHeight: 44, minWidth: 120 }}
                       >
                         {isFull ? 'FULL' : 'Register'}
@@ -471,12 +471,12 @@ const WorkoutDetails = ({
                 {/* Registered Users List */}
                 {regs.length > 0 && (
                   <div className="pt-4 border-t border-gray-200">
-                    <p className="font-semibold text-grip-dark mb-2">
+                    <p className="font-semibold text-gym-text-dark mb-2">
                       Registered Participants ({regs.length}):
                     </p>
                     <div className="space-y-2">
                       {regs.map(reg => (
-                        <div key={reg.id} className="text-sm text-grip-dark">
+                        <div key={reg.id} className="text-sm text-gym-text-dark">
                           • {reg.user_name}
                         </div>
                       ))}

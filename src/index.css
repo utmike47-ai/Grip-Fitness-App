@@ -1,46 +1,54 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   body {
-    @apply text-grip-dark font-montserrat;
+    @apply text-gym-text-light font-poppins;
     font-weight: 400;
-    background: #F5F0E8;
+    /* Bold Gym Gradient Background - teal to brown */
+    background: linear-gradient(180deg, #1a5f5f 0%, #8b5a3c 100%);
+    background-attachment: fixed;
     min-height: 100vh;
+    position: relative;
   }
   
   h1, h2, h3, h4, h5, h6 {
-    @apply font-montserrat font-semibold;
-    font-weight: 600;
-    color: #0F3B37;
+    @apply font-poppins font-bold;
+    font-weight: 700;
+    color: #ffffff;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   }
 }
 
 @layer components {
   .btn-primary {
-    @apply bg-grip-primary text-white px-6 py-3 rounded-grip font-medium
-           hover:bg-opacity-90 transition-all duration-200;
+    @apply bg-gym-primary text-white px-6 py-3 rounded-grip font-semibold
+           hover:bg-[#ff8555] transition-all duration-200;
     min-height: 48px;
   }
   
   .btn-secondary {
-    @apply bg-grip-secondary text-grip-primary px-6 py-3 rounded-grip font-medium
-           hover:bg-opacity-80 transition-all duration-200;
+    @apply border-2 border-gym-accent text-gym-accent bg-transparent px-6 py-3 rounded-grip font-semibold
+           hover:bg-gym-accent hover:text-white transition-all duration-200;
     min-height: 48px;
   }
   
   .card {
-    @apply bg-white rounded-grip shadow-grip p-4 border border-gray-200 mb-8;
-    color: #2d2d2d;
+    @apply bg-white rounded-[12px] shadow-gym p-4 mb-8;
+    color: #2d3142;
   }
   
   .input-field {
-    @apply w-full px-4 py-3 border border-gray-300 rounded-grip bg-white
-           focus:outline-none focus:ring-2 focus:ring-grip-primary focus:border-transparent transition-colors;
+    @apply w-full px-4 py-3 border border-gray-200 rounded-grip bg-white
+           focus:outline-none focus:ring-2 focus:ring-gym-primary focus:border-transparent transition-colors;
     font-weight: 400;
-    color: #2d2d2d;
+    color: #2d3142;
+  }
+  
+  .input-field::placeholder {
+    color: #9ca3af;
   }
 
   @keyframes slide-in {
