@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../../utils/supabaseClient';
+import Logo from '../Logo';
 
 const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshProfiles }) => {
   const userRole = user?.user_metadata?.role || 'student';
@@ -339,17 +340,18 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
       <div className="bg-gym-secondary shadow-lg border-b border-gym-secondary">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <Logo size="medium" variant="dark" />
-          <div className="flex items-center gap-4">
-            <button
-              onClick={onBack}
-              className="text-white hover:text-gym-accent transition-colors"
-              style={{ minWidth: 44, minHeight: 44 }}
-            >
-              ← Back
-            </button>
-          </div>
+          <button
+            onClick={onBack}
+            className="text-white hover:text-gym-accent transition-colors"
+            style={{ minWidth: 44, minHeight: 44 }}
+          >
+            ← Back
+          </button>
         </div>
-        <div className="max-w-7xl mx-auto px-4 pb-4 flex items-center justify-between">
+      </div>
+      
+      <div className="max-w-7xl mx-auto px-4 pt-6">
+        <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-poppins font-bold text-white">
             Manage Members
           </h1>

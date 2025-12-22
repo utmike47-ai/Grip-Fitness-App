@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Logo from '../Logo';
 
 const NotesView = ({ selectedEvent, userNotes, user, onBack, onSaveNote }) => {
   const [noteText, setNoteText] = useState('');

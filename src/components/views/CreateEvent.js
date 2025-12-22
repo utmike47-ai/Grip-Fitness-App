@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { TIME_SLOTS } from '../../utils/constants';
+import Logo from '../Logo';
 
 const CreateEvent = ({ user, onBack, onCreateEvent, editMode = false, existingEvent = null }) => {
     const [eventData, setEventData] = useState(() => {

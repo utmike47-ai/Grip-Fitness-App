@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { TIME_SLOTS } from '../../utils/constants';
+import Logo from '../Logo';
 
 const MyClasses = ({ user, events, registrations, onBack, onSelectEvent, onCancelRegistration }) => {
     const formatTimeDisplay = (time24) => {
