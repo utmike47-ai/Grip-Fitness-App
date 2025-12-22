@@ -29,22 +29,22 @@ const Calendar = ({ events, onDateSelect }) => {
     "July", "August", "September", "October", "November", "December"];
 
   return (
-    <div className="bg-white p-4 rounded-grip shadow-grip border border-gray-300">
+    <div className="bg-white p-4 rounded-[12px] shadow-gym">
       <div className="flex justify-between items-center mb-6">
         <button
           onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))}
-          className="p-2 text-grip-dark hover:bg-gray-100 rounded-grip transition-colors"
+          className="p-2 text-gym-text-dark hover:bg-gray-100 rounded-grip transition-colors"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
-        <h2 className="text-xl font-montserrat font-semibold text-grip-dark">
+        <h2 className="text-xl font-poppins font-bold text-gym-text-dark">
           {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
         </h2>
         <button
           onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))}
-          className="p-2 text-grip-dark hover:bg-gray-100 rounded-grip transition-colors"
+          className="p-2 text-gym-text-dark hover:bg-gray-100 rounded-grip transition-colors"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

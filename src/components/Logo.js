@@ -9,7 +9,7 @@ const Logo = ({ size = 'medium', showText = true }) => {
 
   return (
     <div className="flex items-center">
-      <span className={`${sizes[size]} font-montserrat font-bold text-grip-primary`}>
+      <span className={`${sizes[size]} font-poppins font-bold text-white`}>
         GRIP FITNESS FOR LONGEVITY
       </span>
     </div>
