@@ -1,48 +1,20 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   body {
-    @apply text-mjg-text-primary font-poppins;
+    @apply text-grip-dark font-montserrat;
     font-weight: 400;
-    /* Dark textured background inspired by cast iron kettlebell */
-    background: 
-      radial-gradient(circle at 20% 50%, #1a1a1a 0%, transparent 50%),
-      radial-gradient(circle at 80% 80%, #0f0f0f 0%, transparent 50%),
-      radial-gradient(circle at 40% 20%, #1a1a1a 0%, transparent 50%),
-      #0a0a0a;
-    background-size: 100% 100%;
+    background: #F5F0E8;
     min-height: 100vh;
-    /* Subtle noise texture */
-    position: relative;
-  }
-  
-  body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: 
-      repeating-linear-gradient(0deg, rgba(255,255,255,.02), transparent 1px, transparent 2px, rgba(255,255,255,.02) 3px),
-      repeating-linear-gradient(90deg, rgba(255,255,255,.02), transparent 1px, transparent 2px, rgba(255,255,255,.02) 3px);
-    pointer-events: none;
-    z-index: 0;
-  }
-  
-  #root {
-    position: relative;
-    z-index: 1;
   }
   
   h1, h2, h3, h4, h5, h6 {
-    @apply font-poppins font-semibold;
+    @apply font-montserrat font-semibold;
     font-weight: 600;
-    /* Default to white for headings on dark background, but can be overridden in components */
-    color: #FFFFFF;
+    color: #0F3B37;
   }
 }
 

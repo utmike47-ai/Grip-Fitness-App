@@ -431,8 +431,8 @@ const WorkoutDetails = ({
               <div key={slot.id} className="bg-white rounded-grip shadow-grip border border-gray-200 p-4">
                 <div className="flex justify-between items-center mb-4">
                   <div className="flex-1">
-                    <p className="text-4xl font-extrabold text-grip-primary mb-1">
-                      {formatTime(slot.time)}
+                    <p className="text-4xl font-extrabold mb-1" style={{ color: '#0F3B37' }}>
+                      {formatTime(slot.time) || 'Time TBD'}
                     </p>
                     <p className="text-sm text-gray-600">
                       {regs.length}/15 registered
