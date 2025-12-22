@@ -109,19 +109,19 @@ const ProfileEdit = ({ user, onBack, onProfileUpdate, showToast }) => {
   };
 
   return (
-    <div className="min-h-screen bg-grip-light pb-20">
-      <div className="bg-grip-secondary shadow-grip border-b border-gray-300">
+    <div className="min-h-screen pb-20">
+      <div className="bg-gym-secondary shadow-lg border-b border-gym-secondary">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center">
             <button
               onClick={onBack}
-              className="mr-4 text-grip-primary hover:text-grip-primary transition-colors"
+              className="mr-4 text-white hover:text-gym-accent transition-colors"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
-            <h1 className="text-2xl font-montserrat font-semibold text-grip-primary">
+            <h1 className="text-2xl font-poppins font-bold text-white">
               Edit Profile
             </h1>
           </div>
@@ -130,33 +130,33 @@ const ProfileEdit = ({ user, onBack, onProfileUpdate, showToast }) => {
 
       <div className="max-w-md mx-auto px-4 py-6 space-y-8">
         {/* Edit Profile Form */}
-        <form onSubmit={handleSubmit} className="bg-white rounded-grip shadow-grip border border-gray-300 p-4">
-          <h2 className="text-lg font-montserrat font-semibold text-grip-dark mb-4">
+        <form onSubmit={handleSubmit} className="bg-white rounded-[12px] shadow-gym p-4">
+          <h2 className="text-lg font-poppins font-bold text-gym-text-dark mb-4">
             Edit Profile
           </h2>
           <div className="mb-4">
-            <label className="block text-sm font-semibold text-grip-dark mb-2">
+            <label className="block text-sm font-semibold text-gym-text-dark mb-2">
               First Name
             </label>
             <input
               type="text"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-grip focus:outline-none focus:ring-2 focus:ring-grip-primary focus:border-transparent"
+              className="w-full px-4 py-3 border border-gray-200 rounded-grip focus:outline-none focus:ring-2 focus:ring-gym-primary focus:border-transparent"
               placeholder="Enter your first name"
               required
             />
           </div>
 
           <div className="mb-8">
-            <label className="block text-sm font-semibold text-grip-dark mb-2">
+            <label className="block text-sm font-semibold text-gym-text-dark mb-2">
               Last Name
             </label>
             <input
               type="text"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-grip focus:outline-none focus:ring-2 focus:ring-grip-primary focus:border-transparent"
+              className="w-full px-4 py-3 border border-gray-200 rounded-grip focus:outline-none focus:ring-2 focus:ring-gym-primary focus:border-transparent"
               placeholder="Enter your last name"
               required
             />
@@ -166,14 +166,14 @@ const ProfileEdit = ({ user, onBack, onProfileUpdate, showToast }) => {
             <button
               type="button"
               onClick={onBack}
-              className="flex-1 bg-grip-secondary text-grip-primary py-3 rounded-grip font-semibold"
+              className="flex-1 border-2 border-gym-accent text-gym-accent bg-transparent py-3 rounded-grip font-semibold hover:bg-gym-accent hover:text-white"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 bg-grip-primary text-white py-3 rounded-grip font-semibold"
+              className="flex-1 bg-gym-primary text-white py-3 rounded-grip font-semibold hover:bg-[#ff8555]"
             >
               {loading ? 'Saving...' : 'Save Changes'}
             </button>
@@ -181,8 +181,8 @@ const ProfileEdit = ({ user, onBack, onProfileUpdate, showToast }) => {
         </form>
 
         {/* Change Password Form */}
-        <form onSubmit={handlePasswordChange} className="bg-white rounded-grip shadow-grip border border-gray-300 p-4">
-          <h2 className="text-lg font-montserrat font-semibold text-grip-dark mb-4">
+        <form onSubmit={handlePasswordChange} className="bg-white rounded-[12px] shadow-gym p-4">
+          <h2 className="text-lg font-poppins font-bold text-gym-text-dark mb-4">
             Change Password
           </h2>
           
@@ -193,7 +193,7 @@ const ProfileEdit = ({ user, onBack, onProfileUpdate, showToast }) => {
           )}
 
           <div className="mb-4">
-            <label className="block text-sm font-semibold text-grip-dark mb-2">
+            <label className="block text-sm font-semibold text-gym-text-dark mb-2">
               New Password
             </label>
             <input
@@ -203,7 +203,7 @@ const ProfileEdit = ({ user, onBack, onProfileUpdate, showToast }) => {
                 setNewPassword(e.target.value);
                 setPasswordError('');
               }}
-              className="w-full px-4 py-3 border border-gray-300 rounded-grip focus:outline-none focus:ring-2 focus:ring-grip-primary focus:border-transparent"
+              className="w-full px-4 py-3 border border-gray-200 rounded-grip focus:outline-none focus:ring-2 focus:ring-gym-primary focus:border-transparent"
               placeholder="Enter new password (min 8 characters)"
               minLength={8}
               required
@@ -212,7 +212,7 @@ const ProfileEdit = ({ user, onBack, onProfileUpdate, showToast }) => {
           </div>
 
           <div className="mb-8">
-            <label className="block text-sm font-semibold text-grip-dark mb-2">
+            <label className="block text-sm font-semibold text-gym-text-dark mb-2">
               Confirm New Password
             </label>
             <input
@@ -222,7 +222,7 @@ const ProfileEdit = ({ user, onBack, onProfileUpdate, showToast }) => {
                 setConfirmPassword(e.target.value);
                 setPasswordError('');
               }}
-              className="w-full px-4 py-3 border border-gray-300 rounded-grip focus:outline-none focus:ring-2 focus:ring-grip-primary focus:border-transparent"
+              className="w-full px-4 py-3 border border-gray-200 rounded-grip focus:outline-none focus:ring-2 focus:ring-gym-primary focus:border-transparent"
               placeholder="Confirm new password"
               minLength={8}
               required
@@ -232,7 +232,7 @@ const ProfileEdit = ({ user, onBack, onProfileUpdate, showToast }) => {
           <button
             type="submit"
             disabled={passwordLoading || !newPassword || !confirmPassword}
-            className="w-full bg-grip-primary text-white py-3 rounded-grip font-semibold hover:shadow-grip transition-all disabled:bg-grip-secondary disabled:cursor-not-allowed"
+            className="w-full bg-gym-primary text-white py-3 rounded-grip font-semibold hover:bg-[#ff8555] transition-all disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
             {passwordLoading ? 'Updating...' : 'Update Password'}
           </button>
