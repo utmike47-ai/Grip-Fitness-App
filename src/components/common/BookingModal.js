@@ -16,10 +16,10 @@ const BookingModal = ({ isOpen, onClose, eventDetails }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-      <div className="bg-mjg-card rounded-mjg shadow-mjg border border-mjg-border p-8 max-w-md mx-4 relative">
+      <div className="bg-white rounded-grip shadow-grip border border-gray-300 p-8 max-w-md mx-4 relative">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-mjg-text-secondary hover:text-mjg-text-primary"
+          className="absolute top-4 right-4 text-gray-600 hover:text-grip-primary"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -28,15 +28,15 @@ const BookingModal = ({ isOpen, onClose, eventDetails }) => {
         
         <div className="text-center">
           <div className="text-6xl mb-4">🎉</div>
-          <h2 className="text-3xl font-semibold text-mjg-text-primary mb-4">You're Booked!</h2>
+          <h2 className="text-3xl font-semibold text-grip-primary mb-4">You're Booked!</h2>
           
-          <div className="bg-mjg-bg-secondary rounded-mjg p-4 mb-6">
-            <p className="text-lg font-semibold text-mjg-text-primary mb-2">{eventDetails.title}</p>
-            <p className="text-mjg-text-primary">{formatDate(eventDetails.date)}</p>
-            <p className="text-mjg-text-primary">{eventDetails.time}</p>
+          <div className="bg-grip-secondary rounded-grip p-4 mb-6">
+            <p className="text-lg font-semibold text-grip-primary mb-2">{eventDetails.title}</p>
+            <p className="text-grip-primary">{formatDate(eventDetails.date)}</p>
+            <p className="text-grip-primary">{eventDetails.time}</p>
           </div>
           
-          <p className="text-mjg-text-secondary">See you there!</p>
+          <p className="text-gray-600">See you there!</p>
         </div>
       </div>
     </div>

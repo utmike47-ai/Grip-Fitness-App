@@ -136,9 +136,9 @@ const Dashboard = ({ user, events, registrations, attendance, onSignOut, onViewC
   }, [user, registrations, events]);
 
   return (
-    <div className="min-h-screen bg-mjg-bg-primary pb-20">
+    <div className="min-h-screen bg-grip-light pb-20">
       {/* Header */}
-      <div className="bg-mjg-bg-secondary shadow-mjg border-b border-mjg-border">
+      <div className="bg-grip-secondary shadow-grip border-b border-gray-300">
         <div className="max-w-7xl mx-auto px-4 py-4 h-18 flex items-center">
           <div className="flex justify-between items-center w-full">
             <Logo size="medium" />
@@ -146,14 +146,14 @@ const Dashboard = ({ user, events, registrations, attendance, onSignOut, onViewC
               {userRole === 'coach' && (
                 <button
                   onClick={() => onViewChange('createEvent')}
-                  className="bg-white text-mjg-accent px-4 py-2 rounded-mjg hover:bg-gray-100 transition-all font-semibold border-2 border-white"
+                  className="bg-white text-grip-primary px-4 py-2 rounded-grip hover:bg-gray-100 transition-all font-semibold border-2 border-white"
                 >
                   + Create Event
                 </button>
               )}
               <button
                 onClick={onSignOut}
-                className="bg-mjg-accent text-white px-4 py-2 rounded-mjg hover:opacity-90 transition-all min-h-[48px]"
+                className="bg-grip-primary text-white px-4 py-2 rounded-grip hover:opacity-90 transition-all min-h-[48px]"
               >
                 Logout
               </button>
@@ -165,10 +165,10 @@ const Dashboard = ({ user, events, registrations, attendance, onSignOut, onViewC
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 pt-8 pb-6">
         <div className="mb-8">
-          <h1 className="text-3xl font-poppins font-semibold text-white mb-2">
+          <h1 className="text-3xl font-montserrat font-semibold text-white mb-2">
           Welcome back, {user?.user_metadata?.first_name || user?.email?.split('@')[0]}!
           </h1>
-          <span className="inline-block bg-mjg-card text-mjg-text-card px-4 py-2 rounded-full text-sm font-medium mt-2">
+          <span className="inline-block bg-white text-grip-dark px-4 py-2 rounded-full text-sm font-medium mt-2">
             {userRole === 'coach' ? '👨‍🏫 Coach' : '🏋️‍♂️ Student'} Account
           </span>
           
@@ -176,12 +176,12 @@ const Dashboard = ({ user, events, registrations, attendance, onSignOut, onViewC
           {(user?.user_metadata?.first_name === 'User' || 
             user?.user_metadata?.first_name?.length === 8 ||
             user?.user_metadata?.last_name?.length === 8) && (
-            <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mt-2 rounded-mjg">
+            <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mt-2 rounded-grip">
               <p className="font-bold mb-2">⚠️ Please Update Your Name</p>
               <p className="text-sm mb-2">We need you to update your profile information.</p>
               <button
                 onClick={() => onViewChange('profileEdit')}
-                className="bg-yellow-600 text-white px-4 py-2 rounded-mjg text-sm font-semibold hover:shadow-mjg transition-all"
+                className="bg-yellow-600 text-white px-4 py-2 rounded-grip text-sm font-semibold hover:shadow-grip transition-all"
               >
                 Update Profile Now
               </button>
@@ -192,7 +192,7 @@ const Dashboard = ({ user, events, registrations, attendance, onSignOut, onViewC
           <div className="mt-2">
             <button
               onClick={() => onViewChange('profileEdit')}
-              className="text-sm text-mjg-text-primary underline hover:text-mjg-accent transition-colors"
+              className="text-sm text-grip-primary underline hover:text-grip-primary transition-colors"
             >
               Edit Profile
             </button>
@@ -211,7 +211,7 @@ const Dashboard = ({ user, events, registrations, attendance, onSignOut, onViewC
 
         {/* Loading Error Message */}
         {loadingError && (
-          <div className="mb-4 bg-red-50 border border-red-200 rounded-mjg p-4">
+          <div className="mb-4 bg-red-50 border border-red-200 rounded-grip p-4">
             <p className="text-red-800 font-medium">{loadingError}</p>
             <button
               onClick={() => window.location.reload()}
@@ -226,14 +226,14 @@ const Dashboard = ({ user, events, registrations, attendance, onSignOut, onViewC
           {/* Calendar Section */}
           <div className="lg:col-span-2">
             {loadingEvents ? (
-              <div className="bg-mjg-card rounded-mjg shadow-mjg-lg border border-mjg-border-card p-8 flex items-center justify-center">
+              <div className="bg-white rounded-grip shadow-grip-lg border border-gray-300-card p-8 flex items-center justify-center">
                 <LoadingSpinner size="lg" />
               </div>
             ) : events.length === 0 ? (
-              <div className="bg-mjg-card rounded-mjg shadow-mjg-lg border border-mjg-border-card p-8 text-center">
+              <div className="bg-white rounded-grip shadow-grip-lg border border-gray-300-card p-8 text-center">
                 <span className="text-6xl block mb-4">📅</span>
-                <p className="text-xl font-semibold text-mjg-text-card mb-2">No classes scheduled yet</p>
-                <p className="text-mjg-text-secondary mb-4">Click + to create one</p>
+                <p className="text-xl font-semibold text-grip-dark mb-2">No classes scheduled yet</p>
+                <p className="text-gray-600 mb-4">Click + to create one</p>
               </div>
             ) : (
               <Calendar events={events} onDateSelect={onDateSelect} />
@@ -243,8 +243,8 @@ const Dashboard = ({ user, events, registrations, attendance, onSignOut, onViewC
           {/* Side Panel */}
           <div className="space-y-8">
             {userRole === 'student' && (
-              <div id="my-classes-section" className="bg-mjg-card rounded-mjg shadow-mjg-lg border border-mjg-border-card p-4">
-                <h2 className="text-xl font-poppins font-semibold text-mjg-text-card mb-4">
+              <div id="my-classes-section" className="bg-white rounded-grip shadow-grip-lg border border-gray-300-card p-4">
+                <h2 className="text-xl font-montserrat font-semibold text-grip-dark mb-4">
                   My Upcoming Classes
                 </h2>
                 {loadingRegistrations ? (
@@ -254,8 +254,8 @@ const Dashboard = ({ user, events, registrations, attendance, onSignOut, onViewC
                 ) : userRegs.length === 0 ? (
                   <div className="text-center py-8">
                     <span className="text-5xl block mb-2">💪</span>
-                    <p className="text-mjg-text-card font-medium">You haven't registered for any classes yet</p>
-                    <p className="text-sm text-mjg-text-secondary mt-2">
+                    <p className="text-grip-dark font-medium">You haven't registered for any classes yet</p>
+                    <p className="text-sm text-gray-600 mt-2">
                       Click on calendar dates to find workouts
                     </p>
                   </div>
@@ -264,11 +264,11 @@ const Dashboard = ({ user, events, registrations, attendance, onSignOut, onViewC
                     {userRegs.slice(0, 3).map(reg => (
                       <div 
                       key={reg.id} 
-                      className="border border-mjg-border-card rounded-mjg p-4 hover:shadow-mjg-lg transition-all cursor-pointer"
+                      className="border border-gray-300-card rounded-grip p-4 hover:shadow-grip-lg transition-all cursor-pointer"
                       onClick={() => onEventSelect?.(reg.event)} 
                       >
-                        <h3 className="font-semibold text-mjg-text-card">{reg.event.title}</h3>
-                        <p className="text-sm text-mjg-text-secondary mt-2">
+                        <h3 className="font-semibold text-grip-dark">{reg.event.title}</h3>
+                        <p className="text-sm text-gray-600 mt-2">
                           {new Date(reg.event.date + 'T12:00:00').toLocaleDateString('en-US', { 
                             weekday: 'short', 
                             month: 'short', 
@@ -278,12 +278,12 @@ const Dashboard = ({ user, events, registrations, attendance, onSignOut, onViewC
                         <div className="flex justify-between items-center mt-2">
                           <span className={`px-2 py-1 rounded text-xs font-semibold
                             ${reg.event.type === 'workout' 
-                              ? 'bg-mjg-accent text-white' 
+                              ? 'bg-grip-primary text-white' 
                               : 'bg-green-100 text-green-800'}`}
                           >
                             {reg.event.type.toUpperCase()}
                           </span>
-                          <span className="text-mjg-accent text-sm font-semibold">
+                          <span className="text-grip-primary text-sm font-semibold">
   View →
 </span>
                         </div>
@@ -292,7 +292,7 @@ const Dashboard = ({ user, events, registrations, attendance, onSignOut, onViewC
                     {userRegs.length > 3 && (
                       <button
                         onClick={() => onViewChange('myClasses')}
-                        className="w-full text-mjg-accent font-semibold py-2 hover:bg-mjg-bg-secondary/20 rounded-mjg transition-all"
+                        className="w-full text-grip-primary font-semibold py-2 hover:bg-grip-secondary/20 rounded-grip transition-all"
                       >
                         View All ({userRegs.length} classes)
                       </button>
@@ -304,39 +304,39 @@ const Dashboard = ({ user, events, registrations, attendance, onSignOut, onViewC
 
             {/* Quick Stats */}
             {loadingEvents || loadingRegistrations ? (
-              <div className="bg-mjg-card rounded-mjg shadow-mjg-lg border border-mjg-border-card p-8 flex items-center justify-center">
+              <div className="bg-white rounded-grip shadow-grip-lg border border-gray-300-card p-8 flex items-center justify-center">
                 <LoadingSpinner size="md" />
               </div>
             ) : (
-              <div className="bg-mjg-card rounded-mjg shadow-mjg-lg border border-mjg-border-card p-4">
-                <h2 className="text-xl font-poppins font-semibold text-mjg-text-card mb-4">
+              <div className="bg-white rounded-grip shadow-grip-lg border border-gray-300-card p-4">
+                <h2 className="text-xl font-montserrat font-semibold text-grip-dark mb-4">
                   Quick Stats
                 </h2>
               <div className="space-y-2">
                 {userRole === 'coach' ? (
                   <>
                     <div className="flex justify-between items-center">
-                      <span className="text-mjg-text-secondary">Total Events</span>
-                      <span className="text-4xl font-extrabold text-mjg-text-card">{events.length}</span>
+                      <span className="text-gray-600">Total Events</span>
+                      <span className="text-4xl font-extrabold text-grip-dark">{events.length}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-mjg-text-card">Total Registrations</span>
-                      <span className="text-4xl font-extrabold text-mjg-text-card">{registrations.length}</span>
+                      <span className="text-grip-dark">Total Registrations</span>
+                      <span className="text-4xl font-extrabold text-grip-dark">{registrations.length}</span>
                     </div>
                   </>
                 ) : (
                   <>
-                    <div className="flex justify-between items-center py-2 border-b border-mjg-border-card">
-                      <span className="text-mjg-text-card font-semibold">My Classes This Week</span>
-                      <span className="text-4xl font-extrabold text-mjg-text-card">{personalStats.classesThisWeek}</span>
+                    <div className="flex justify-between items-center py-2 border-b border-gray-300-card">
+                      <span className="text-grip-dark font-semibold">My Classes This Week</span>
+                      <span className="text-4xl font-extrabold text-grip-dark">{personalStats.classesThisWeek}</span>
                     </div>
-                    <div className="flex justify-between items-center py-2 border-b border-mjg-border-card">
-                      <span className="text-mjg-text-card font-semibold">My Classes This Month</span>
-                      <span className="text-4xl font-extrabold text-mjg-text-card">{personalStats.classesThisMonth}</span>
+                    <div className="flex justify-between items-center py-2 border-b border-gray-300-card">
+                      <span className="text-grip-dark font-semibold">My Classes This Month</span>
+                      <span className="text-4xl font-extrabold text-grip-dark">{personalStats.classesThisMonth}</span>
                     </div>
                     <div className="flex justify-between items-center py-2">
-                      <span className="text-mjg-text-card font-semibold">Current Streak</span>
-                      <span className="text-4xl font-extrabold text-mjg-text-card">
+                      <span className="text-grip-dark font-semibold">Current Streak</span>
+                      <span className="text-4xl font-extrabold text-grip-dark">
                         🔥 {personalStats.streak} {personalStats.streak === 1 ? 'day' : 'days'}
                       </span>
                     </div>
@@ -350,11 +350,11 @@ const Dashboard = ({ user, events, registrations, attendance, onSignOut, onViewC
       </div>
 
       {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-mjg-card border-t border-mjg-border">
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-300">
         <div className="max-w-md mx-auto px-4 py-2">
           <div className="flex justify-around">
             <button
-              className="flex flex-col items-center py-2 px-4 text-mjg-text-primary"
+              className="flex flex-col items-center py-2 px-4 text-grip-primary"
             >
               <span className="text-xl mb-1">🏠</span>
               <span className="text-xs font-semibold">Home</span>
@@ -363,7 +363,7 @@ const Dashboard = ({ user, events, registrations, attendance, onSignOut, onViewC
             {userRole === 'student' && (
               <button
                 onClick={() => onViewChange('myClasses')}
-                className="flex flex-col items-center py-2 px-4 text-mjg-text-secondary hover:text-mjg-text-primary"
+                className="flex flex-col items-center py-2 px-4 text-gray-600 hover:text-grip-primary"
               >
                 <span className="text-xl mb-1">💪</span>
                 <span className="text-xs font-semibold">My Classes</span>
@@ -373,7 +373,7 @@ const Dashboard = ({ user, events, registrations, attendance, onSignOut, onViewC
             {userRole === 'coach' && (
               <button
                 onClick={() => onViewChange('createEvent')}
-                className="flex flex-col items-center py-2 px-4 text-mjg-text-secondary hover:text-mjg-text-primary"
+                className="flex flex-col items-center py-2 px-4 text-gray-600 hover:text-grip-primary"
               >
                 <span className="text-xl mb-1">➕</span>
                 <span className="text-xs font-semibold">Create</span>

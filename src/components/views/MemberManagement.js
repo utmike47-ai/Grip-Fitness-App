@@ -318,13 +318,13 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
   // Redirect if not authorized
   if (!isAuthorized) {
     return (
-      <div className="min-h-screen bg-mjg-bg-primary pb-20 flex items-center justify-center">
-        <div className="bg-mjg-card rounded-mjg shadow-mjg border border-mjg-border p-4 text-center max-w-md mx-4">
-          <p className="text-xl font-semibold text-mjg-text-card mb-2">Access Denied</p>
-          <p className="text-mjg-text-secondary mb-4">You don't have permission to access this page.</p>
+      <div className="min-h-screen bg-grip-light pb-20 flex items-center justify-center">
+        <div className="bg-white rounded-grip shadow-grip border border-gray-300 p-4 text-center max-w-md mx-4">
+          <p className="text-xl font-semibold text-grip-dark mb-2">Access Denied</p>
+          <p className="text-gray-600 mb-4">You don't have permission to access this page.</p>
           <button
             onClick={onBack}
-              className="bg-mjg-accent text-white px-4 py-3 rounded-mjg font-medium hover:opacity-90 transition-all min-h-[48px]"
+              className="bg-grip-primary text-white px-4 py-3 rounded-grip font-medium hover:opacity-90 transition-all min-h-[48px]"
           >
             Go Back
           </button>
@@ -334,21 +334,21 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
   }
 
   return (
-    <div className="min-h-screen bg-mjg-bg-primary pb-20">
+    <div className="min-h-screen bg-grip-light pb-20">
       {/* Header */}
-      <div className="bg-mjg-bg-secondary shadow-mjg border-b border-mjg-border">
+      <div className="bg-grip-secondary shadow-grip border-b border-gray-300">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <button
                 onClick={onBack}
-                className="mr-4 text-mjg-accent hover:text-mjg-text-primary transition-colors"
+                className="mr-4 text-grip-primary hover:text-grip-primary transition-colors"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
-              <h1 className="text-2xl font-poppins font-semibold text-mjg-text-primary">
+              <h1 className="text-2xl font-montserrat font-semibold text-grip-primary">
                 Manage Members
               </h1>
             </div>
@@ -364,7 +364,7 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
                 setAddFormErrors({});
                 setAddModalOpen(true);
               }}
-              className="bg-mjg-accent text-white px-4 py-3 rounded-mjg font-medium hover:opacity-90 transition-all min-h-[48px]"
+              className="bg-grip-primary text-white px-4 py-3 rounded-grip font-medium hover:opacity-90 transition-all min-h-[48px]"
             >
               Add Member
             </button>
@@ -380,28 +380,28 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
             placeholder="Search members by name..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full px-4 py-3 border border-mjg-border rounded-mjg focus:outline-none focus:ring-2 focus:ring-mjg-accent focus:border-transparent transition-colors"
+            className="w-full px-4 py-3 border border-gray-300 rounded-grip focus:outline-none focus:ring-2 focus:ring-grip-primary focus:border-transparent transition-colors"
           />
         </div>
 
         {/* Member List */}
         {loading ? (
           <div className="text-center py-12">
-            <div className="inline-block w-8 h-8 border-4 border-mjg-border border-t-mjg-accent rounded-full animate-spin"></div>
-            <p className="mt-4 text-mjg-text-secondary">Loading members...</p>
+            <div className="inline-block w-8 h-8 border-4 border-gray-300 border-t-mjg-accent rounded-full animate-spin"></div>
+            <p className="mt-4 text-gray-600">Loading members...</p>
           </div>
         ) : filteredMembers.length === 0 ? (
-          <div className="bg-mjg-card rounded-mjg shadow-mjg border border-mjg-border p-12 text-center">
+          <div className="bg-white rounded-grip shadow-grip border border-gray-300 p-12 text-center">
             <div className="text-6xl mb-4">👥</div>
-                <p className="text-xl font-semibold text-mjg-text-card mb-2">
+                <p className="text-xl font-semibold text-grip-dark mb-2">
               {searchQuery.trim() 
                 ? `No members found matching '${searchQuery}'` 
                 : 'No members yet'}
             </p>
             {!searchQuery.trim() && (
-              <p className="text-mjg-text-secondary text-sm mt-2">Click "Add Member" to get started</p>
+              <p className="text-gray-600 text-sm mt-2">Click "Add Member" to get started</p>
             )}
-            <p className="text-mjg-text-secondary">
+            <p className="text-gray-600">
               {searchQuery.trim() 
                 ? 'Try a different search term' 
                 : 'Add your first member to get started'}
@@ -410,26 +410,26 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
         ) : (
           <>
             {/* Desktop Table View */}
-            <div className="hidden md:block bg-mjg-card rounded-mjg shadow-mjg border border-mjg-border overflow-hidden">
+            <div className="hidden md:block bg-white rounded-grip shadow-grip border border-gray-300 overflow-hidden">
               <table className="w-full">
-                <thead className="bg-mjg-bg-secondary">
+                <thead className="bg-grip-secondary">
                   <tr>
-                    <th className="px-4 py-4 text-left text-sm font-semibold text-mjg-text-primary">First Name</th>
-                    <th className="px-4 py-4 text-left text-sm font-semibold text-mjg-text-primary">Last Name</th>
-                    <th className="px-4 py-4 text-left text-sm font-semibold text-mjg-text-primary">Role</th>
-                    <th className="px-4 py-4 text-right text-sm font-semibold text-mjg-text-primary">Actions</th>
+                    <th className="px-4 py-4 text-left text-sm font-semibold text-grip-primary">First Name</th>
+                    <th className="px-4 py-4 text-left text-sm font-semibold text-grip-primary">Last Name</th>
+                    <th className="px-4 py-4 text-left text-sm font-semibold text-grip-primary">Role</th>
+                    <th className="px-4 py-4 text-right text-sm font-semibold text-grip-primary">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {filteredMembers.map((member) => (
                     <tr key={member.id} className="hover:bg-gray-50">
-                      <td className="px-4 py-4 text-sm text-mjg-text-primary">{member.first_name}</td>
-                      <td className="px-4 py-4 text-sm text-mjg-text-primary">{member.last_name}</td>
+                      <td className="px-4 py-4 text-sm text-grip-primary">{member.first_name}</td>
+                      <td className="px-4 py-4 text-sm text-grip-primary">{member.last_name}</td>
                       <td className="px-4 py-4">
                         <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
                           member.role === 'coach' || member.role === 'admin'
-                            ? 'bg-mjg-accent text-white'
-                            : 'bg-mjg-bg-secondary text-mjg-text-secondary'
+                            ? 'bg-grip-primary text-white'
+                            : 'bg-grip-secondary text-gray-600'
                         }`}>
                           {member.role === 'coach' || member.role === 'admin' ? 'Coach' : 'Student'}
                         </span>
@@ -438,13 +438,13 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
                         <div className="flex justify-end gap-2">
                           <button
                             onClick={() => openEditModal(member)}
-                            className="px-4 py-2 text-sm bg-mjg-bg-secondary text-mjg-text-primary rounded-mjg hover:bg-mjg-bg-secondary/70 transition-all min-h-[48px]"
+                            className="px-4 py-2 text-sm bg-grip-secondary text-grip-primary rounded-grip hover:bg-grip-secondary/70 transition-all min-h-[48px]"
                           >
                             Edit
                           </button>
                           <button
                             onClick={() => openDeleteModal(member)}
-                            className="px-4 py-2 text-sm bg-red-500 text-white rounded-mjg hover:bg-red-600 transition-all min-h-[48px]"
+                            className="px-4 py-2 text-sm bg-red-500 text-white rounded-grip hover:bg-red-600 transition-all min-h-[48px]"
                           >
                             Delete
                           </button>
@@ -459,16 +459,16 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
             {/* Mobile Card View */}
             <div className="md:hidden space-y-4">
               {filteredMembers.map((member) => (
-                <div key={member.id} className="bg-white rounded-mjg shadow-mjg p-4">
+                <div key={member.id} className="bg-white rounded-grip shadow-grip p-4">
                   <div className="flex justify-between items-start mb-3">
                     <div>
-                      <h3 className="font-semibold text-lg text-mjg-text-primary">
+                      <h3 className="font-semibold text-lg text-grip-primary">
                         {member.first_name} {member.last_name}
                       </h3>
                       <span className={`inline-block mt-1 px-3 py-1 rounded-full text-xs font-semibold ${
                         member.role === 'coach' || member.role === 'admin'
-                          ? 'bg-mjg-accent text-white'
-                          : 'bg-mjg-bg-secondary text-mjg-text-primary'
+                          ? 'bg-grip-primary text-white'
+                          : 'bg-grip-secondary text-grip-primary'
                       }`}>
                         {member.role === 'coach' || member.role === 'admin' ? 'Coach' : 'Student'}
                       </span>
@@ -477,13 +477,13 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
                   <div className="flex gap-2 mt-4">
                     <button
                       onClick={() => openEditModal(member)}
-                      className="flex-1 px-4 py-3 text-sm bg-mjg-bg-secondary text-mjg-text-primary rounded-mjg hover:bg-mjg-bg-secondary/70 transition-all font-medium min-h-[48px]"
+                      className="flex-1 px-4 py-3 text-sm bg-grip-secondary text-grip-primary rounded-grip hover:bg-grip-secondary/70 transition-all font-medium min-h-[48px]"
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => openDeleteModal(member)}
-                      className="flex-1 px-4 py-3 text-sm bg-red-500 text-white rounded-mjg hover:bg-red-600 transition-all font-semibold min-h-[48px]"
+                      className="flex-1 px-4 py-3 text-sm bg-red-500 text-white rounded-grip hover:bg-red-600 transition-all font-semibold min-h-[48px]"
                     >
                       Delete
                     </button>
@@ -498,15 +498,15 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
       {/* Add Member Modal */}
       {addModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-mjg-card rounded-mjg shadow-mjg border border-mjg-border p-4 max-w-md w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-grip shadow-grip border border-gray-300 p-4 max-w-md w-full max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-8">
-              <h2 className="text-2xl font-poppins font-semibold text-mjg-text-card">Add Member</h2>
+              <h2 className="text-2xl font-montserrat font-semibold text-grip-dark">Add Member</h2>
               <button
                 onClick={() => {
                   setAddModalOpen(false);
                   setAddFormErrors({});
                 }}
-                className="text-mjg-text-secondary hover:text-mjg-text-primary"
+                className="text-gray-600 hover:text-grip-primary"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -517,7 +517,7 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
             <form onSubmit={handleAddMember}>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-semibold text-mjg-text-card mb-2">
+                  <label className="block text-sm font-semibold text-grip-dark mb-2">
                     First Name *
                   </label>
                   <input
@@ -527,8 +527,8 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
                       setAddFormData({ ...addFormData, firstName: e.target.value });
                       setAddFormErrors({ ...addFormErrors, firstName: '' });
                     }}
-                    className={`w-full px-4 py-3 border rounded-mjg bg-mjg-card focus:outline-none transition-colors ${
-                      addFormErrors.firstName ? 'border-mjg-error' : 'border-mjg-border focus:ring-2 focus:ring-mjg-accent focus:border-transparent'
+                    className={`w-full px-4 py-3 border rounded-grip bg-white focus:outline-none transition-colors ${
+                      addFormErrors.firstName ? 'border-mjg-error' : 'border-gray-300 focus:ring-2 focus:ring-grip-primary focus:border-transparent'
                     }`}
                     required
                   />
@@ -538,7 +538,7 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-mjg-text-card mb-2">
+                  <label className="block text-sm font-semibold text-grip-dark mb-2">
                     Last Name *
                   </label>
                   <input
@@ -548,8 +548,8 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
                       setAddFormData({ ...addFormData, lastName: e.target.value });
                       setAddFormErrors({ ...addFormErrors, lastName: '' });
                     }}
-                    className={`w-full px-4 py-3 border rounded-mjg focus:outline-none transition-colors ${
-                      addFormErrors.lastName ? 'border-red-500' : 'border-mjg-border focus:ring-2 focus:ring-mjg-accent focus:border-transparent'
+                    className={`w-full px-4 py-3 border rounded-grip focus:outline-none transition-colors ${
+                      addFormErrors.lastName ? 'border-red-500' : 'border-gray-300 focus:ring-2 focus:ring-grip-primary focus:border-transparent'
                     }`}
                     required
                   />
@@ -559,7 +559,7 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-mjg-text-card mb-2">
+                  <label className="block text-sm font-semibold text-grip-dark mb-2">
                     Email *
                   </label>
                   <input
@@ -569,8 +569,8 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
                       setAddFormData({ ...addFormData, email: e.target.value });
                       setAddFormErrors({ ...addFormErrors, email: '' });
                     }}
-                    className={`w-full px-4 py-3 border rounded-mjg focus:outline-none transition-colors ${
-                      addFormErrors.email ? 'border-red-500' : 'border-mjg-border focus:ring-2 focus:ring-mjg-accent focus:border-transparent'
+                    className={`w-full px-4 py-3 border rounded-grip focus:outline-none transition-colors ${
+                      addFormErrors.email ? 'border-red-500' : 'border-gray-300 focus:ring-2 focus:ring-grip-primary focus:border-transparent'
                     }`}
                     required
                   />
@@ -580,7 +580,7 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-mjg-text-card mb-2">
+                  <label className="block text-sm font-semibold text-grip-dark mb-2">
                     Password * (min 6 characters)
                   </label>
                   <input
@@ -590,8 +590,8 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
                       setAddFormData({ ...addFormData, password: e.target.value });
                       setAddFormErrors({ ...addFormErrors, password: '' });
                     }}
-                    className={`w-full px-4 py-3 border rounded-mjg focus:outline-none transition-colors ${
-                      addFormErrors.password ? 'border-red-500' : 'border-mjg-border focus:ring-2 focus:ring-mjg-accent focus:border-transparent'
+                    className={`w-full px-4 py-3 border rounded-grip focus:outline-none transition-colors ${
+                      addFormErrors.password ? 'border-red-500' : 'border-gray-300 focus:ring-2 focus:ring-grip-primary focus:border-transparent'
                     }`}
                     minLength={6}
                     required
@@ -602,13 +602,13 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-mjg-text-card mb-2">
+                  <label className="block text-sm font-semibold text-grip-dark mb-2">
                     Role *
                   </label>
                   <select
                     value={addFormData.role}
                     onChange={(e) => setAddFormData({ ...addFormData, role: e.target.value })}
-                    className="w-full px-4 py-3 border border-mjg-border rounded-mjg focus:outline-none focus:ring-2 focus:ring-mjg-accent focus:border-transparent transition-colors"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-grip focus:outline-none focus:ring-2 focus:ring-grip-primary focus:border-transparent transition-colors"
                   >
                     <option value="student">Student</option>
                     <option value="coach">Coach</option>
@@ -623,14 +623,14 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
                     setAddModalOpen(false);
                     setAddFormErrors({});
                   }}
-                  className="flex-1 bg-mjg-bg-secondary text-mjg-text-primary py-3 rounded-mjg font-medium hover:bg-mjg-bg-secondary/80 transition-all min-h-[48px]"
+                  className="flex-1 bg-grip-secondary text-grip-primary py-3 rounded-grip font-medium hover:bg-grip-secondary/80 transition-all min-h-[48px]"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={addFormLoading}
-                  className="flex-1 bg-mjg-accent text-white py-3 rounded-mjg font-medium hover:opacity-90 transition-all disabled:bg-mjg-bg-secondary disabled:cursor-not-allowed min-h-[48px]"
+                  className="flex-1 bg-grip-primary text-white py-3 rounded-grip font-medium hover:opacity-90 transition-all disabled:bg-grip-secondary disabled:cursor-not-allowed min-h-[48px]"
                 >
                   {addFormLoading ? 'Adding...' : 'Add Member'}
                 </button>
@@ -645,13 +645,13 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl p-4 max-w-md w-full">
             <div className="flex justify-between items-center mb-8">
-              <h2 className="text-2xl font-poppins font-semibold text-mjg-text-card">Edit Member</h2>
+              <h2 className="text-2xl font-montserrat font-semibold text-grip-dark">Edit Member</h2>
               <button
                 onClick={() => {
                   setEditModalOpen(false);
                   setSelectedMember(null);
                 }}
-                className="text-mjg-text-secondary hover:text-mjg-text-primary"
+                className="text-gray-600 hover:text-grip-primary"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -662,52 +662,52 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
             <form onSubmit={handleEditMember}>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-semibold text-mjg-text-card mb-2">
+                  <label className="block text-sm font-semibold text-grip-dark mb-2">
                     Email
                   </label>
                   <input
                     type="email"
                     value={selectedMember.email || 'N/A'}
                     disabled
-                    className="w-full px-4 py-3 border border-gray-300 rounded-mjg bg-mjg-bg-secondary text-mjg-text-secondary cursor-not-allowed"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-grip bg-grip-secondary text-gray-600 cursor-not-allowed"
                   />
-                  <p className="text-xs text-mjg-text-secondary mt-1">Email cannot be changed</p>
+                  <p className="text-xs text-gray-600 mt-1">Email cannot be changed</p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-mjg-text-card mb-2">
+                  <label className="block text-sm font-semibold text-grip-dark mb-2">
                     First Name *
                   </label>
                   <input
                     type="text"
                     value={editFormData.firstName}
                     onChange={(e) => setEditFormData({ ...editFormData, firstName: e.target.value })}
-                    className="w-full px-4 py-3 border border-mjg-border rounded-mjg focus:outline-none focus:ring-2 focus:ring-mjg-accent focus:border-transparent transition-colors"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-grip focus:outline-none focus:ring-2 focus:ring-grip-primary focus:border-transparent transition-colors"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-mjg-text-card mb-2">
+                  <label className="block text-sm font-semibold text-grip-dark mb-2">
                     Last Name *
                   </label>
                   <input
                     type="text"
                     value={editFormData.lastName}
                     onChange={(e) => setEditFormData({ ...editFormData, lastName: e.target.value })}
-                    className="w-full px-4 py-3 border border-mjg-border rounded-mjg focus:outline-none focus:ring-2 focus:ring-mjg-accent focus:border-transparent transition-colors"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-grip focus:outline-none focus:ring-2 focus:ring-grip-primary focus:border-transparent transition-colors"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-mjg-text-card mb-2">
+                  <label className="block text-sm font-semibold text-grip-dark mb-2">
                     Role *
                   </label>
                   <select
                     value={editFormData.role}
                     onChange={(e) => setEditFormData({ ...editFormData, role: e.target.value })}
-                    className="w-full px-4 py-3 border border-mjg-border rounded-mjg focus:outline-none focus:ring-2 focus:ring-mjg-accent focus:border-transparent transition-colors"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-grip focus:outline-none focus:ring-2 focus:ring-grip-primary focus:border-transparent transition-colors"
                   >
                     <option value="student">Student</option>
                     <option value="coach">Coach</option>
@@ -722,14 +722,14 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
                     setEditModalOpen(false);
                     setSelectedMember(null);
                   }}
-                  className="flex-1 bg-mjg-bg-secondary text-mjg-text-primary py-3 rounded-mjg font-medium hover:bg-mjg-bg-secondary/80 transition-all min-h-[48px]"
+                  className="flex-1 bg-grip-secondary text-grip-primary py-3 rounded-grip font-medium hover:bg-grip-secondary/80 transition-all min-h-[48px]"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={editFormLoading}
-                  className="flex-1 bg-mjg-accent text-white py-3 rounded-mjg font-medium hover:opacity-90 transition-all disabled:bg-mjg-bg-secondary disabled:cursor-not-allowed min-h-[48px]"
+                  className="flex-1 bg-grip-primary text-white py-3 rounded-grip font-medium hover:opacity-90 transition-all disabled:bg-grip-secondary disabled:cursor-not-allowed min-h-[48px]"
                 >
                   {editFormLoading ? 'Updating...' : 'Update Member'}
                 </button>
@@ -744,13 +744,13 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl p-4 max-w-md w-full">
             <div className="flex justify-between items-center mb-8">
-              <h2 className="text-2xl font-poppins font-semibold text-mjg-text-card">Delete Member</h2>
+              <h2 className="text-2xl font-montserrat font-semibold text-grip-dark">Delete Member</h2>
               <button
                 onClick={() => {
                   setDeleteModalOpen(false);
                   setSelectedMember(null);
                 }}
-                className="text-mjg-text-secondary hover:text-mjg-text-primary"
+                className="text-gray-600 hover:text-grip-primary"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -759,12 +759,12 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
             </div>
 
             <div className="mb-8">
-              <p className="text-mjg-text-card mb-4">
-                Delete <span className="font-semibold text-mjg-text-card">
+              <p className="text-grip-dark mb-4">
+                Delete <span className="font-semibold text-grip-dark">
                   {selectedMember.first_name} {selectedMember.last_name}
                 </span>?
               </p>
-              <p className="text-mjg-text-secondary text-sm">
+              <p className="text-gray-600 text-sm">
                 This will remove their account and all their class registrations. This cannot be undone.
               </p>
             </div>
@@ -776,14 +776,14 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
                   setDeleteModalOpen(false);
                   setSelectedMember(null);
                 }}
-                className="flex-1 bg-mjg-bg-secondary text-mjg-text-primary py-3 rounded-mjg font-semibold hover:bg-mjg-bg-secondary transition-all"
+                className="flex-1 bg-grip-secondary text-grip-primary py-3 rounded-grip font-semibold hover:bg-grip-secondary transition-all"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={handleDeleteMember}
-                className="flex-1 bg-red-500 text-white py-3 rounded-mjg font-semibold hover:bg-red-600 transition-all min-h-[48px]"
+                className="flex-1 bg-red-500 text-white py-3 rounded-grip font-semibold hover:bg-red-600 transition-all min-h-[48px]"
               >
                 Delete
               </button>
