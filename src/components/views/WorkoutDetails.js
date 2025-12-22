@@ -72,11 +72,15 @@ const WorkoutDetails = ({
   ), [registrations]);
 
   const formatTime = useCallback((time24) => {
-    if (!time24) return 'No time set';
-    // Remove seconds if present (e.g., "16:30:00" becomes "16:30")
-    const timeWithoutSeconds = time24.split(':').slice(0, 2).join(':');
-    const match = TIME_SLOTS.find(slot => slot.value === timeWithoutSeconds);
-    return match ? match.display : timeWithoutSeconds;
+    if (!time24) return 'Time TBD';
+    try {
+      // Remove seconds if present (e.g., "16:30:00" becomes "16:30")
+      const timeWithoutSeconds = time24.split(':').slice(0, 2).join(':');
+      const match = TIME_SLOTS.find(slot => slot.value === timeWithoutSeconds);
+      return match ? match.display : timeWithoutSeconds;
+    } catch (error) {
+      return time24 || 'Time TBD';
+    }
   }, []);
 
   const closeModal = useCallback(() => {
@@ -427,7 +431,7 @@ const WorkoutDetails = ({
               <div key={slot.id} className="bg-mjg-card rounded-mjg shadow-mjg border border-mjg-border p-4">
                 <div className="flex justify-between items-center mb-4">
                   <div className="flex-1">
-                    <p className="text-4xl font-extrabold text-mjg-text-card mb-1">
+                    <p className="text-4xl font-extrabold mb-1" style={{ color: '#2d2d2d' }}>
                       {formatTime(slot.time)}
                     </p>
                     <p className="text-sm text-mjg-text-secondary">
