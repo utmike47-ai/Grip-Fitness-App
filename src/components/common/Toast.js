@@ -18,7 +18,7 @@ const Toast = ({ message, type = 'success', onClose }) => {
 
   return (
     <div className="fixed top-4 right-4 left-4 md:left-auto z-50 animate-slide-in">
-      <div className={`${bgColor} text-white px-4 md:px-4 py-3 rounded-grip shadow-grip-lg flex items-center space-x-3 max-w-sm ml-auto`}>
+      <div className={`${bgColor} text-white px-4 md:px-4 py-3 rounded-grip shadow-gym-lg flex items-center space-x-3 max-w-sm ml-auto`}>
         <span className="text-lg">
           {type === 'success' && '✓'}
           {type === 'error' && '✕'}

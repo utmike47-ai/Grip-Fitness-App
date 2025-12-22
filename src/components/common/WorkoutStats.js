@@ -106,12 +106,12 @@ const WorkoutStats = ({ attendance, registrations, events, user }) => {
   const weekPattern = getWeekPattern();
 
   return (
-    <div className="bg-white rounded-grip shadow-grip-lg border border-gray-300-card p-4 mb-8">
+    <div className="bg-white rounded-grip shadow-gym-lg border border-gray-300-card p-4 mb-8">
       {/* Streak Counter */}
       <div className="text-center mb-4">
         <div className="flex items-center justify-center gap-2 mb-2">
           <span className="text-3xl">🔥</span>
-          <span className="text-2xl font-bold text-grip-primary">{streak}</span>
+          <span className="text-2xl font-bold text-gym-accent">{streak}</span>
         </div>
         <p className="text-gray-600">Day Streak</p>
       </div>
@@ -139,7 +139,7 @@ const WorkoutStats = ({ attendance, registrations, events, user }) => {
       {/* Monthly Stats */}
       <div className="flex justify-center">
         <div className="text-center p-4 bg-grip-secondary rounded-grip w-full max-w-xs">
-          <p className="text-2xl font-bold text-grip-primary">{monthlyCount}</p>
+          <p className="text-2xl font-bold text-gym-accent">{monthlyCount}</p>
           <p className="text-xs text-gray-600">This Month</p>
         </div>
       </div>

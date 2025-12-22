@@ -42,11 +42,11 @@ const NotesView = ({ selectedEvent, userNotes, user, onBack, onSaveNote }) => {
   };
 
   return (
-    <div className="min-h-screen bg-grip-light pb-20">
+    <div className="min-h-screen pb-20 pb-20">
       {/* Header */}
-      <div className="bg-grip-secondary shadow-grip border-b border-gray-300">
+      <div className="bg-gym-secondary shadow-lg border-b border-gray-300">
         <div className="max-w-7xl mx-auto px-4 py-4">
-          <h1 className="text-2xl font-montserrat font-semibold text-grip-primary">
+          <h1 className="text-2xl font-poppins font-bold text-gym-accent">
             Workout Notes
           </h1>
         </div>
@@ -55,7 +55,7 @@ const NotesView = ({ selectedEvent, userNotes, user, onBack, onSaveNote }) => {
       {/* Content */}
       <div className="max-w-3xl mx-auto px-4 py-6">
         {/* Event Info Card */}
-        <div className="bg-white rounded-grip shadow-grip border border-gray-300 p-4 mb-8">
+        <div className="bg-white rounded-grip shadow-lg border border-gray-300 p-4 mb-8">
           <h2 className="text-xl font-bold text-white mb-2">
             {selectedEvent?.title}
           </h2>
@@ -70,14 +70,14 @@ const NotesView = ({ selectedEvent, userNotes, user, onBack, onSaveNote }) => {
         </div>
 
         {/* Notes Card */}
-        <div className="bg-white rounded-grip shadow-grip border border-gray-300 p-4">
-          <h3 className="text-lg font-semibold text-grip-dark mb-4">
+        <div className="bg-white rounded-grip shadow-lg border border-gray-300 p-4">
+          <h3 className="text-lg font-semibold text-gym-text-dark mb-4">
             Your Personal Notes
           </h3>
           
           {!isEditing && existingNote ? (
             <div>
-              <div className="bg-grip-secondary/20 rounded-grip p-4 whitespace-pre-wrap text-gray-800 leading-relaxed min-h-[200px]">
+              <div className="bg-gym-secondary/20 rounded-grip p-4 whitespace-pre-wrap text-gray-800 leading-relaxed min-h-[200px]">
                 {noteText}
               </div>
               <div className="flex justify-between items-center mt-6">
@@ -86,7 +86,7 @@ const NotesView = ({ selectedEvent, userNotes, user, onBack, onSaveNote }) => {
                 </p>
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="bg-grip-primary text-white px-4 py-2 rounded-grip font-semibold hover:shadow-grip transition-all"
+                  className="bg-gym-primary text-white px-4 py-2 rounded-grip font-semibold hover:shadow-lg transition-all"
                 >
                   Edit Note
                 </button>
@@ -104,14 +104,14 @@ const NotesView = ({ selectedEvent, userNotes, user, onBack, onSaveNote }) => {
               <div className="flex gap-4 mt-6">
                 <button
                   onClick={handleCancel}
-                  className="flex-1 bg-grip-secondary text-grip-primary py-3 rounded-grip font-semibold hover:bg-grip-secondary transition-all"
+                  className="flex-1 bg-gym-secondary text-gym-accent py-3 rounded-grip font-semibold hover:bg-gym-secondary transition-all"
                 >
                   {existingNote ? 'Cancel' : 'Back'}
                 </button>
                 <button
                   onClick={handleSave}
                   disabled={!noteText.trim()}
-                  className="flex-1 bg-grip-primary text-white py-3 rounded-grip font-semibold hover:shadow-grip disabled:bg-grip-secondary disabled:cursor-not-allowed transition-all"
+                  className="flex-1 bg-gym-primary text-white py-3 rounded-grip font-semibold hover:shadow-lg disabled:bg-gym-secondary disabled:cursor-not-allowed transition-all"
                 >
                   Save Note
                 </button>

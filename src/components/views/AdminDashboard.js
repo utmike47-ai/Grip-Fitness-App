@@ -262,14 +262,14 @@ const AdminDashboard = ({ user, events, registrations, profiles = [], attendance
   // Block unauthorized access
   if (!isAuthorized) {
     return (
-      <div className="min-h-screen bg-grip-light pb-20 flex items-center justify-center px-4">
-        <div className="bg-white rounded-grip shadow-grip border border-gray-300 p-4 text-center max-w-md w-full">
+      <div className="min-h-screen pb-20 pb-20 flex items-center justify-center px-4">
+        <div className="bg-white rounded-grip shadow-lg border border-gray-300 p-4 text-center max-w-md w-full">
           <div className="text-6xl mb-4">🔒</div>
           <h2 className="text-2xl font-semibold text-white mb-2">Access Denied</h2>
           <p className="text-gray-600 mb-8">You don't have permission to access the admin dashboard.</p>
           <button
             onClick={() => onNavigate('dashboard')}
-            className="bg-grip-primary text-white px-4 py-3 rounded-grip font-medium hover:opacity-90 transition-all min-h-[48px]"
+            className="bg-gym-primary text-white px-4 py-3 rounded-grip font-medium hover:opacity-90 transition-all min-h-[48px]"
           >
             Go to Dashboard
           </button>
@@ -279,11 +279,11 @@ const AdminDashboard = ({ user, events, registrations, profiles = [], attendance
   }
 
   return (
-    <div className="min-h-screen bg-grip-light pb-20">
+    <div className="min-h-screen pb-20 pb-20">
       <div className="max-w-4xl mx-auto px-4 py-6">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-montserrat font-semibold text-white mb-2">
+          <h1 className="text-3xl font-poppins font-bold text-white mb-2">
             Admin Dashboard
           </h1>
           <p className="text-gray-600">Manage gym members and view analytics</p>
@@ -291,45 +291,45 @@ const AdminDashboard = ({ user, events, registrations, profiles = [], attendance
 
         {/* Quick Stats Section */}
         <div className="mb-8">
-          <h2 className="text-xl font-montserrat font-semibold text-white mb-4">
+          <h2 className="text-xl font-poppins font-bold text-white mb-4">
             Quick Stats
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {/* Total Members */}
-            <div className="bg-white rounded-grip shadow-grip p-4 border border-gray-300">
+            <div className="bg-white rounded-grip shadow-lg p-4 border border-gray-300">
               <div className="text-sm text-gray-600 mb-2">Total Members</div>
-              <div className="text-3xl font-bold text-grip-dark">{stats.totalMembers}</div>
+              <div className="text-3xl font-bold text-gym-text-dark">{stats.totalMembers}</div>
             </div>
 
             {/* Active This Week */}
-            <div className="bg-white rounded-grip shadow-grip p-4 border border-gray-300">
+            <div className="bg-white rounded-grip shadow-lg p-4 border border-gray-300">
               <div className="text-sm text-gray-600 mb-2">Active This Week</div>
-              <div className="text-3xl font-bold text-grip-dark">{stats.activeThisWeek}</div>
+              <div className="text-3xl font-bold text-gym-text-dark">{stats.activeThisWeek}</div>
             </div>
 
             {/* Total Classes This Week */}
-            <div className="bg-white rounded-grip shadow-grip p-4 border border-gray-300">
+            <div className="bg-white rounded-grip shadow-lg p-4 border border-gray-300">
               <div className="text-sm text-gray-600 mb-2">Classes This Week</div>
-              <div className="text-3xl font-bold text-grip-dark">{stats.classesThisWeek}</div>
+              <div className="text-3xl font-bold text-gym-text-dark">{stats.classesThisWeek}</div>
             </div>
 
             {/* Today's Classes */}
-            <div className="bg-white rounded-grip shadow-grip p-4 border border-gray-300">
+            <div className="bg-white rounded-grip shadow-lg p-4 border border-gray-300">
               <div className="text-sm text-gray-600 mb-2">Today's Classes</div>
-              <div className="text-3xl font-bold text-grip-dark">{stats.todaysClasses}</div>
+              <div className="text-3xl font-bold text-gym-text-dark">{stats.todaysClasses}</div>
             </div>
           </div>
         </div>
 
         {/* Today's Classes Section */}
         <div className="mb-8">
-          <h2 className="text-xl font-montserrat font-semibold text-white mb-4">
+          <h2 className="text-xl font-poppins font-bold text-white mb-4">
             Today's Classes
           </h2>
           {todaysClassesWithCounts.length === 0 ? (
-            <div className="bg-white rounded-grip shadow-grip p-4 border border-gray-300 text-center">
+            <div className="bg-white rounded-grip shadow-lg p-4 border border-gray-300 text-center">
               <span className="text-4xl block mb-2">📅</span>
-              <p className="text-grip-dark text-lg font-medium">No classes scheduled for today</p>
+              <p className="text-gym-text-dark text-lg font-medium">No classes scheduled for today</p>
               <p className="text-gray-600 text-sm mt-2">Click "Create Workout" to schedule one</p>
             </div>
           ) : (
@@ -338,7 +338,7 @@ const AdminDashboard = ({ user, events, registrations, profiles = [], attendance
                 <div
                   key={event.id}
                   onClick={() => handleClassClick(event)}
-                  className={`bg-white rounded-grip shadow-grip p-4 border-2 cursor-pointer transition-all hover:shadow-grip-lg min-h-[80px] flex items-center ${
+                  className={`bg-white rounded-grip shadow-lg p-4 border-2 cursor-pointer transition-all hover:shadow-lg-lg min-h-[80px] flex items-center ${
                     event.isFull 
                       ? 'border-mjg-error bg-red-50' 
                       : 'border-gray-300 hover:border-mjg-accent'
@@ -347,7 +347,7 @@ const AdminDashboard = ({ user, events, registrations, profiles = [], attendance
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <h3 className="font-semibold text-lg text-grip-dark">
+                        <h3 className="font-semibold text-lg text-gym-text-dark">
                           {event.title}
                         </h3>
                         {event.isFull && (
@@ -359,7 +359,7 @@ const AdminDashboard = ({ user, events, registrations, profiles = [], attendance
                       <p className="text-gray-600 text-sm">{formatTime(event.time)}</p>
                     </div>
                     <div className="text-right">
-                      <div className="text-2xl font-bold text-grip-dark">
+                      <div className="text-2xl font-bold text-gym-text-dark">
                         {event.registrationCount}/{event.maxCapacity}
                       </div>
                       <p className="text-xs text-gray-600 mt-1">registered</p>
@@ -373,14 +373,14 @@ const AdminDashboard = ({ user, events, registrations, profiles = [], attendance
 
         {/* Member Activity Section */}
         <div className="mb-8">
-          <h2 className="text-xl font-montserrat font-semibold text-white mb-4">
+          <h2 className="text-xl font-poppins font-bold text-white mb-4">
             Member Activity
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Most Active This Month */}
-            <div className="bg-white rounded-grip shadow-grip p-4 border border-gray-300">
-              <h3 className="text-lg font-semibold text-grip-dark mb-4">
+            <div className="bg-white rounded-grip shadow-lg p-4 border border-gray-300">
+              <h3 className="text-lg font-semibold text-gym-text-dark mb-4">
                 🏆 Most Active This Month
               </h3>
               {memberActivity.mostActive.length === 0 ? (
@@ -394,11 +394,11 @@ const AdminDashboard = ({ user, events, registrations, profiles = [], attendance
                     <div key={member.id} className="flex justify-between items-center">
                       <div className="flex items-center gap-2">
                         {index === 0 && <span className="text-lg">🏆</span>}
-                        <span className="text-sm text-grip-primary font-medium">
+                        <span className="text-sm text-gym-accent font-medium">
                           {member.name}
                         </span>
                       </div>
-                      <span className="text-sm font-semibold text-grip-primary">
+                      <span className="text-sm font-semibold text-gym-accent">
                         {member.count} {member.count === 1 ? 'class' : 'classes'}
                       </span>
                     </div>
@@ -408,22 +408,22 @@ const AdminDashboard = ({ user, events, registrations, profiles = [], attendance
             </div>
 
             {/* Need Attention */}
-            <div className="bg-white rounded-grip shadow-grip p-4 border border-gray-300">
-              <h3 className="text-lg font-semibold text-grip-dark mb-4">
+            <div className="bg-white rounded-grip shadow-lg p-4 border border-gray-300">
+              <h3 className="text-lg font-semibold text-gym-text-dark mb-4">
                 ⚠️ Need Attention
               </h3>
               {memberActivity.inactive.length === 0 ? (
                 <div className="text-center py-4">
                   <div className="text-center py-4">
                     <span className="text-2xl block mb-2">🎉</span>
-                    <p className="text-grip-dark text-sm font-medium">All members active!</p>
+                    <p className="text-gym-text-dark text-sm font-medium">All members active!</p>
                   </div>
                 </div>
               ) : (
                 <div className="space-y-2">
                   {memberActivity.inactive.map((member) => (
                     <div key={member.id} className="flex justify-between items-center">
-                      <span className="text-sm text-grip-primary font-medium">
+                      <span className="text-sm text-gym-accent font-medium">
                         {member.name}
                       </span>
                       <span className="text-xs text-gray-600">
@@ -436,8 +436,8 @@ const AdminDashboard = ({ user, events, registrations, profiles = [], attendance
             </div>
 
             {/* Current Streaks */}
-            <div className="bg-white rounded-grip shadow-grip p-4 border border-gray-300">
-              <h3 className="text-lg font-semibold text-grip-dark mb-4">
+            <div className="bg-white rounded-grip shadow-lg p-4 border border-gray-300">
+              <h3 className="text-lg font-semibold text-gym-text-dark mb-4">
                 🔥 Current Streaks
               </h3>
               {memberActivity.streaks.length === 0 ? (
@@ -449,10 +449,10 @@ const AdminDashboard = ({ user, events, registrations, profiles = [], attendance
                 <div className="space-y-2">
                   {memberActivity.streaks.map((member) => (
                     <div key={member.id} className="flex justify-between items-center">
-                      <span className="text-sm text-grip-primary font-medium">
+                      <span className="text-sm text-gym-accent font-medium">
                         {member.name}
                       </span>
-                      <span className="text-sm font-semibold text-grip-primary">
+                      <span className="text-sm font-semibold text-gym-accent">
                         🔥 {member.streak} {member.streak === 1 ? 'day' : 'days'}
                       </span>
                     </div>
@@ -465,22 +465,22 @@ const AdminDashboard = ({ user, events, registrations, profiles = [], attendance
 
         {/* Quick Actions Section */}
         <div>
-          <h2 className="text-xl font-montserrat font-semibold text-white mb-4">
+          <h2 className="text-xl font-poppins font-bold text-white mb-4">
             Quick Actions
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <button
               onClick={() => onNavigate('manageMembers')}
-              className="bg-white rounded-grip shadow-grip p-4 border-2 border-gray-300 hover:border-mjg-accent transition-all hover:shadow-grip text-left min-h-[48px]"
+              className="bg-white rounded-grip shadow-lg p-4 border-2 border-gray-300 hover:border-mjg-accent transition-all hover:shadow-lg text-left min-h-[48px]"
             >
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-grip-secondary rounded-grip flex items-center justify-center">
-                  <svg className="w-6 h-6 text-grip-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-12 h-12 bg-gym-secondary rounded-grip flex items-center justify-center">
+                  <svg className="w-6 h-6 text-gym-text-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-lg text-grip-dark">Manage Members</h3>
+                  <h3 className="font-semibold text-lg text-gym-text-dark">Manage Members</h3>
                   <p className="text-sm text-gray-600 mt-1">View and manage gym members</p>
                 </div>
               </div>
@@ -488,16 +488,16 @@ const AdminDashboard = ({ user, events, registrations, profiles = [], attendance
 
             <button
               onClick={() => onNavigate('createEvent')}
-              className="bg-white rounded-grip shadow-grip p-4 border-2 border-gray-300 hover:border-mjg-accent transition-all hover:shadow-grip text-left min-h-[48px]"
+              className="bg-white rounded-grip shadow-lg p-4 border-2 border-gray-300 hover:border-mjg-accent transition-all hover:shadow-lg text-left min-h-[48px]"
             >
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-grip-secondary rounded-grip flex items-center justify-center">
-                  <svg className="w-6 h-6 text-grip-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-12 h-12 bg-gym-secondary rounded-grip flex items-center justify-center">
+                  <svg className="w-6 h-6 text-gym-text-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-lg text-grip-dark">Create Workout</h3>
+                  <h3 className="font-semibold text-lg text-gym-text-dark">Create Workout</h3>
                   <p className="text-sm text-gray-600 mt-1">Schedule a new workout class</p>
                 </div>
               </div>
