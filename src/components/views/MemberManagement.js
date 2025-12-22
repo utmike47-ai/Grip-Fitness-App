@@ -319,8 +319,8 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
   // Redirect if not authorized
   if (!isAuthorized) {
     return (
-      <div className="min-h-screen pb-20 pb-20 flex items-center justify-center">
-        <div className="bg-white rounded-[12px] shadow-gym-300 p-4 text-center max-w-md mx-4">
+      <div className="min-h-screen pb-20 flex items-center justify-center">
+        <div className="bg-white rounded-[12px] shadow-gym p-4 text-center max-w-md mx-4">
           <p className="text-xl font-semibold text-gym-text-dark mb-2">Access Denied</p>
           <p className="text-gray-600 mb-4">You don't have permission to access this page.</p>
           <button
@@ -335,7 +335,7 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
   }
 
   return (
-    <div className="min-h-screen pb-20 pb-20">
+    <div className="min-h-screen pb-20">
       {/* Header */}
       <div className="bg-gym-secondary shadow-lg border-b border-gym-secondary">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
@@ -394,7 +394,7 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
             <p className="mt-4 text-gray-600">Loading members...</p>
           </div>
         ) : filteredMembers.length === 0 ? (
-          <div className="bg-white rounded-[12px] shadow-gym-300 p-12 text-center">
+          <div className="bg-white rounded-[12px] shadow-gym p-12 text-center">
             <div className="text-6xl mb-4">👥</div>
                 <p className="text-xl font-semibold text-gym-text-dark mb-2">
               {searchQuery.trim() 
@@ -413,7 +413,7 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
         ) : (
           <>
             {/* Desktop Table View */}
-            <div className="hidden md:block bg-white rounded-[12px] shadow-gym-300 overflow-hidden">
+            <div className="hidden md:block bg-white rounded-[12px] shadow-gym overflow-hidden">
               <table className="w-full">
                 <thead className="bg-gym-secondary">
                   <tr>
@@ -501,7 +501,7 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
       {/* Add Member Modal */}
       {addModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-[12px] shadow-gym-300 p-4 max-w-md w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-[12px] shadow-gym p-4 max-w-md w-full max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-8">
               <h2 className="text-2xl font-poppins font-bold text-gym-text-dark">Add Member</h2>
               <button

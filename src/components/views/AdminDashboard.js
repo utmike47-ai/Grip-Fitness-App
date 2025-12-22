@@ -263,7 +263,7 @@ const AdminDashboard = ({ user, events, registrations, profiles = [], attendance
   // Block unauthorized access
   if (!isAuthorized) {
     return (
-      <div className="min-h-screen pb-20 pb-20 flex items-center justify-center px-4">
+      <div className="min-h-screen pb-20 flex items-center justify-center px-4">
         <div className="bg-white rounded-[12px] shadow-gym p-4 text-center max-w-md w-full">
           <div className="text-6xl mb-4">🔒</div>
           <h2 className="text-2xl font-semibold text-white mb-2">Access Denied</h2>
