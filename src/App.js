@@ -472,7 +472,7 @@ function App() {
       // Find all events with same title and date (all time slots)
       const eventToDelete = events.find(e => e.id === eventId);
       if (!eventToDelete) {
-        toast.'Event not found');
+        toast.error('Event not found');
         return;
       }
       
@@ -624,7 +624,7 @@ function App() {
       
       await fetchAttendance();
     } catch (error) {
-      toast.'Failed to update attendance: ' + error.message);
+      toast.error('Failed to update attendance: ' + error.message);
     }
   };
 
