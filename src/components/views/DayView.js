@@ -624,13 +624,13 @@ const DayView = ({
                           {/* Show registered participants to everyone */}
                           {timeSlot.registeredUsers.length > 0 && (
                             <div className="mt-4 pt-4 border-t border-gray-300">
-                              <p className="font-semibold text-white mb-2">
+                              <p className="font-semibold text-gym-text-dark mb-2">
                                 Registered Participants ({timeSlot.registeredUsers.length}):
                               </p>
                               <div className="space-y-2">
                                 {timeSlot.registeredUsers.map(reg => (
                                   <div key={reg.id} className="text-sm flex items-center justify-between gap-2">
-                                    <span>{reg.user_name}</span>
+                                    <span className="text-gym-text-dark">{reg.user_name}</span>
                                     {isCoach && (
                                       <button
                                         type="button"
