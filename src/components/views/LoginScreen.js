@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Logo from '../Logo';
 import { supabase } from '../../utils/supabaseClient';
+import { Eye, EyeOff } from 'lucide-react';
 
 // Password validation function
 const validatePassword = (password) => {
@@ -30,6 +31,8 @@ const LoginScreen = ({ onLogin, loading }) => {
   const [resetEmail, setResetEmail] = useState('');
   const [resendEmail, setResendEmail] = useState('');
   const [showResend, setShowResend] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showAccessCode, setShowAccessCode] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -200,15 +203,25 @@ const LoginScreen = ({ onLogin, loading }) => {
               <label className="block text-sm font-semibold text-grip-dark mb-2">
                 Access Code *
               </label>
-              <input
-                type="password"
-                placeholder="Enter your access code from MJG Fitness"
-                value={accessCode}
-                onChange={(e) => setAccessCode(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-grip focus:outline-none focus:ring-2 focus:ring-grip-primary focus:border-transparent transition-colors text-gray-900 placeholder:text-gray-400"
-                style={{ color: '#1f2937' }}
-                required
-              />
+              <div className="relative">
+                <input
+                  type={showAccessCode ? "text" : "password"}
+                  placeholder="Enter your access code from MJG Fitness"
+                  value={accessCode}
+                  onChange={(e) => setAccessCode(e.target.value)}
+                  className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-grip focus:outline-none focus:ring-2 focus:ring-grip-primary focus:border-transparent transition-colors text-gray-900 placeholder:text-gray-400"
+                  style={{ color: '#1f2937' }}
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowAccessCode(!showAccessCode)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  aria-label={showAccessCode ? "Hide access code" : "Show access code"}
+                >
+                  {showAccessCode ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
               <p className="text-xs text-gray-600 mt-1">
                 {role === 'coach' ? 'Enter coach access code' : 'Enter member access code'}
               </p>
@@ -234,28 +247,38 @@ const LoginScreen = ({ onLogin, loading }) => {
             <label className="block text-sm font-semibold text-grip-dark mb-2">
               Password {isSignUp && '*'}
             </label>
-            <input
-              type="password"
-              placeholder={isSignUp ? "Create a strong password" : "Enter your password"}
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-                if (isSignUp) {
-                  const validation = validatePassword(e.target.value);
-                  setShowRequirements(true);
-                  if (!validation.isValid && e.target.value.length > 0) {
-                    setPasswordError('Password does not meet requirements');
-                  } else {
-                    setPasswordError('');
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder={isSignUp ? "Create a strong password" : "Enter your password"}
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  if (isSignUp) {
+                    const validation = validatePassword(e.target.value);
+                    setShowRequirements(true);
+                    if (!validation.isValid && e.target.value.length > 0) {
+                      setPasswordError('Password does not meet requirements');
+                    } else {
+                      setPasswordError('');
+                    }
                   }
-                }
-              }}
-              onFocus={() => isSignUp && setShowRequirements(true)}
-              className={`w-full px-4 py-3 border rounded-grip focus:outline-none transition-colors text-gray-900 placeholder:text-gray-400
-                ${passwordError ? 'border-gym-error' : 'border-gray-200 focus:ring-2 focus:ring-gym-primary focus:border-transparent'}`}
-              style={{ color: '#1f2937' }}
-              required
-            />
+                }}
+                onFocus={() => isSignUp && setShowRequirements(true)}
+                className={`w-full px-4 py-3 pr-12 border rounded-grip focus:outline-none transition-colors text-gray-900 placeholder:text-gray-400
+                  ${passwordError ? 'border-gym-error' : 'border-gray-200 focus:ring-2 focus:ring-gym-primary focus:border-transparent'}`}
+                style={{ color: '#1f2937' }}
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
+            </div>
             
             {/* Password Requirements Checklist */}
             {isSignUp && showRequirements && (
