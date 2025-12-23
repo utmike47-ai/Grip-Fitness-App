@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { fetchNoteForEvent, saveNote, deleteNote } from '../../utils/notesService';
 import { TIME_SLOTS } from '../../utils/constants';
 import Logo from '../Logo';
+import { FileText, StickyNote } from 'lucide-react';
 
 const NOTE_MAX_LENGTH = 500;
 const MODAL_CLOSE_DELAY = 1200;
@@ -247,57 +248,62 @@ const WorkoutDetails = ({
       <div className="max-w-4xl mx-auto px-4 py-6">
         {/* Workout Info */}
         <div className="bg-white rounded-[12px] shadow-gym p-4 mb-8">
-          <div className="flex justify-between items-start mb-4">
-            <div className="flex-1 pr-6">
-              <h2 className="text-xl font-bold text-gym-text-dark mb-2">
-                {new Date(event.date + 'T12:00:00').toLocaleDateString('en-US', { 
-                  weekday: 'long', 
-                  month: 'long', 
-                  day: 'numeric' 
-                })}
-              </h2>
-              {event.details && (
-                <div className="text-gym-text-dark leading-relaxed">
-                  {event.details
-                    .split('\n')
-                    .filter(line => line.trim())
-                    .map((line, index) => (
-                      <div 
-                        key={index} 
-                        style={{ 
-                          display: 'block', 
-                          width: '100%',
-                          marginBottom: '8px',
-                          lineHeight: '1.5'
-                        }}
-                      >
-                        {line.trim()}
-                      </div>
-                    ))}
-                </div>
-              )}
-            </div>
-            <div className="w-full max-w-xs">
-              <div className="flex flex-col gap-2">
-                <span
-                  className={`w-full inline-flex items-center justify-center px-4 py-3 rounded-full text-sm font-semibold ${
-                    event.type === 'workout'
-                      ? 'bg-gym-primary text-white'
-                      : 'bg-green-100 text-green-800'
-                  }`}
-                  style={{ minHeight: 48 }}
-                >
-                  {event.type === 'workout' ? 'WORKOUT' : 'SOCIAL EVENT'}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => openModal(event)}
-                  className="w-full px-4 py-3 rounded-full font-semibold text-white transition-all shadow-sm bg-gym-primary hover:bg-[#ff8555]"
-                  style={{ minHeight: 48 }}
-                >
-                  {noteButtonLabel}
-                </button>
+          <div className="mb-6">
+            <h2 className="text-2xl font-poppins font-bold text-gym-text-dark mb-2">
+              {event.title || new Date(event.date + 'T12:00:00').toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                month: 'long', 
+                day: 'numeric' 
+              })}
+            </h2>
+            {event.details && (
+              <div className="text-gym-text-dark leading-relaxed mt-3">
+                {event.details
+                  .split('\n')
+                  .filter(line => line.trim())
+                  .map((line, index) => (
+                    <div 
+                      key={index} 
+                      style={{ 
+                        display: 'block', 
+                        width: '100%',
+                        marginBottom: '8px',
+                        lineHeight: '1.5'
+                      }}
+                    >
+                      {line.trim()}
+                    </div>
+                  ))}
               </div>
+            )}
+          </div>
+
+          {/* Icon Action Row */}
+          <div className="bg-gray-50 rounded-[12px] p-4 mb-6">
+            <div className="flex justify-center items-center gap-3 flex-wrap">
+              {/* Workout Icon */}
+              <button
+                type="button"
+                className="flex flex-col items-center justify-center"
+                disabled
+              >
+                <div className="w-14 h-14 rounded-full bg-gym-primary flex items-center justify-center mb-1">
+                  <FileText className="w-6 h-6 text-white" />
+                </div>
+                <span className="text-xs text-gray-600 font-medium">Workout</span>
+              </button>
+
+              {/* Notes Icon */}
+              <button
+                type="button"
+                onClick={() => openModal(event)}
+                className="flex flex-col items-center justify-center"
+              >
+                <div className="w-14 h-14 rounded-full bg-gym-primary flex items-center justify-center mb-1 hover:bg-[#ff8555] transition-colors">
+                  <StickyNote className="w-6 h-6 text-white" />
+                </div>
+                <span className="text-xs text-gray-600 font-medium">Notes</span>
+              </button>
             </div>
           </div>
         </div>
@@ -418,7 +424,7 @@ const WorkoutDetails = ({
 
         {/* Time Slots */}
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-grip-primary">Available Times:</h3>
+          <h3 className="text-lg font-semibold text-white mb-4">Available Times:</h3>
           {relatedEvents.map((slot) => {
             const regs = getRegistrationsForEvent(slot.id);
             const userRegistered = isUserRegistered(slot.id);

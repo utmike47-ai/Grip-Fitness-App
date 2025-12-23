@@ -4,6 +4,7 @@ import { useSwipeable } from 'react-swipeable';
 import { fetchNoteForEvent, saveNote, deleteNote } from '../../utils/notesService';
 import { supabase } from '../../utils/supabaseClient';
 import Logo from '../Logo';
+import { FileText, StickyNote, Pencil, Trash2, UserPlus } from 'lucide-react';
 
 const DayView = ({ 
   selectedDate, 
@@ -471,84 +472,105 @@ const DayView = ({
         ) : (
           <div className="space-y-8">
             {eventGroupList.map((eventGroup, index) => {
-              const primary = eventGroup.times[0];
-              const hasNote = primary ? noteMap[primary.id]?.hasNote : false;
-              const noteButtonLabel = hasNote ? 'VIEW/EDIT NOTES' : 'WORKOUT NOTES';
-
               return (
               <div key={index} className="bg-white rounded-[12px] shadow-gym p-4">
-                <div className="mb-4">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 gap-2">
-  <h2 className="text-2xl font-poppins font-bold text-gym-text-dark">
-    {eventGroup.title}
-  </h2>
-  
-  <div className="flex flex-col gap-2 w-full sm:w-auto max-w-xs">
-    <span className={`w-full inline-flex items-center justify-center px-4 py-3 rounded-full text-sm font-semibold
-      ${eventGroup.type === 'workout' 
-        ? 'bg-gym-primary text-white' 
-        : 'bg-green-100 text-green-800'}`}
-      style={{ minHeight: 48 }}
-    >
-      {eventGroup.type === 'workout' ? 'WORKOUT' : 'SOCIAL EVENT'}
-    </span>
-    <button
-      type="button"
-      onClick={() => openNotesModal(eventGroup)}
-      className="w-full px-4 py-3 rounded-full font-semibold text-white transition-all shadow-sm bg-gym-primary hover:bg-[#ff8555]"
-      style={{ minHeight: 48 }}
-    >
-      {noteButtonLabel}
-    </button>
-    {user?.user_metadata?.role === 'coach' && (
-        <>
-      <button
-        onClick={() => onEditEvent(eventGroup.times[0].id)}
-        className="bg-yellow-500 text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-yellow-600 transition-all"
-      >
-        Edit
-      </button>
-      <button
-      onClick={() => onDeleteEvent(eventGroup.times[0].id)}
-      className="bg-red-500 text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-red-600 transition-all"
-    >
-      Delete
-    </button>
-    </>
-    )}
-  </div>
-</div>
-{eventGroup.details && (
-  <div className="text-gym-text-dark leading-relaxed">
-    {eventGroup.details
-      .split('\n')
-      .filter(line => line.trim())
-      .map((line, index) => (
-        <div 
-          key={index} 
-          style={{ 
-            display: 'block', 
-            width: '100%',
-            marginBottom: '8px',
-            lineHeight: '1.5'
-          }}
-        >
-          {line.trim()}
-        </div>
-      ))}
-  </div>
-)}
+                {/* Title and Details */}
+                <div className="mb-6">
+                  <h2 className="text-2xl font-poppins font-bold text-gym-text-dark mb-3">
+                    {eventGroup.title}
+                  </h2>
+                  {eventGroup.details && (
+                    <div className="text-gym-text-dark leading-relaxed">
+                      {eventGroup.details
+                        .split('\n')
+                        .filter(line => line.trim())
+                        .map((line, index) => (
+                          <div 
+                            key={index} 
+                            style={{ 
+                              display: 'block', 
+                              width: '100%',
+                              marginBottom: '8px',
+                              lineHeight: '1.5'
+                            }}
+                          >
+                            {line.trim()}
+                          </div>
+                        ))}
+                    </div>
+                  )}
                 </div>
 
+                {/* Icon Action Row */}
+                <div className="bg-gray-50 rounded-[12px] p-4 mb-6">
+                  <div className="flex justify-center items-center gap-3 flex-wrap">
+                    {/* Workout Icon */}
+                    <button
+                      type="button"
+                      className="flex flex-col items-center justify-center"
+                      disabled
+                    >
+                      <div className="w-14 h-14 rounded-full bg-gym-primary flex items-center justify-center mb-1">
+                        <FileText className="w-6 h-6 text-white" />
+                      </div>
+                      <span className="text-xs text-gray-600 font-medium">Workout</span>
+                    </button>
+
+                    {/* Notes Icon */}
+                    <button
+                      type="button"
+                      onClick={() => openNotesModal(eventGroup)}
+                      className="flex flex-col items-center justify-center"
+                    >
+                      <div className="w-14 h-14 rounded-full bg-gym-primary flex items-center justify-center mb-1 hover:bg-[#ff8555] transition-colors">
+                        <StickyNote className="w-6 h-6 text-white" />
+                      </div>
+                      <span className="text-xs text-gray-600 font-medium">Notes</span>
+                    </button>
+
+                    {/* Edit Icon (coach only) */}
+                    {isCoach && (
+                      <button
+                        type="button"
+                        onClick={() => onEditEvent(eventGroup.times[0].id)}
+                        className="flex flex-col items-center justify-center"
+                      >
+                        <div className="w-14 h-14 rounded-full bg-gym-primary flex items-center justify-center mb-1 hover:bg-[#ff8555] transition-colors">
+                          <Pencil className="w-6 h-6 text-white" />
+                        </div>
+                        <span className="text-xs text-gray-600 font-medium">Edit</span>
+                      </button>
+                    )}
+
+                    {/* Delete Icon (coach only) */}
+                    {isCoach && (
+                      <button
+                        type="button"
+                        onClick={() => onDeleteEvent(eventGroup.times[0].id)}
+                        className="flex flex-col items-center justify-center"
+                      >
+                        <div className="w-14 h-14 rounded-full bg-gym-primary flex items-center justify-center mb-1 hover:bg-[#ff8555] transition-colors">
+                          <Trash2 className="w-6 h-6 text-white" />
+                        </div>
+                        <span className="text-xs text-gray-600 font-medium">Delete</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Available Times Section */}
                 <div className="border-t border-gray-300 pt-4">
                   <h3 className="font-semibold text-gym-text-dark mb-4">Available Times:</h3>
+                  
+                  {/* Add Student Button (below icon row, before time slots) */}
                   {isCoach && (
                     <button
                       type="button"
                       onClick={() => openAddStudentModal(eventGroup)}
-                      className="w-full px-4 py-3 mb-4 rounded-full font-semibold text-white transition-all shadow-sm bg-[#C67158] hover:bg-[#b2604b]"
+                      className="w-full px-4 py-3 mb-4 rounded-[12px] font-semibold text-white transition-all shadow-sm bg-[#C67158] hover:bg-[#b2604b] flex items-center justify-center gap-2"
                       style={{ minHeight: 48 }}
                     >
+                      <UserPlus className="w-5 h-5" />
                       + Add Student to Class
                     </button>
                   )}
