@@ -59,7 +59,7 @@ const CreateEvent = ({ user, onBack, onCreateEvent, editMode = false, existingEv
 
       {/* Form */}
       <div className="max-w-3xl mx-auto px-4 py-6">
-        <form onSubmit={handleSubmit} className="bg-white rounded-[12px] shadow-gym p-4 sm:p-6">
+        <form onSubmit={handleSubmit} className="bg-white rounded-[12px] shadow-gym p-4 sm:p-6" style={{ overflowX: 'hidden' }}>
           {/* Event Type */}
           <div className="mb-8">
             <label className="block text-sm font-semibold text-gym-text-dark mb-3">
@@ -99,8 +99,7 @@ const CreateEvent = ({ user, onBack, onCreateEvent, editMode = false, existingEv
               value={eventData.title}
               onChange={(e) => setEventData(prev => ({ ...prev, title: e.target.value }))}
               placeholder="e.g., Monday Morning HIIT"
-              className="w-full max-w-full px-4 py-3 border border-gray-200 rounded-grip focus:outline-none focus:ring-2 focus:ring-gym-primary focus:border-transparent transition-colors box-border"
-              style={{ width: '100%' }}
+              className="w-full px-4 py-3 border border-gray-200 rounded-grip focus:outline-none focus:ring-2 focus:ring-gym-primary focus:border-transparent transition-colors"
               required
             />
           </div>
@@ -114,8 +113,15 @@ const CreateEvent = ({ user, onBack, onCreateEvent, editMode = false, existingEv
               type="date"
               value={eventData.date}
               onChange={(e) => setEventData(prev => ({ ...prev, date: e.target.value }))}
-              className="w-full max-w-full px-4 py-3 border border-gray-200 rounded-grip focus:outline-none focus:ring-2 focus:ring-gym-primary focus:border-transparent transition-colors text-gym-text-dark text-center box-border"
-              style={{ color: '#2d3142', width: '100%' }}
+              className="w-full px-4 py-3 border border-gray-200 rounded-grip focus:outline-none focus:ring-2 focus:ring-gym-primary focus:border-transparent transition-colors text-gym-text-dark text-center"
+              style={{ 
+                color: '#2d3142',
+                width: '100%',
+                maxWidth: '100%',
+                boxSizing: 'border-box',
+                WebkitAppearance: 'none',
+                MozAppearance: 'textfield'
+              }}
               required
             />
           </div>
