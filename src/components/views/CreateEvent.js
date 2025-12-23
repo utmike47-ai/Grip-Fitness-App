@@ -11,14 +11,23 @@ const CreateEvent = ({ user, onBack, onCreateEvent, editMode = false, existingEv
           e.title === existingEvent.title && 
           e.date === existingEvent.date
         );
-        // Extract all times from related events
-        const existingTimes = relatedEvents.map(e => e.time).filter(Boolean);
+        // Extract all times from related events and normalize them (remove seconds if present)
+        const existingTimes = relatedEvents
+          .map(e => e.time)
+          .filter(Boolean)
+          .map(time => {
+            // Normalize time format: "08:00:00" -> "08:00", "08:00" -> "08:00"
+            return time.split(':').slice(0, 2).join(':');
+          });
+        
+        console.log('Edit mode - Related events:', relatedEvents);
+        console.log('Edit mode - Existing times (normalized):', existingTimes);
         
         return {
           title: existingEvent.title,
           type: existingEvent.type,
           date: existingEvent.date,
-          times: existingTimes.length > 0 ? existingTimes : [existingEvent.time],
+          times: existingTimes.length > 0 ? existingTimes : (existingEvent.time ? [existingEvent.time.split(':').slice(0, 2).join(':')] : []),
           details: existingEvent.details || '',
           maxCapacity: 25,
           eventIds: relatedEvents.map(e => e.id) // Store IDs for update
@@ -41,6 +50,8 @@ const CreateEvent = ({ user, onBack, onCreateEvent, editMode = false, existingEv
       alert('Please fill in all required fields and select at least one time slot');
       return;
     }
+    console.log('CreateEvent handleSubmit - editMode:', editMode);
+    console.log('CreateEvent handleSubmit - eventData:', eventData);
     onCreateEvent(eventData);
   };
 
