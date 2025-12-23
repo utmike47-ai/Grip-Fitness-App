@@ -356,27 +356,23 @@ const MemberManagement = ({ user, profiles = [], onBack, onRefreshProfiles }) =>
           <h1 className="text-2xl font-poppins font-bold text-white">
             Manage Members
           </h1>
-            <button
-              onClick={() => {
-                setAddFormData({
-                  firstName: '',
-                  lastName: '',
-                  email: '',
-                  password: '',
-                  role: 'student'
-                });
-                setAddFormErrors({});
-                setAddModalOpen(true);
-              }}
-              className="bg-gym-primary text-white px-4 py-3 rounded-grip font-medium hover:opacity-90 transition-all min-h-[48px]"
-            >
-              Add Member
-            </button>
-          </div>
+          <button
+            onClick={() => {
+              setAddFormData({
+                firstName: '',
+                lastName: '',
+                email: '',
+                password: '',
+                role: 'student'
+              });
+              setAddFormErrors({});
+              setAddModalOpen(true);
+            }}
+            className="bg-gym-primary text-white px-4 py-3 rounded-grip font-medium hover:opacity-90 transition-all min-h-[48px]"
+          >
+            Add Member
+          </button>
         </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Search Bar */}
         <div className="mb-8">
           <input
