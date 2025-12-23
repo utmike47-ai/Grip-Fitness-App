@@ -113,7 +113,8 @@ const CreateEvent = ({ user, onBack, onCreateEvent, editMode = false, existingEv
               type="date"
               value={eventData.date}
               onChange={(e) => setEventData(prev => ({ ...prev, date: e.target.value }))}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-grip focus:outline-none focus:ring-2 focus:ring-gym-primary focus:border-transparent transition-colors"
+              className="w-full px-4 py-3 border border-gray-200 rounded-grip focus:outline-none focus:ring-2 focus:ring-gym-primary focus:border-transparent transition-colors text-gym-text-dark text-center"
+              style={{ color: '#2d3142' }}
               required
             />
           </div>
