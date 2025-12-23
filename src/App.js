@@ -435,17 +435,23 @@ function App() {
       }
 
       // Find all events with the same title and date (they're the same workout, different times)
+      // Use the ORIGINAL title/date from editingEvent to find events, then update them with NEW values from eventData
       const relatedEvents = events.filter(e => 
         e.title === editingEvent.title && 
         e.date === editingEvent.date
       );
       
-      console.log('Related events found:', relatedEvents.length, relatedEvents);
+      console.log('=== Finding related events ===');
+      console.log('Searching for events with original title:', editingEvent.title);
+      console.log('Searching for events with original date:', editingEvent.date);
+      console.log('Related events found:', relatedEvents.length, relatedEvents.map(e => ({ id: e.id, title: e.title, date: e.date, time: e.time })));
+      console.log('New values from form - title:', eventData.title, 'date:', eventData.date);
       console.log('New times from eventData:', eventData.times);
-      console.log('eventData.date:', eventData.date);
-      console.log('eventData.title:', eventData.title);
       
       if (relatedEvents.length === 0) {
+        console.error('ERROR: Could not find any related events to update!');
+        console.error('Searched with title:', editingEvent.title, 'date:', editingEvent.date);
+        console.error('Available events:', events.map(e => ({ id: e.id, title: e.title, date: e.date, time: e.time })));
         throw new Error('Could not find related events to update');
       }
 
