@@ -147,7 +147,8 @@ const LoginScreen = ({ onLogin, loading }) => {
                     type="text"
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-grip bg-white focus:outline-none focus:ring-2 focus:ring-gym-primary focus:border-transparent transition-colors"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-grip bg-white focus:outline-none focus:ring-2 focus:ring-gym-primary focus:border-transparent transition-colors text-gray-900 placeholder:text-gray-400"
+                    style={{ color: '#1f2937' }}
                     required
                   />
                 </div>
@@ -159,7 +160,8 @@ const LoginScreen = ({ onLogin, loading }) => {
                     type="text"
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-grip bg-white focus:outline-none focus:ring-2 focus:ring-gym-primary focus:border-transparent transition-colors"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-grip bg-white focus:outline-none focus:ring-2 focus:ring-gym-primary focus:border-transparent transition-colors text-gray-900 placeholder:text-gray-400"
+                    style={{ color: '#1f2937' }}
                     required
                   />
                 </div>
@@ -203,7 +205,8 @@ const LoginScreen = ({ onLogin, loading }) => {
                 placeholder="Enter your access code from MJG Fitness"
                 value={accessCode}
                 onChange={(e) => setAccessCode(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-grip focus:outline-none focus:ring-2 focus:ring-grip-primary focus:border-transparent transition-colors"
+                className="w-full px-4 py-3 border border-gray-300 rounded-grip focus:outline-none focus:ring-2 focus:ring-grip-primary focus:border-transparent transition-colors text-gray-900 placeholder:text-gray-400"
+                style={{ color: '#1f2937' }}
                 required
               />
               <p className="text-xs text-gray-600 mt-1">
@@ -213,14 +216,15 @@ const LoginScreen = ({ onLogin, loading }) => {
           )}
 
           <div>
-            <label className="block text-sm font-medium text-white mb-2">
+            <label className="block text-sm font-semibold text-gym-text-dark mb-2">
               Email Address
             </label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-grip focus:outline-none focus:ring-2 focus:ring-grip-primary focus:border-transparent transition-colors"
+              className="w-full px-4 py-3 border border-gray-300 rounded-grip focus:outline-none focus:ring-2 focus:ring-grip-primary focus:border-transparent transition-colors text-gray-900 placeholder:text-gray-400"
+              style={{ color: '#1f2937' }}
               placeholder="Enter your email"
               required
             />
@@ -247,8 +251,9 @@ const LoginScreen = ({ onLogin, loading }) => {
                 }
               }}
               onFocus={() => isSignUp && setShowRequirements(true)}
-              className={`w-full px-4 py-3 border rounded-grip focus:outline-none transition-colors
+              className={`w-full px-4 py-3 border rounded-grip focus:outline-none transition-colors text-gray-900 placeholder:text-gray-400
                 ${passwordError ? 'border-gym-error' : 'border-gray-200 focus:ring-2 focus:ring-gym-primary focus:border-transparent'}`}
+              style={{ color: '#1f2937' }}
               required
             />
             
@@ -329,7 +334,8 @@ const LoginScreen = ({ onLogin, loading }) => {
                 placeholder="Enter your email"
                 value={resetEmail}
                 onChange={(e) => setResetEmail(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-grip focus:outline-none focus:ring-2 focus:ring-gym-primary focus:border-transparent transition-colors mb-4"
+                className="w-full px-4 py-3 border border-gray-200 rounded-grip focus:outline-none focus:ring-2 focus:ring-gym-primary focus:border-transparent transition-colors mb-4 text-gray-900 placeholder:text-gray-400"
+                style={{ color: '#1f2937' }}
                 required
               />
               
@@ -366,7 +372,8 @@ const LoginScreen = ({ onLogin, loading }) => {
               placeholder="Enter your email address"
               value={resendEmail}
               onChange={(e) => setResendEmail(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-grip focus:outline-none focus:ring-2 focus:ring-gym-primary focus:border-transparent mb-4"
+              className="w-full px-4 py-3 border border-gray-200 rounded-grip focus:outline-none focus:ring-2 focus:ring-gym-primary focus:border-transparent mb-4 text-gray-900 placeholder:text-gray-400"
+              style={{ color: '#1f2937' }}
             />
             <div className="flex gap-4">
               <button
