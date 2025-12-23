@@ -442,8 +442,10 @@ function App() {
         throw new Error('Could not find related events to update');
       }
 
-      const oldTimes = relatedEvents.map(e => e.time).filter(Boolean);
-      const newTimes = eventData.times || [];
+      // Normalize times: remove seconds if present (e.g., "08:00:00" -> "08:00")
+      const normalizeTime = (time) => time ? time.split(':').slice(0, 2).join(':') : null;
+      const oldTimes = relatedEvents.map(e => normalizeTime(e.time)).filter(Boolean);
+      const newTimes = (eventData.times || []).map(t => normalizeTime(t)).filter(Boolean);
       const oldTimeSet = new Set(oldTimes);
       const newTimeSet = new Set(newTimes);
 
@@ -455,7 +457,8 @@ function App() {
       console.log('Times to remove:', timesToRemove);
 
       // Update title, details, and type for all existing events (that aren't being removed)
-      const eventsToUpdate = relatedEvents.filter(e => !timesToRemove.includes(e.time));
+      // Need to normalize event.time for comparison
+      const eventsToUpdate = relatedEvents.filter(e => !timesToRemove.includes(normalizeTime(e.time)));
       
       for (const event of eventsToUpdate) {
         const { error } = await supabase
@@ -475,7 +478,7 @@ function App() {
 
       // Delete events for removed times
       if (timesToRemove.length > 0) {
-        const eventsToDelete = relatedEvents.filter(e => timesToRemove.includes(e.time));
+        const eventsToDelete = relatedEvents.filter(e => timesToRemove.includes(normalizeTime(e.time)));
         for (const event of eventsToDelete) {
           const { error } = await supabase
             .from('events')
