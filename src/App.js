@@ -577,7 +577,7 @@ function App() {
       // Refresh data to update UI
       await fetchEvents();
       await fetchRegistrations();
-      toast.'Class cancelled! ✓', .success(
+      toast.success('Class cancelled! ✓');
       return { success: true };
     } catch (error) {
       console.error('Failed to cancel class:', error);
@@ -656,7 +656,7 @@ function App() {
       toast.success('Note saved! ✓');
       return true;
     } catch (error) {
-      toast.'Failed to save note: ' + error.message);
+      toast.error('Failed to save note: ' + error.message);
       return false;
     }
   };
@@ -686,7 +686,7 @@ function App() {
 
       if (error) {
         if (error.code === '23505') {
-          toast.'Student already registered for this time'.error();
+          toast.error('Student already registered for this time');
           return { success: false, error };
         }
         throw error;
