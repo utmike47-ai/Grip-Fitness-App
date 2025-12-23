@@ -44,15 +44,26 @@ const CreateEvent = ({ user, onBack, onCreateEvent, editMode = false, existingEv
       };
     });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('=== CreateEvent handleSubmit START ===');
+    console.log('editMode:', editMode);
+    console.log('eventData:', JSON.stringify(eventData, null, 2));
+    console.log('onCreateEvent function:', typeof onCreateEvent);
+    
     if (!eventData.title || !eventData.date || eventData.times.length === 0) {
       alert('Please fill in all required fields and select at least one time slot');
       return;
     }
-    console.log('CreateEvent handleSubmit - editMode:', editMode);
-    console.log('CreateEvent handleSubmit - eventData:', eventData);
-    onCreateEvent(eventData);
+    
+    try {
+      console.log('Calling onCreateEvent with eventData...');
+      const result = await onCreateEvent(eventData);
+      console.log('onCreateEvent result:', result);
+    } catch (error) {
+      console.error('Error in handleSubmit:', error);
+    }
+    console.log('=== CreateEvent handleSubmit END ===');
   };
 
   const toggleTimeSlot = (time) => {

@@ -423,9 +423,14 @@ function App() {
   };
 
   const updateEvent = async (eventData) => {
+    console.log('=== updateEvent START ===');
+    console.log('eventData received:', JSON.stringify(eventData, null, 2));
+    console.log('editingEvent:', editingEvent);
+    console.log('events array length:', events.length);
+    
     try {
-      console.log('updateEvent called with:', eventData);
       if (!editingEvent) {
+        console.error('ERROR: No event selected for editing');
         throw new Error('No event selected for editing');
       }
 
@@ -435,8 +440,10 @@ function App() {
         e.date === editingEvent.date
       );
       
-      console.log('Related events found:', relatedEvents);
-      console.log('New times:', eventData.times);
+      console.log('Related events found:', relatedEvents.length, relatedEvents);
+      console.log('New times from eventData:', eventData.times);
+      console.log('eventData.date:', eventData.date);
+      console.log('eventData.title:', eventData.title);
       
       if (relatedEvents.length === 0) {
         throw new Error('Could not find related events to update');
@@ -459,41 +466,58 @@ function App() {
       // Update title, details, and type for all existing events (that aren't being removed)
       // Need to normalize event.time for comparison
       const eventsToUpdate = relatedEvents.filter(e => !timesToRemove.includes(normalizeTime(e.time)));
+      console.log('Events to update (count):', eventsToUpdate.length, eventsToUpdate.map(e => ({ id: e.id, time: e.time })));
       
       for (const event of eventsToUpdate) {
-        const { error } = await supabase
+        console.log(`Updating event ${event.id} with:`, {
+          title: eventData.title,
+          type: eventData.type,
+          details: eventData.details ? eventData.details.substring(0, 50) + '...' : ''
+        });
+        
+        const { data, error } = await supabase
           .from('events')
           .update({
             title: eventData.title,
             details: eventData.details ? eventData.details.replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim() : '',
             type: eventData.type
           })
-          .eq('id', event.id);
+          .eq('id', event.id)
+          .select();
         
         if (error) {
-          console.error('Error updating event:', event.id, error);
+          console.error(`ERROR updating event ${event.id}:`, error);
           throw error;
         }
+        console.log(`Successfully updated event ${event.id}`, data);
       }
 
       // Delete events for removed times
       if (timesToRemove.length > 0) {
+        console.log('Deleting events for removed times:', timesToRemove);
         const eventsToDelete = relatedEvents.filter(e => timesToRemove.includes(normalizeTime(e.time)));
+        console.log('Events to delete (count):', eventsToDelete.length, eventsToDelete.map(e => ({ id: e.id, time: e.time })));
+        
         for (const event of eventsToDelete) {
+          console.log(`Deleting event ${event.id}`);
           const { error } = await supabase
             .from('events')
             .delete()
             .eq('id', event.id);
           
           if (error) {
-            console.error('Error deleting event:', event.id, error);
+            console.error(`ERROR deleting event ${event.id}:`, error);
             throw error;
           }
+          console.log(`Successfully deleted event ${event.id}`);
         }
+      } else {
+        console.log('No events to delete');
       }
 
       // Create new events for added times
       if (timesToAdd.length > 0) {
+        console.log('Creating new events for added times:', timesToAdd);
         const eventsToCreate = timesToAdd.map(time => ({
           title: eventData.title,
           date: eventData.date || editingEvent.date,
@@ -503,23 +527,36 @@ function App() {
           created_by: user.id,
         }));
 
-        const { error } = await supabase
+        console.log('Events to create:', eventsToCreate);
+        const { data, error } = await supabase
           .from('events')
-          .insert(eventsToCreate);
+          .insert(eventsToCreate)
+          .select();
         
         if (error) {
-          console.error('Error creating new events:', error);
+          console.error('ERROR creating new events:', error);
           throw error;
         }
+        console.log('Successfully created new events:', data);
+      } else {
+        console.log('No new events to create');
       }
       
+      console.log('Fetching updated events...');
       await fetchEvents();
+      console.log('Successfully updated all events!');
       toast.success('Event updated successfully!');
       setCurrentView('dashboard');
       setEditingEvent(null);
+      console.log('=== updateEvent END (SUCCESS) ===');
+      return { success: true };
     } catch (error) {
-      console.error('Update error:', error);
+      console.error('=== updateEvent END (ERROR) ===');
+      console.error('Update error details:', error);
+      console.error('Error message:', error.message);
+      console.error('Error code:', error.code);
       toast.error('Couldn\'t update class. Please try again.');
+      return { success: false, error };
     }
   };
 
