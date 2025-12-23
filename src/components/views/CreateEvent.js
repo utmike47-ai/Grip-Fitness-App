@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TIME_SLOTS } from '../../utils/constants';
 import Logo from '../Logo';
 
@@ -43,6 +43,39 @@ const CreateEvent = ({ user, onBack, onCreateEvent, editMode = false, existingEv
         maxCapacity: 25
       };
     });
+
+  // Update state when existingEvent or editMode changes (when switching to edit mode)
+  useEffect(() => {
+    if (editMode && existingEvent) {
+      console.log('useEffect: Updating eventData from existingEvent:', existingEvent);
+      // Find all related events (same title and date) to get all time slots
+      const relatedEvents = allEvents.filter(e => 
+        e.title === existingEvent.title && 
+        e.date === existingEvent.date
+      );
+      // Extract all times from related events and normalize them (remove seconds if present)
+      const existingTimes = relatedEvents
+        .map(e => e.time)
+        .filter(Boolean)
+        .map(time => {
+          // Normalize time format: "08:00:00" -> "08:00", "08:00" -> "08:00"
+          return time.split(':').slice(0, 2).join(':');
+        });
+      
+      console.log('useEffect: Related events:', relatedEvents);
+      console.log('useEffect: Existing times (normalized):', existingTimes);
+      
+      setEventData({
+        title: existingEvent.title || '',
+        type: existingEvent.type || 'workout',
+        date: existingEvent.date || '',
+        times: existingTimes.length > 0 ? existingTimes : (existingEvent.time ? [existingEvent.time.split(':').slice(0, 2).join(':')] : []),
+        details: existingEvent.details || '',
+        maxCapacity: 25,
+        eventIds: relatedEvents.map(e => e.id)
+      });
+    }
+  }, [editMode, existingEvent, allEvents]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -127,8 +160,11 @@ const CreateEvent = ({ user, onBack, onCreateEvent, editMode = false, existingEv
             </label>
             <input
               type="text"
-              value={eventData.title}
-              onChange={(e) => setEventData(prev => ({ ...prev, title: e.target.value }))}
+              value={eventData.title || ''}
+              onChange={(e) => {
+                console.log('Title changed to:', e.target.value);
+                setEventData(prev => ({ ...prev, title: e.target.value }));
+              }}
               placeholder="e.g., Monday Morning HIIT"
               className="w-full px-4 py-3 border border-gray-200 rounded-grip focus:outline-none focus:ring-2 focus:ring-gym-primary focus:border-transparent transition-colors text-gray-900 placeholder:text-gray-400"
               style={{ color: '#1f2937' }}
@@ -141,10 +177,13 @@ const CreateEvent = ({ user, onBack, onCreateEvent, editMode = false, existingEv
             <label className="block text-sm font-semibold text-gym-text-dark mb-2">
               Date *
             </label>
-            <input
-              type="date"
-              value={eventData.date}
-              onChange={(e) => setEventData(prev => ({ ...prev, date: e.target.value }))}
+              <input
+                type="date"
+                value={eventData.date || ''}
+                onChange={(e) => {
+                  console.log('Date changed to:', e.target.value);
+                  setEventData(prev => ({ ...prev, date: e.target.value }));
+                }}
               className="w-full px-4 py-3 border border-gray-200 rounded-grip focus:outline-none focus:ring-2 focus:ring-gym-primary focus:border-transparent transition-colors text-gym-text-dark text-center"
               style={{ 
                 color: '#2d3142',
@@ -188,8 +227,11 @@ const CreateEvent = ({ user, onBack, onCreateEvent, editMode = false, existingEv
               Details (Optional)
             </label>
             <textarea
-              value={eventData.details}
-              onChange={(e) => setEventData(prev => ({ ...prev, details: e.target.value }))}
+              value={eventData.details || ''}
+              onChange={(e) => {
+                console.log('Details changed, length:', e.target.value.length);
+                setEventData(prev => ({ ...prev, details: e.target.value }));
+              }}
               placeholder="Enter workout details (one exercise per line):
 20 min EMOM
 12-15 Heel Raised Goblet Squats
