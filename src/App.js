@@ -424,6 +424,7 @@ function App() {
 
   const updateEvent = async (eventData) => {
     try {
+      console.log('updateEvent called with:', eventData);
       if (!editingEvent) {
         throw new Error('No event selected for editing');
       }
@@ -434,23 +435,79 @@ function App() {
         e.date === editingEvent.date
       );
       
+      console.log('Related events found:', relatedEvents);
+      console.log('New times:', eventData.times);
+      
       if (relatedEvents.length === 0) {
         throw new Error('Could not find related events to update');
       }
 
-      // Update each related event
-      for (const event of relatedEvents) {
+      const oldTimes = relatedEvents.map(e => e.time).filter(Boolean);
+      const newTimes = eventData.times || [];
+      const oldTimeSet = new Set(oldTimes);
+      const newTimeSet = new Set(newTimes);
+
+      // Find times to add and remove
+      const timesToAdd = newTimes.filter(t => !oldTimeSet.has(t));
+      const timesToRemove = oldTimes.filter(t => !newTimeSet.has(t));
+
+      console.log('Times to add:', timesToAdd);
+      console.log('Times to remove:', timesToRemove);
+
+      // Update title, details, and type for all existing events (that aren't being removed)
+      const eventsToUpdate = relatedEvents.filter(e => !timesToRemove.includes(e.time));
+      
+      for (const event of eventsToUpdate) {
         const { error } = await supabase
           .from('events')
           .update({
             title: eventData.title,
             details: eventData.details ? eventData.details.replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim() : '',
             type: eventData.type
-            // Note: we don't update date or time here to preserve the original schedule
           })
           .eq('id', event.id);
         
-        if (error) throw error;
+        if (error) {
+          console.error('Error updating event:', event.id, error);
+          throw error;
+        }
+      }
+
+      // Delete events for removed times
+      if (timesToRemove.length > 0) {
+        const eventsToDelete = relatedEvents.filter(e => timesToRemove.includes(e.time));
+        for (const event of eventsToDelete) {
+          const { error } = await supabase
+            .from('events')
+            .delete()
+            .eq('id', event.id);
+          
+          if (error) {
+            console.error('Error deleting event:', event.id, error);
+            throw error;
+          }
+        }
+      }
+
+      // Create new events for added times
+      if (timesToAdd.length > 0) {
+        const eventsToCreate = timesToAdd.map(time => ({
+          title: eventData.title,
+          date: eventData.date || editingEvent.date,
+          time: time,
+          type: eventData.type,
+          details: eventData.details ? eventData.details.replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim() : '',
+          created_by: user.id,
+        }));
+
+        const { error } = await supabase
+          .from('events')
+          .insert(eventsToCreate);
+        
+        if (error) {
+          console.error('Error creating new events:', error);
+          throw error;
+        }
       }
       
       await fetchEvents();
@@ -459,7 +516,7 @@ function App() {
       setEditingEvent(null);
     } catch (error) {
       console.error('Update error:', error);
-        toast.error('Couldn\'t update class. Please try again.');
+      toast.error('Couldn\'t update class. Please try again.');
     }
   };
 
@@ -785,6 +842,7 @@ function App() {
             onCreateEvent={updateEvent}
             editMode={true}
             existingEvent={editingEvent}
+            allEvents={events}
           />;
         
       case 'myClasses':

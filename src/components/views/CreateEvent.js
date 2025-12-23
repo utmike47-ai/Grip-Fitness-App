@@ -2,17 +2,26 @@ import React, { useState } from 'react';
 import { TIME_SLOTS } from '../../utils/constants';
 import Logo from '../Logo';
 
-const CreateEvent = ({ user, onBack, onCreateEvent, editMode = false, existingEvent = null }) => {
+const CreateEvent = ({ user, onBack, onCreateEvent, editMode = false, existingEvent = null, allEvents = [] }) => {
     const [eventData, setEventData] = useState(() => {
       // If editing, populate with existing data
       if (editMode && existingEvent) {
+        // Find all related events (same title and date) to get all time slots
+        const relatedEvents = allEvents.filter(e => 
+          e.title === existingEvent.title && 
+          e.date === existingEvent.date
+        );
+        // Extract all times from related events
+        const existingTimes = relatedEvents.map(e => e.time).filter(Boolean);
+        
         return {
           title: existingEvent.title,
           type: existingEvent.type,
           date: existingEvent.date,
-          times: [existingEvent.time],
+          times: existingTimes.length > 0 ? existingTimes : [existingEvent.time],
           details: existingEvent.details || '',
-          maxCapacity: 25
+          maxCapacity: 25,
+          eventIds: relatedEvents.map(e => e.id) // Store IDs for update
         };
       }
       // Otherwise, start with empty form
@@ -197,7 +206,7 @@ const CreateEvent = ({ user, onBack, onCreateEvent, editMode = false, existingEv
             <button
               type="button"
               onClick={onBack}
-              className="flex-1 bg-grip-secondary text-grip-dark py-3 rounded-grip font-semibold hover:bg-grip-secondary transition-all"
+              className="flex-1 bg-red-500 text-white py-3 rounded-grip font-semibold hover:bg-red-600 transition-all"
             >
               Cancel
             </button>
