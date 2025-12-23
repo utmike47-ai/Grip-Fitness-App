@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { TIME_SLOTS } from '../../utils/constants';
 import Logo from '../Logo';
 
@@ -44,38 +44,55 @@ const CreateEvent = ({ user, onBack, onCreateEvent, editMode = false, existingEv
       };
     });
 
-  // Update state when existingEvent or editMode changes (when switching to edit mode)
+  // Update state when existingEvent changes (when switching to edit mode or editing different event)
+  // Use a ref to track the last existingEvent.id we initialized from to prevent overwriting user edits
+  const lastInitializedEventIdRef = useRef(null);
+  
   useEffect(() => {
-    if (editMode && existingEvent) {
-      console.log('useEffect: Updating eventData from existingEvent:', existingEvent);
-      // Find all related events (same title and date) to get all time slots
-      const relatedEvents = allEvents.filter(e => 
-        e.title === existingEvent.title && 
-        e.date === existingEvent.date
-      );
-      // Extract all times from related events and normalize them (remove seconds if present)
-      const existingTimes = relatedEvents
-        .map(e => e.time)
-        .filter(Boolean)
-        .map(time => {
-          // Normalize time format: "08:00:00" -> "08:00", "08:00" -> "08:00"
-          return time.split(':').slice(0, 2).join(':');
+    // Only initialize when entering edit mode with a new existingEvent
+    if (editMode && existingEvent?.id) {
+      const eventId = existingEvent.id;
+      
+      // Only initialize if this is a different event than we last initialized
+      if (lastInitializedEventIdRef.current !== eventId) {
+        console.log('useEffect: Initializing eventData from existingEvent:', existingEvent);
+        lastInitializedEventIdRef.current = eventId;
+        
+        // Find all related events (same title and date) to get all time slots
+        const relatedEvents = allEvents.filter(e => 
+          e.title === existingEvent.title && 
+          e.date === existingEvent.date
+        );
+        // Extract all times from related events and normalize them (remove seconds if present)
+        const existingTimes = relatedEvents
+          .map(e => e.time)
+          .filter(Boolean)
+          .map(time => {
+            // Normalize time format: "08:00:00" -> "08:00", "08:00" -> "08:00"
+            return time.split(':').slice(0, 2).join(':');
+          });
+        
+        console.log('useEffect: Related events:', relatedEvents);
+        console.log('useEffect: Existing times (normalized):', existingTimes);
+        
+        setEventData({
+          title: existingEvent.title || '',
+          type: existingEvent.type || 'workout',
+          date: existingEvent.date || '',
+          times: existingTimes.length > 0 ? existingTimes : (existingEvent.time ? [existingEvent.time.split(':').slice(0, 2).join(':')] : []),
+          details: existingEvent.details || '',
+          maxCapacity: 25,
+          eventIds: relatedEvents.map(e => e.id)
         });
-      
-      console.log('useEffect: Related events:', relatedEvents);
-      console.log('useEffect: Existing times (normalized):', existingTimes);
-      
-      setEventData({
-        title: existingEvent.title || '',
-        type: existingEvent.type || 'workout',
-        date: existingEvent.date || '',
-        times: existingTimes.length > 0 ? existingTimes : (existingEvent.time ? [existingEvent.time.split(':').slice(0, 2).join(':')] : []),
-        details: existingEvent.details || '',
-        maxCapacity: 25,
-        eventIds: relatedEvents.map(e => e.id)
-      });
+      } else {
+        console.log('useEffect: Skipping initialization - already initialized for event:', eventId);
+      }
+    } else if (!editMode) {
+      // Reset the ref when exiting edit mode
+      console.log('useEffect: Exiting edit mode, resetting ref');
+      lastInitializedEventIdRef.current = null;
     }
-  }, [editMode, existingEvent, allEvents]);
+  }, [editMode, existingEvent?.id, allEvents]); // Depend on existingEvent.id, but allEvents needed for finding related events
 
   const handleSubmit = async (e) => {
     e.preventDefault();
