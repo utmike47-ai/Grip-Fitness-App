@@ -4,7 +4,7 @@ import { useSwipeable } from 'react-swipeable';
 import { fetchNoteForEvent, saveNote, deleteNote } from '../../utils/notesService';
 import { supabase } from '../../utils/supabaseClient';
 import Logo from '../Logo';
-import { FileText, StickyNote, Pencil, Trash2, UserPlus } from 'lucide-react';
+import { StickyNote, Pencil, Trash2, UserPlus } from 'lucide-react';
 
 const DayView = ({ 
   selectedDate, 
@@ -504,18 +504,6 @@ const DayView = ({
                 {/* Icon Action Row */}
                 <div className="bg-gray-50 rounded-[12px] p-4 mb-6">
                   <div className="flex justify-center items-center gap-3 flex-wrap">
-                    {/* Workout Icon */}
-                    <button
-                      type="button"
-                      className="flex flex-col items-center justify-center"
-                      disabled
-                    >
-                      <div className="w-14 h-14 rounded-full bg-gym-primary flex items-center justify-center mb-1">
-                        <FileText className="w-6 h-6 text-white" />
-                      </div>
-                      <span className="text-xs text-gray-600 font-medium">Workout</span>
-                    </button>
-
                     {/* Notes Icon */}
                     <button
                       type="button"
