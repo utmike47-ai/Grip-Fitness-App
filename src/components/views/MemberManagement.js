@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../../utils/supabaseClient';
+import toast from 'react-hot-toast';
 import Logo from '../Logo';
 
-const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshProfiles }) => {
+const MemberManagement = ({ user, profiles = [], onBack, onRefreshProfiles }) => {
   const userRole = user?.user_metadata?.role || 'student';
   const isAuthorized = userRole === 'coach' || userRole === 'admin';
 
@@ -59,7 +60,7 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
         setMembers(membersWithData);
       } catch (error) {
         console.error('Error fetching members:', error);
-        showToast('Couldn\'t load members. Please try refreshing.', 'error');
+        toast.error('Couldn\'t load members. Please try refreshing.');
       } finally {
         setLoading(false);
       }
@@ -193,11 +194,11 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
           role: 'student'
         });
         setAddModalOpen(false);
-        showToast('Member added! ✓', 'success');
+        toast.success('Member added! ✓');
       }
     } catch (error) {
       console.error('Error adding member:', error);
-      showToast('Couldn\'t add member. Please try again.', 'error');
+      toast.error('Couldn\'t add member. Please try again.');
     } finally {
       setAddFormLoading(false);
     }
@@ -246,10 +247,10 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
 
       setEditModalOpen(false);
       setSelectedMember(null);
-      showToast('Member updated! ✓', 'success');
+      toast.success('Member updated! ✓');
     } catch (error) {
       console.error('Error updating member:', error);
-      showToast('Couldn\'t update member. Please try again.', 'error');
+      toast.error('Couldn\'t update member. Please try again.');
     } finally {
       setEditFormLoading(false);
     }
@@ -292,10 +293,10 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
 
       setDeleteModalOpen(false);
       setSelectedMember(null);
-      showToast('Member deleted! ✓', 'success');
+      toast.success('Member deleted! ✓');
     } catch (error) {
       console.error('Error deleting member:', error);
-      showToast('Couldn\'t delete member. Please try again.', 'error');
+      toast.error('Couldn\'t delete member. Please try again.');
     }
   };
 

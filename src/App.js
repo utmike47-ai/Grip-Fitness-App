@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { Toaster, toast } from 'react-hot-toast';
 import { supabase } from './utils/supabaseClient';
 import { TIME_SLOTS } from './utils/constants';
 import LoginScreen from './components/views/LoginScreen';
@@ -10,7 +11,6 @@ import NotesView from './components/views/NotesView';
 import ProfileEdit from './components/views/ProfileEdit';
 import AdminDashboard from './components/views/AdminDashboard';
 import MemberManagement from './components/views/MemberManagement';
-import Toast from './components/common/Toast';
 import BookingModal from './components/common/BookingModal';
 import BottomNav from './components/common/BottomNav';
 
@@ -30,7 +30,6 @@ function App() {
   const [loadingRegistrations, setLoadingRegistrations] = useState(false);
   const [loadingError, setLoadingError] = useState(null);
   const [editingEvent, setEditingEvent] = useState(null);
-  const [toast, setToast] = useState(null);
   const [bookingModal, setBookingModal] = useState({ isOpen: false, details: null }); 
   const fetchUserProfile = useCallback(async (userId) => {
     try {
@@ -183,7 +182,7 @@ function App() {
           });
           
           setCurrentView('dashboard');
-          showToast(`Account created as ${userRole}! Please check your email to confirm.`);
+          toast.success(`Account created as ${userRole}! Please check your email to confirm.`);
         }
       } else {
         // Regular login
@@ -199,7 +198,7 @@ function App() {
         setCurrentView('dashboard');
       }
     } catch (error) {
-      showToast(error.message, 'error');
+      toast.error(error.message);
     } finally {
       setLoading(false);
     }
@@ -217,9 +216,6 @@ function App() {
     setAttendance([]);
   };
 
-  const showToast = (message, type = 'success') => {
-    setToast({ message, type });
-  };
 
   // Data fetching functions
   const fetchEvents = useCallback(async () => {
@@ -374,12 +370,12 @@ function App() {
         }
       });
       
-      showToast('Registered successfully! ✓', 'success');
+      toast.success('Registered successfully! ✓');
     } catch (error) {
       if (error.code === '23505') {
-        showToast('You\'re already registered for this event!', 'error');
+        toast.error('You\'re already registered for this event!');
       } else {
-        showToast('Couldn\'t register. Please try again.', 'error');
+        toast.error('Couldn\'t register. Please try again.');
       }
     }
   };
@@ -394,9 +390,9 @@ function App() {
       
       if (error) throw error;
       await fetchRegistrations();
-      showToast('Registration cancelled ✓', 'success');
+      toast.success('Registration cancelled ✓');
     } catch (error) {
-        showToast('Couldn\'t cancel registration. Please try again.', 'error');
+        toast.error('Couldn\'t cancel registration. Please try again.');
     }
   };
 
@@ -419,10 +415,10 @@ function App() {
       
       await fetchEvents();
       setCurrentView('dashboard');
-      showToast('Class created! ✓', 'success');
+      toast.success('Class created! ✓');
     } catch (error) {
       console.error('Failed to create event:', error);
-        showToast('Couldn\'t create class. Please try again.', 'error');
+        toast.error('Couldn\'t create class. Please try again.');
     }
   };
 
@@ -458,12 +454,12 @@ function App() {
       }
       
       await fetchEvents();
-      showToast('Event updated successfully!');
+      toast.success('Event updated successfully!');
       setCurrentView('dashboard');
       setEditingEvent(null);
     } catch (error) {
       console.error('Update error:', error);
-        showToast('Couldn\'t update class. Please try again.', 'error');
+        toast.error('Couldn\'t update class. Please try again.');
     }
   };
 
@@ -476,7 +472,7 @@ function App() {
       // Find all events with same title and date (all time slots)
       const eventToDelete = events.find(e => e.id === eventId);
       if (!eventToDelete) {
-        showToast('Event not found');
+        toast.'Event not found');
         return;
       }
       
@@ -527,18 +523,18 @@ function App() {
       
       await fetchEvents();
       await fetchRegistrations();
-      showToast('Class deleted! ✓', 'success');
+      toast.success('Class deleted! ✓');
       setCurrentView('dashboard');
     } catch (error) {
       console.error('Delete failed:', error);
-      showToast('Failed to delete event: ' + error.message);
+      toast.error('Failed to delete event: ' + error.message);
     }
   };
 
   const cancelTimeSlot = useCallback(async (eventId) => {
     // Verify user is a coach
     if (user?.user_metadata?.role !== 'coach') {
-      showToast('Only coaches can cancel classes', 'error');
+      toast.error('Only coaches can cancel classes');
       return { success: false };
     }
 
@@ -581,11 +577,11 @@ function App() {
       // Refresh data to update UI
       await fetchEvents();
       await fetchRegistrations();
-      showToast('Class cancelled! ✓', 'success');
+      toast.'Class cancelled! ✓', .success(
       return { success: true };
     } catch (error) {
       console.error('Failed to cancel class:', error);
-        showToast('Couldn\'t cancel class. Please try again.', 'error');
+        toast.error('Couldn\'t cancel class. Please try again.');
       return { success: false, error };
     }
   }, [user, fetchEvents, fetchRegistrations]);
@@ -628,7 +624,7 @@ function App() {
       
       await fetchAttendance();
     } catch (error) {
-      showToast('Failed to update attendance: ' + error.message);
+      toast.'Failed to update attendance: ' + error.message);
     }
   };
 
@@ -657,10 +653,10 @@ function App() {
       }
       
       await fetchUserNotes();
-      showToast('Note saved! ✓', 'success');
+      toast.success('Note saved! ✓');
       return true;
     } catch (error) {
-      showToast('Failed to save note: ' + error.message);
+      toast.'Failed to save note: ' + error.message);
       return false;
     }
   };
@@ -675,10 +671,10 @@ function App() {
       if (error) throw error;
 
       await fetchRegistrations();
-      showToast('Student removed! ✓', 'success');
+      toast.success('Student removed! ✓');
     } catch (error) {
       console.error('Failed to remove student:', error);
-        showToast('Couldn\'t remove student. Please try again.', 'error');
+        toast.error('Couldn\'t remove student. Please try again.');
     }
   }, [fetchRegistrations]);
 
@@ -690,18 +686,18 @@ function App() {
 
       if (error) {
         if (error.code === '23505') {
-          showToast('Student already registered for this time', 'error');
+          toast.'Student already registered for this time'.error();
           return { success: false, error };
         }
         throw error;
       }
 
       await fetchRegistrations();
-      showToast('Student added to class!');
+      toast.success('Student added to class!');
       return { success: true };
     } catch (error) {
       console.error('Failed to add student:', error);
-        showToast('Couldn\'t add student. Please try again.', 'error');
+        toast.error('Couldn\'t add student. Please try again.');
       return { success: false, error };
     }
   }, [fetchRegistrations]);
@@ -827,7 +823,6 @@ function App() {
               }));
               fetchUserProfile(user.id); // Refresh profile data
             }}
-            showToast={showToast}
           />;
 
         case 'adminDashboard':
@@ -853,7 +848,6 @@ function App() {
             user={user}
             profiles={profiles}
             onBack={() => setCurrentView('adminDashboard')}
-            showToast={showToast}
             onRefreshProfiles={fetchProfiles}
           />;
       
@@ -875,13 +869,39 @@ function App() {
   return (
     <>
       {renderView()}
-      {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast(null)}
-        />
-      )}
+      <Toaster 
+        position="top-center"
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: '#ffffff',
+            color: '#2d3142',
+            borderRadius: '12px',
+            padding: '16px',
+            fontSize: '15px',
+            fontWeight: '500',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.25)',
+          },
+          success: {
+            iconTheme: {
+              primary: '#10b981',
+              secondary: '#fff',
+            },
+          },
+          error: {
+            iconTheme: {
+              primary: '#ef4444',
+              secondary: '#fff',
+            },
+          },
+          info: {
+            iconTheme: {
+              primary: '#ff6b35',
+              secondary: '#fff',
+            },
+          },
+        }}
+      />
       <BookingModal 
         isOpen={bookingModal.isOpen}
         eventDetails={bookingModal.details}

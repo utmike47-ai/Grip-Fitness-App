@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { supabase } from '../../utils/supabaseClient';
+import toast from 'react-hot-toast';
 import Logo from '../Logo';
 
-const ProfileEdit = ({ user, onBack, onProfileUpdate, showToast }) => {
+const ProfileEdit = ({ user, onBack, onProfileUpdate }) => {
   const [firstName, setFirstName] = useState(user?.user_metadata?.first_name || '');
   const [lastName, setLastName] = useState(user?.user_metadata?.last_name || '');
   const [loading, setLoading] = useState(false);
@@ -39,21 +40,10 @@ const ProfileEdit = ({ user, onBack, onProfileUpdate, showToast }) => {
         last_name: lastName.trim()
       });
       
-      if (showToast) {
-        showToast('Profile updated! ✓', 'success');
-      } else {
-        alert('Profile updated successfully!');
-      }
-      if (showToast) {
-        showToast('Profile updated! ✓', 'success');
-      }
+      toast.success('Profile updated! ✓');
       onBack();
     } catch (error) {
-      if (showToast) {
-        showToast('Couldn\'t update profile. Please try again.', 'error');
-      } else {
-        alert('Couldn\'t update profile. Please try again.');
-      }
+      toast.error('Couldn\'t update profile. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -93,17 +83,11 @@ const ProfileEdit = ({ user, onBack, onProfileUpdate, showToast }) => {
       setConfirmPassword('');
       setPasswordError('');
 
-      if (showToast) {
-        showToast('Password updated! ✓', 'success');
-      } else {
-        alert('Password updated successfully!');
-      }
+      toast.success('Password updated! ✓');
     } catch (error) {
       const errorMessage = 'Couldn\'t update password. Please try again.';
       setPasswordError(errorMessage);
-      if (showToast) {
-        showToast(errorMessage, 'error');
-      }
+      toast.error(errorMessage);
     } finally {
       setPasswordLoading(false);
     }
