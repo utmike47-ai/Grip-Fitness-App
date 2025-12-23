@@ -99,7 +99,8 @@ const CreateEvent = ({ user, onBack, onCreateEvent, editMode = false, existingEv
               value={eventData.title}
               onChange={(e) => setEventData(prev => ({ ...prev, title: e.target.value }))}
               placeholder="e.g., Monday Morning HIIT"
-              className="w-full px-4 py-3 border border-gray-200 rounded-grip focus:outline-none focus:ring-2 focus:ring-gym-primary focus:border-transparent transition-colors"
+              className="w-full px-4 py-3 border border-gray-200 rounded-grip focus:outline-none focus:ring-2 focus:ring-gym-primary focus:border-transparent transition-colors text-gray-900 placeholder:text-gray-400"
+              style={{ color: '#1f2937' }}
               required
             />
           </div>
@@ -165,7 +166,8 @@ const CreateEvent = ({ user, onBack, onCreateEvent, editMode = false, existingEv
 12-15 DB Bench press
 20 Sit ups"
               rows="4"
-              className="w-full px-4 py-3 border border-gray-300 rounded-grip focus:outline-none focus:ring-2 focus:ring-grip-primary focus:border-transparent transition-colors resize-none"
+              className="w-full px-4 py-3 border border-gray-300 rounded-grip focus:outline-none focus:ring-2 focus:ring-grip-primary focus:border-transparent transition-colors resize-none text-gray-900 placeholder:text-gray-400"
+              style={{ color: '#1f2937' }}
             />
           </div>
 
@@ -181,7 +183,8 @@ const CreateEvent = ({ user, onBack, onCreateEvent, editMode = false, existingEv
                 onChange={(e) => setEventData(prev => ({ ...prev, maxCapacity: parseInt(e.target.value) }))}
                 min="1"
                 max="100"
-                    className="w-full px-4 py-3 border border-gray-200 rounded-grip focus:outline-none focus:ring-2 focus:ring-gym-primary focus:border-transparent transition-colors"
+                className="w-full px-4 py-3 border border-gray-200 rounded-grip focus:outline-none focus:ring-2 focus:ring-gym-primary focus:border-transparent transition-colors text-gray-900 placeholder:text-gray-400"
+                style={{ color: '#1f2937' }}
               />
               <p className="text-xs text-gray-600 mt-1">
                 Workouts are automatically limited to 15 participants
