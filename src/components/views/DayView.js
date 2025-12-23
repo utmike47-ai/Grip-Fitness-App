@@ -4,7 +4,7 @@ import { useSwipeable } from 'react-swipeable';
 import { fetchNoteForEvent, saveNote, deleteNote } from '../../utils/notesService';
 import { supabase } from '../../utils/supabaseClient';
 import Logo from '../Logo';
-import { StickyNote, Pencil, Trash2, UserPlus } from 'lucide-react';
+import { StickyNote, Pencil, Trash2, UserPlus, ChevronDown, ChevronUp, X } from 'lucide-react';
 
 const DayView = ({ 
   selectedDate, 
@@ -57,6 +57,7 @@ const DayView = ({
   const [studentSearch, setStudentSearch] = useState('');
   const [selectedStudentId, setSelectedStudentId] = useState(null);
   const [studentsLoading, setStudentsLoading] = useState(false);
+  const [expandedTimeSlots, setExpandedTimeSlots] = useState(new Set());
  
   const getRegistrationCount = useCallback((eventId) => (
     registrations.filter(reg => reg.event_id === eventId).length
@@ -572,77 +573,169 @@ const DayView = ({
                       })
                       .map(timeSlot => {
                       const isFull = timeSlot.registrationCount >= 15;
+                      const isExpanded = expandedTimeSlots.has(timeSlot.id);
+                      const capacity = timeSlot.registrationCount;
+                      const capacityPercent = (capacity / 15) * 100;
+                      
+                      // Get progress bar color
+                      let progressColor = 'bg-gray-400'; // 0%
+                      if (capacityPercent >= 100) {
+                        progressColor = 'bg-red-500'; // 100%
+                      } else if (capacityPercent >= 75) {
+                        progressColor = 'bg-orange-500'; // 75-99%
+                      } else if (capacityPercent >= 50) {
+                        progressColor = 'bg-amber-400'; // 50-74%
+                      } else if (capacityPercent >= 1) {
+                        progressColor = 'bg-emerald-500'; // 1-49%
+                      }
+                      
+                      // Get member preview text
+                      const getMemberPreview = () => {
+                        if (timeSlot.registeredUsers.length === 0) return 'No one registered yet';
+                        const first3 = timeSlot.registeredUsers.slice(0, 3).map(u => u.user_name);
+                        const remaining = timeSlot.registeredUsers.length - 3;
+                        if (remaining > 0) {
+                          return `${first3.join(', ')} +${remaining} more`;
+                        }
+                        return first3.join(', ');
+                      };
+                      
+                      const toggleExpand = () => {
+                        setExpandedTimeSlots(prev => {
+                          const newSet = new Set(prev);
+                          if (newSet.has(timeSlot.id)) {
+                            newSet.delete(timeSlot.id);
+                          } else {
+                            newSet.add(timeSlot.id);
+                          }
+                          return newSet;
+                        });
+                      };
                       
                       return (
-                        <div key={timeSlot.id} className="border border-gray-300 rounded-grip p-4">
-                          <div className="flex items-center justify-between">
-                            <div className="flex-1">
-                              <p className="text-4xl font-extrabold text-gym-text-dark mb-1">
-                                {formatTimeDisplay(timeSlot.time)}
+                        <div key={timeSlot.id} className="border border-gray-300 rounded-[12px] overflow-hidden bg-white">
+                          {/* Collapsed State */}
+                          {!isExpanded && (
+                            <button
+                              type="button"
+                              onClick={toggleExpand}
+                              className="w-full p-4 text-left hover:bg-gray-50 transition-colors"
+                            >
+                              <div className="flex items-center justify-between mb-3">
+                                <p className="text-2xl font-extrabold text-gym-text-dark">
+                                  {formatTimeDisplay(timeSlot.time)}
+                                </p>
+                                <div className="flex items-center gap-3">
+                                  <span className="text-sm font-semibold text-gym-text-dark">
+                                    {capacity}/15
+                                  </span>
+                                  {isExpanded ? (
+                                    <ChevronUp className="w-5 h-5 text-gray-400" />
+                                  ) : (
+                                    <ChevronDown className="w-5 h-5 text-gray-400" />
+                                  )}
+                                </div>
+                              </div>
+                              
+                              {/* Progress Bar */}
+                              <div className="w-full h-2 bg-gray-200 rounded-full mb-2">
+                                <div
+                                  className={`h-full rounded-full transition-all ${progressColor}`}
+                                  style={{ width: `${Math.min(capacityPercent, 100)}%` }}
+                                />
+                              </div>
+                              
+                              {/* Member Preview */}
+                              <p className="text-sm text-gray-600 truncate">
+                                {getMemberPreview()}
                               </p>
-                              <p className="text-sm text-gray-600">
-                                {timeSlot.registrationCount}/15 registered
-                              </p>
-                            </div>
-                            
-                            <div className="flex flex-col gap-2">
-  {timeSlot.userRegistered ? (
-    <button
-      onClick={() => onCancelRegistration(timeSlot.id)}
-      className="px-4 py-2.5 rounded-full text-sm font-semibold text-white bg-gym-primary hover:bg-[#ff8555] transition-all"
-      style={{ minHeight: 44 }}
-    >
-      Cancel
-    </button>
-  ) : (
-    <button
-      onClick={() => onRegister(timeSlot.id)}
-      disabled={isFull}
-      className={`px-4 py-2.5 rounded-full text-sm font-semibold text-white transition-all
-        ${isFull 
-          ? 'bg-grip-secondary text-gray-600 cursor-not-allowed' 
-          : 'bg-grip-primary hover:shadow-grip'}`}
-      style={{ minHeight: 44 }}
-    >
-      {isFull ? 'FULL' : 'Register'}
-    </button>
-  )}
-  {isCoach && (
-    <button
-      type="button"
-      onClick={() => openCancelClassModal(timeSlot)}
-      className="px-4 py-2.5 rounded-full text-sm font-semibold text-white bg-red-600 hover:bg-red-700 active:bg-red-800 transition-all hover:shadow-grip"
-      style={{ minHeight: 44 }}
-      aria-label="Cancel this class time slot"
-    >
-      Cancel
-    </button>
-  )}
-</div>
-                          </div>
-
-                          {/* Show registered participants to everyone */}
-                          {timeSlot.registeredUsers.length > 0 && (
-                            <div className="mt-4 pt-4 border-t border-gray-300">
-                              <p className="font-semibold text-gym-text-dark mb-2">
-                                Registered Participants ({timeSlot.registeredUsers.length}):
-                              </p>
-                              <div className="space-y-2">
-                                {timeSlot.registeredUsers.map(reg => (
-                                  <div key={reg.id} className="text-sm flex items-center justify-between gap-2">
-                                    <span className="text-gym-text-dark">{reg.user_name}</span>
-                                    {isCoach && (
-                                      <button
-                                        type="button"
-                                        onClick={() => openRemoveModal(reg)}
-                                        className="text-xs font-semibold text-red-600 hover:text-red-700"
-                                        style={{ minWidth: 44, minHeight: 32 }}
+                            </button>
+                          )}
+                          
+                          {/* Expanded State */}
+                          {isExpanded && (
+                            <div className="p-4">
+                              <div className="flex items-center justify-between mb-4">
+                                <div>
+                                  <p className="text-2xl font-extrabold text-gym-text-dark">
+                                    {formatTimeDisplay(timeSlot.time)}
+                                  </p>
+                                  <span className="text-sm font-semibold text-gym-text-dark">
+                                    {capacity}/15 registered
+                                  </span>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={toggleExpand}
+                                  className="text-gray-400 hover:text-gray-600"
+                                >
+                                  <ChevronUp className="w-5 h-5" />
+                                </button>
+                              </div>
+                              
+                              {/* Progress Bar */}
+                              <div className="w-full h-2 bg-gray-200 rounded-full mb-4">
+                                <div
+                                  className={`h-full rounded-full transition-all ${progressColor}`}
+                                  style={{ width: `${Math.min(capacityPercent, 100)}%` }}
+                                />
+                              </div>
+                              
+                              {/* Member Pills */}
+                              {timeSlot.registeredUsers.length > 0 && (
+                                <div className="mb-4">
+                                  <div className="flex flex-wrap gap-2">
+                                    {timeSlot.registeredUsers.map(reg => (
+                                      <div
+                                        key={reg.id}
+                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-300 rounded-full text-sm text-gym-text-dark"
                                       >
-                                        × Cancel
-                                      </button>
-                                    )}
+                                        <span>{reg.user_name}</span>
+                                        {isCoach && (
+                                          <button
+                                            type="button"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              openRemoveModal(reg);
+                                            }}
+                                            className="text-gray-400 hover:text-red-500 transition-colors"
+                                          >
+                                            <X className="w-4 h-4" />
+                                          </button>
+                                        )}
+                                      </div>
+                                    ))}
                                   </div>
-                                ))}
+                                </div>
+                              )}
+                              
+                              {/* Action Buttons */}
+                              <div className="flex flex-col gap-2 mt-4">
+                                {!isFull && !timeSlot.userRegistered && (
+                                  <button
+                                    onClick={() => onRegister(timeSlot.id)}
+                                    className="w-full px-4 py-2.5 rounded-[12px] text-sm font-semibold text-white bg-gym-primary hover:bg-[#ff8555] transition-all"
+                                  >
+                                    Register
+                                  </button>
+                                )}
+                                {timeSlot.userRegistered && (
+                                  <button
+                                    onClick={() => onCancelRegistration(timeSlot.id)}
+                                    className="w-full px-4 py-2.5 rounded-[12px] text-sm font-semibold text-white bg-gym-primary hover:bg-[#ff8555] transition-all"
+                                  >
+                                    Cancel Registration
+                                  </button>
+                                )}
+                                {isCoach && (
+                                  <button
+                                    type="button"
+                                    onClick={() => openCancelClassModal(timeSlot)}
+                                    className="w-full px-4 py-2.5 rounded-[12px] text-sm font-semibold text-red-600 border-2 border-red-600 hover:bg-red-50 transition-all"
+                                  >
+                                    Cancel Class
+                                  </button>
+                                )}
                               </div>
                             </div>
                           )}
