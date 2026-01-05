@@ -390,6 +390,13 @@ function App() {
   };
 
   const createEvent = async (eventData) => {
+    // Verify user is a coach or admin
+    const userRole = user?.user_metadata?.role;
+    if (userRole !== 'coach' && userRole !== 'admin') {
+      showToast('Only coaches and admins can create events', 'error');
+      return { success: false };
+    }
+
     try {
       const eventsToCreate = eventData.times.map(time => ({
         title: eventData.title,
@@ -416,6 +423,13 @@ function App() {
   };
 
   const updateEvent = async (eventData) => {
+    // Verify user is a coach or admin
+    const userRole = user?.user_metadata?.role;
+    if (userRole !== 'coach' && userRole !== 'admin') {
+      showToast('Only coaches and admins can update events', 'error');
+      return { success: false };
+    }
+
     try {
       if (!editingEvent) {
         throw new Error('No event selected for editing');
@@ -457,6 +471,13 @@ function App() {
   };
 
   const deleteEvent = async (eventId) => {
+    // Verify user is a coach or admin
+    const userRole = user?.user_metadata?.role;
+    if (userRole !== 'coach' && userRole !== 'admin') {
+      showToast('Only coaches and admins can delete events', 'error');
+      return;
+    }
+
     if (!window.confirm('Are you sure you want to delete this event? This will also remove all registrations, notes, and attendance records.')) {
       return;
     }
@@ -525,9 +546,10 @@ function App() {
   };
 
   const cancelTimeSlot = useCallback(async (eventId) => {
-    // Verify user is a coach
-    if (user?.user_metadata?.role !== 'coach') {
-      showToast('Only coaches can cancel classes', 'error');
+    // Verify user is a coach or admin
+    const userRole = user?.user_metadata?.role;
+    if (userRole !== 'coach' && userRole !== 'admin') {
+      showToast('Only coaches and admins can cancel classes', 'error');
       return { success: false };
     }
 
@@ -580,6 +602,13 @@ function App() {
   }, [user, fetchEvents, fetchRegistrations]);
 
   const handleEditEvent = (eventId) => {
+    // Verify user is a coach or admin
+    const userRole = user?.user_metadata?.role;
+    if (userRole !== 'coach' && userRole !== 'admin') {
+      showToast('Only coaches and admins can edit events', 'error');
+      return;
+    }
+
     const event = events.find(e => e.id === eventId);
     if (event) {
       setEditingEvent(event);
@@ -655,6 +684,13 @@ function App() {
   };
 
   const removeStudentFromClass = useCallback(async (registrationId) => {
+    // Verify user is a coach or admin
+    const userRole = user?.user_metadata?.role;
+    if (userRole !== 'coach' && userRole !== 'admin') {
+      showToast('Only coaches and admins can remove students', 'error');
+      return { success: false };
+    }
+
     try {
       const { error } = await supabase
         .from('registrations')
@@ -665,13 +701,22 @@ function App() {
 
       await fetchRegistrations();
       showToast('Student removed from class');
+      return { success: true };
     } catch (error) {
       console.error('Failed to remove student:', error);
       showToast('Failed to remove student: ' + error.message);
+      return { success: false, error };
     }
-  }, [fetchRegistrations]);
+  }, [user, fetchRegistrations]);
 
   const addStudentToClass = useCallback(async (eventId, studentId) => {
+    // Verify user is a coach or admin
+    const userRole = user?.user_metadata?.role;
+    if (userRole !== 'coach' && userRole !== 'admin') {
+      showToast('Only coaches and admins can add students', 'error');
+      return { success: false };
+    }
+
     try {
       const { error } = await supabase
         .from('registrations')
@@ -693,7 +738,7 @@ function App() {
       showToast('Failed to add student: ' + error.message, 'error');
       return { success: false, error };
     }
-  }, [fetchRegistrations]);
+  }, [user, fetchRegistrations]);
 
   // Render based on currentView
   const renderView = () => {

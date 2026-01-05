@@ -50,21 +50,6 @@ const WorkoutStats = ({ attendance, registrations, events, user }) => {
     return streak + 1; // Add 1 for the first day
   };
 
-  // Calculate workouts this month
-  const getMonthlyWorkouts = () => {
-    if (!attendance || !events) return 0;
-    
-    const now = new Date();
-    const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    
-    return attendance.filter(a => {
-      if (a.user_id !== user.id || !a.attended) return false;
-      const event = events.find(e => e.id === a.event_id);
-      if (!event) return false;
-      const eventDate = new Date(event.date);
-      return eventDate >= firstDayOfMonth;
-    }).length;
-  };
 
   // Get this week's workout pattern
   const getWeekPattern = () => {
@@ -102,7 +87,6 @@ const WorkoutStats = ({ attendance, registrations, events, user }) => {
   };
 
   const streak = calculateStreak();
-  const monthlyCount = getMonthlyWorkouts();
   const weekPattern = getWeekPattern();
 
   return (
@@ -117,7 +101,7 @@ const WorkoutStats = ({ attendance, registrations, events, user }) => {
       </div>
 
       {/* Week Pattern */}
-      <div className="mb-6">
+      <div>
         <p className="text-sm font-semibold text-gray-600 mb-3">This Week</p>
         <div className="flex justify-between">
           {weekPattern.map((day, index) => (
@@ -133,14 +117,6 @@ const WorkoutStats = ({ attendance, registrations, events, user }) => {
               {day.day}
             </div>
           ))}
-        </div>
-      </div>
-
-      {/* Monthly Stats */}
-      <div className="flex justify-center">
-        <div className="text-center p-3 bg-grip-secondary rounded-lg w-full max-w-xs">
-          <p className="text-2xl font-bold text-grip-primary">{monthlyCount}</p>
-          <p className="text-xs text-gray-600">This Month</p>
         </div>
       </div>
     </div>

@@ -3,6 +3,7 @@ import { TIME_SLOTS } from '../../utils/constants';
 import { useSwipeable } from 'react-swipeable';
 import { fetchNoteForEvent, saveNote, deleteNote } from '../../utils/notesService';
 import { supabase } from '../../utils/supabaseClient';
+import { ChevronDown, ChevronUp, X, StickyNote, Pencil, Trash2 } from 'lucide-react';
 
 const DayView = ({ 
   selectedDate, 
@@ -55,6 +56,7 @@ const DayView = ({
   const [studentSearch, setStudentSearch] = useState('');
   const [selectedStudentId, setSelectedStudentId] = useState(null);
   const [studentsLoading, setStudentsLoading] = useState(false);
+  const [expandedTimeSlots, setExpandedTimeSlots] = useState(new Set());
  
   const getRegistrationCount = useCallback((eventId) => (
     registrations.filter(reg => reg.event_id === eventId).length
@@ -64,7 +66,7 @@ const DayView = ({
     registrations.some(reg => reg.event_id === eventId && reg.user_id === user.id)
   ), [registrations, user?.id]);
 
-  const isCoach = user?.user_metadata?.role === 'coach';
+  const isCoach = user?.user_metadata?.role === 'coach' || user?.user_metadata?.role === 'admin';
 
   const formatTimeDisplay = (time24) => {
     // Remove seconds if present (e.g., "16:30:00" becomes "16:30")
@@ -473,40 +475,62 @@ const DayView = ({
     {eventGroup.title}
   </h2>
   
-  <div className="flex flex-col gap-2 w-full sm:w-auto max-w-xs">
-    <span className={`w-full inline-flex items-center justify-center px-4 py-3 rounded-full text-sm font-semibold
-      ${eventGroup.type === 'workout' 
-        ? 'bg-grip-primary text-white' 
-        : 'bg-green-100 text-green-800'}`}
-      style={{ minHeight: 48 }}
-    >
-      {eventGroup.type === 'workout' ? 'WORKOUT' : 'SOCIAL EVENT'}
-    </span>
-    <button
-      type="button"
-      onClick={() => openNotesModal(eventGroup)}
-      className="w-full px-4 py-3 rounded-full font-semibold text-white transition-all shadow-sm bg-[#C67158] hover:bg-[#b2604b]"
-      style={{ minHeight: 48 }}
-    >
-      {noteButtonLabel}
-    </button>
-    {user?.user_metadata?.role === 'coach' && (
-        <>
+  {isCoach ? (
+    // Coach/Admin view: Circular icon buttons (Notes, Edit, Delete) - no WORKOUT badge
+    <div className="bg-gray-50 rounded-lg p-4">
+      <div className="flex justify-center items-center gap-3 flex-wrap">
+        {/* Notes Icon */}
+        <button
+          type="button"
+          onClick={() => openNotesModal(eventGroup)}
+          className="flex flex-col items-center justify-center"
+        >
+          <div className="w-14 h-14 rounded-full bg-grip-accent flex items-center justify-center mb-1 hover:bg-[#B86450] transition-colors">
+            <StickyNote className="w-6 h-6 text-white" />
+          </div>
+          <span className="text-xs text-gray-600 font-medium">Notes</span>
+        </button>
+
+        {/* Edit Icon */}
+        <button
+          type="button"
+          onClick={() => onEditEvent(eventGroup.times[0].id)}
+          className="flex flex-col items-center justify-center"
+        >
+          <div className="w-14 h-14 rounded-full bg-grip-accent flex items-center justify-center mb-1 hover:bg-[#B86450] transition-colors">
+            <Pencil className="w-6 h-6 text-white" />
+          </div>
+          <span className="text-xs text-gray-600 font-medium">Edit</span>
+        </button>
+
+        {/* Delete Icon */}
+        <button
+          type="button"
+          onClick={() => onDeleteEvent(eventGroup.times[0].id)}
+          className="flex flex-col items-center justify-center"
+        >
+          <div className="w-14 h-14 rounded-full bg-grip-accent flex items-center justify-center mb-1 hover:bg-[#B86450] transition-colors">
+            <Trash2 className="w-6 h-6 text-white" />
+          </div>
+          <span className="text-xs text-gray-600 font-medium">Delete</span>
+        </button>
+      </div>
+    </div>
+  ) : (
+    // Student view: Only circular Notes icon button (no WORKOUT button)
+    <div className="flex justify-center items-start">
       <button
-        onClick={() => onEditEvent(eventGroup.times[0].id)}
-        className="bg-yellow-500 text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-yellow-600 transition-all"
+        type="button"
+        onClick={() => openNotesModal(eventGroup)}
+        className="flex flex-col items-center justify-center"
       >
-        Edit
+        <div className="w-14 h-14 rounded-full bg-grip-accent flex items-center justify-center mb-1 hover:bg-[#B86450] transition-colors">
+          <StickyNote className="w-6 h-6 text-white" />
+        </div>
+        <span className="text-xs text-gray-600 font-medium">Notes</span>
       </button>
-      <button
-      onClick={() => onDeleteEvent(eventGroup.times[0].id)}
-      className="bg-red-500 text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-red-600 transition-all"
-    >
-      Delete
-    </button>
-    </>
-    )}
-  </div>
+    </div>
+  )}
 </div>
 {eventGroup.details && (
   <div className="text-gray-700 leading-relaxed">
@@ -542,7 +566,7 @@ const DayView = ({
                       + Add Student to Class
                     </button>
                   )}
-                  <div className="flex flex-col gap-3">
+                  <div className="flex flex-col gap-2">
                     {eventGroup.times
                       .slice()
                       .sort((a, b) => {
@@ -552,77 +576,165 @@ const DayView = ({
                       })
                       .map(timeSlot => {
                       const isFull = timeSlot.registrationCount >= 15;
+                      const isExpanded = expandedTimeSlots.has(timeSlot.id);
+                      const capacity = timeSlot.registrationCount;
+                      const capacityPercent = (capacity / 15) * 100;
+                      
+                      // Get progress bar color - color-coded by capacity
+                      let progressColor = 'bg-gray-400'; // 0%
+                      if (capacityPercent >= 100) {
+                        progressColor = 'bg-red-500'; // 100%
+                      } else if (capacityPercent >= 75) {
+                        progressColor = 'bg-orange-500'; // 75-99%
+                      } else if (capacityPercent >= 50) {
+                        progressColor = 'bg-amber-400'; // 50-74%
+                      } else if (capacityPercent >= 1) {
+                        progressColor = 'bg-emerald-500'; // 1-49%
+                      }
+                      
+                      // Get member preview text
+                      const getMemberPreview = () => {
+                        if (timeSlot.registeredUsers.length === 0) return 'No one registered yet';
+                        const first3 = timeSlot.registeredUsers.slice(0, 3).map(u => u.user_name);
+                        const remaining = timeSlot.registeredUsers.length - 3;
+                        if (remaining > 0) {
+                          return `${first3.join(', ')} +${remaining} more`;
+                        }
+                        return first3.join(', ');
+                      };
+                      
+                      const toggleExpand = () => {
+                        setExpandedTimeSlots(prev => {
+                          const newSet = new Set(prev);
+                          if (newSet.has(timeSlot.id)) {
+                            newSet.delete(timeSlot.id);
+                          } else {
+                            newSet.add(timeSlot.id);
+                          }
+                          return newSet;
+                        });
+                      };
                       
                       return (
-                        <div key={timeSlot.id} className="border border-grip-secondary rounded-lg p-4">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                              <span className="text-xl font-bold text-grip-primary">
-                                {formatTimeDisplay(timeSlot.time)}
-                              </span>
-                              <span className="text-sm text-gray-600">
-                                {timeSlot.registrationCount}/15 registered
-                              </span>
-                            </div>
-                            
-                            <div className="flex flex-col gap-2">
-  {timeSlot.userRegistered ? (
-    <button
-      onClick={() => onCancelRegistration(timeSlot.id)}
-      className="px-6 py-2.5 rounded-full text-sm font-semibold text-white bg-grip-accent hover:shadow-lg transition-all"
-      style={{ minHeight: 44 }}
-    >
-      Cancel
-    </button>
-  ) : (
-    <button
-      onClick={() => onRegister(timeSlot.id)}
-      disabled={isFull}
-      className={`px-6 py-2.5 rounded-full text-sm font-semibold text-white transition-all
-        ${isFull 
-          ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
-          : 'bg-grip-primary hover:shadow-lg'}`}
-      style={{ minHeight: 44 }}
-    >
-      {isFull ? 'FULL' : 'Register'}
-    </button>
-  )}
-  {isCoach && (
-    <button
-      type="button"
-      onClick={() => openCancelClassModal(timeSlot)}
-      className="px-6 py-2.5 rounded-full text-sm font-semibold text-white bg-red-600 hover:bg-red-700 active:bg-red-800 transition-all hover:shadow-lg"
-      style={{ minHeight: 44 }}
-      aria-label="Cancel this class time slot"
-    >
-      Cancel
-    </button>
-  )}
-</div>
-                          </div>
-
-                          {/* Show registered participants to everyone */}
-                          {timeSlot.registeredUsers.length > 0 && (
-                            <div className="mt-4 pt-4 border-t border-grip-secondary">
-                              <p className="font-semibold text-grip-primary mb-2">
-                                Registered Participants ({timeSlot.registeredUsers.length}):
+                        <div key={timeSlot.id} className="border border-grip-secondary rounded-lg overflow-hidden bg-white">
+                          {/* Collapsed State */}
+                          {!isExpanded && (
+                            <button
+                              type="button"
+                              onClick={toggleExpand}
+                              className="w-full p-4 text-left hover:bg-grip-light transition-colors"
+                            >
+                              <div className="flex items-center justify-between mb-3">
+                                <p className="text-2xl font-extrabold text-grip-primary">
+                                  {formatTimeDisplay(timeSlot.time)}
+                                </p>
+                                <div className="flex items-center gap-3">
+                                  <span className="text-sm font-semibold text-grip-primary">
+                                    {capacity}/15
+                                  </span>
+                                  <ChevronDown className="w-5 h-5 text-gray-400" />
+                                </div>
+                              </div>
+                              
+                              {/* Progress Bar */}
+                              <div className="w-full h-2 bg-gray-200 rounded-full mb-2">
+                                <div
+                                  className={`h-full rounded-full transition-all ${progressColor}`}
+                                  style={{ width: `${Math.min(capacityPercent, 100)}%` }}
+                                />
+                              </div>
+                              
+                              {/* Member Preview */}
+                              <p className="text-sm text-gray-600 truncate">
+                                {getMemberPreview()}
                               </p>
-                              <div className="space-y-2">
-                                {timeSlot.registeredUsers.map(reg => (
-                                  <div key={reg.id} className="text-sm flex items-center justify-between gap-3">
-                                    <span>{reg.user_name}</span>
-                                    {isCoach && (
-                                      <button
-                                        type="button"
-                                        onClick={() => openRemoveModal(reg)}
-                                        className="text-xs font-semibold text-red-600 hover:text-red-700"
-                                        style={{ minWidth: 44, minHeight: 32 }}
+                            </button>
+                          )}
+                          
+                          {/* Expanded State */}
+                          {isExpanded && (
+                            <div className="p-4">
+                              <div className="flex items-center justify-between mb-4">
+                                <div>
+                                  <p className="text-2xl font-extrabold text-grip-primary">
+                                    {formatTimeDisplay(timeSlot.time)}
+                                  </p>
+                                  <span className="text-sm font-semibold text-grip-primary">
+                                    {capacity}/15 registered
+                                  </span>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={toggleExpand}
+                                  className="text-gray-400 hover:text-grip-primary"
+                                >
+                                  <ChevronUp className="w-5 h-5" />
+                                </button>
+                              </div>
+                              
+                              {/* Progress Bar */}
+                              <div className="w-full h-2 bg-gray-200 rounded-full mb-4">
+                                <div
+                                  className={`h-full rounded-full transition-all ${progressColor}`}
+                                  style={{ width: `${Math.min(capacityPercent, 100)}%` }}
+                                />
+                              </div>
+                              
+                              {/* Member Pills */}
+                              {timeSlot.registeredUsers.length > 0 && (
+                                <div className="mb-4">
+                                  <div className="flex flex-wrap gap-2">
+                                    {timeSlot.registeredUsers.map(reg => (
+                                      <div
+                                        key={reg.id}
+                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-grip-secondary rounded-full text-sm text-grip-primary"
                                       >
-                                        × Cancel
-                                      </button>
-                                    )}
+                                        <span>{reg.user_name}</span>
+                                        {isCoach && (
+                                          <button
+                                            type="button"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              openRemoveModal(reg);
+                                            }}
+                                            className="text-gray-400 hover:text-red-500 transition-colors"
+                                          >
+                                            <X className="w-4 h-4" />
+                                          </button>
+                                        )}
+                                      </div>
+                                    ))}
                                   </div>
-                                ))}
+                                </div>
+                              )}
+                              
+                              {/* Action Buttons */}
+                              <div className="flex flex-col gap-2 mt-4">
+                                {!isFull && !timeSlot.userRegistered && (
+                                  <button
+                                    onClick={() => onRegister(timeSlot.id)}
+                                    className="w-full px-4 py-2.5 rounded-lg text-sm font-semibold text-white bg-grip-accent hover:bg-[#B86450] hover:shadow-lg transition-all"
+                                  >
+                                    Register
+                                  </button>
+                                )}
+                                {timeSlot.userRegistered && (
+                                  <button
+                                    onClick={() => onCancelRegistration(timeSlot.id)}
+                                    className="w-full px-4 py-2.5 rounded-lg text-sm font-semibold text-white bg-grip-accent hover:bg-[#B86450] hover:shadow-lg transition-all"
+                                  >
+                                    Cancel Registration
+                                  </button>
+                                )}
+                                {isCoach && (
+                                  <button
+                                    type="button"
+                                    onClick={() => openCancelClassModal(timeSlot)}
+                                    className="w-full px-4 py-2.5 rounded-lg text-sm font-semibold text-red-600 border-2 border-red-600 hover:bg-red-50 transition-all"
+                                  >
+                                    Cancel Class
+                                  </button>
+                                )}
                               </div>
                             </div>
                           )}

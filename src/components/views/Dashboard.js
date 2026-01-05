@@ -28,6 +28,8 @@ const Dashboard = ({ user, events, registrations, attendance, onSignOut, onViewC
 
   const userRegs = getUserRegistrations();
   const userRole = user?.user_metadata?.role || 'student';
+  const isCoach = userRole === 'coach' || userRole === 'admin';
+  const isAdmin = userRole === 'admin';
 
   // Calculate personal attendance stats - only PAST events (date <= today)
   // Memoized to recalculate when user, registrations, or events change
@@ -142,7 +144,7 @@ const Dashboard = ({ user, events, registrations, attendance, onSignOut, onViewC
           <div className="flex justify-between items-center">
             <Logo size="medium" />
             <div className="flex items-center gap-4">
-              {userRole === 'coach' && (
+              {isCoach && (
                 <button
                   onClick={() => onViewChange('createEvent')}
                   className="bg-grip-accent text-white px-4 py-2 rounded-lg hover:shadow-lg transition-all font-semibold"
@@ -168,7 +170,7 @@ const Dashboard = ({ user, events, registrations, attendance, onSignOut, onViewC
           Welcome back, {user?.user_metadata?.first_name || user?.email?.split('@')[0]}!
           </h1>
           <span className="inline-block bg-grip-secondary text-grip-primary px-4 py-2 rounded-full text-sm font-semibold">
-            {userRole === 'coach' ? '👨‍🏫 Coach' : '🏋️‍♂️ Student'} Account
+            {isAdmin ? '👑 Admin' : userRole === 'coach' ? '👨‍🏫 Coach' : '🏋️‍♂️ Student'} Account
           </span>
           
           {/* Profile Update Alert for users with broken names */}
@@ -278,7 +280,7 @@ const Dashboard = ({ user, events, registrations, attendance, onSignOut, onViewC
                 Quick Stats
               </h2>
               <div className="space-y-3">
-                {userRole === 'coach' ? (
+                {isCoach ? (
                   <>
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600">Total Events</span>
@@ -334,7 +336,7 @@ const Dashboard = ({ user, events, registrations, attendance, onSignOut, onViewC
               </button>
             )}
             
-            {userRole === 'coach' && (
+            {isCoach && (
               <button
                 onClick={() => onViewChange('createEvent')}
                 className="flex flex-col items-center py-2 px-4 text-gray-600 hover:text-grip-primary"

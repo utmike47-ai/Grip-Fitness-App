@@ -1,4 +1,4 @@
--- Allow coaches to insert registrations on behalf of students
+-- Allow coaches and admins to insert registrations on behalf of students
 create policy "Coaches can add students"
   on public.registrations
   for insert
@@ -7,11 +7,11 @@ create policy "Coaches can add students"
       select 1
       from public.profiles
       where profiles.id = auth.uid()
-        and profiles.role = 'coach'
+        and profiles.role in ('coach', 'admin')
     )
   );
 
--- Allow coaches to delete registrations for any student
+-- Allow coaches and admins to delete registrations for any student
 create policy "Coaches can remove students"
   on public.registrations
   for delete
@@ -20,6 +20,6 @@ create policy "Coaches can remove students"
       select 1
       from public.profiles
       where profiles.id = auth.uid()
-        and profiles.role = 'coach'
+        and profiles.role in ('coach', 'admin')
     )
   );

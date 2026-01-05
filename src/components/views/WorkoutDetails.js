@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { fetchNoteForEvent, saveNote, deleteNote } from '../../utils/notesService';
 import { TIME_SLOTS } from '../../utils/constants';
+import { StickyNote } from 'lucide-react';
 
 const NOTE_MAX_LENGTH = 500;
 const MODAL_CLOSE_DELAY = 1200;
@@ -272,27 +273,17 @@ const WorkoutDetails = ({
                 </div>
               )}
             </div>
-            <div className="w-full max-w-xs">
-              <div className="flex flex-col gap-2">
-                <span
-                  className={`w-full inline-flex items-center justify-center px-4 py-3 rounded-full text-sm font-semibold ${
-                    event.type === 'workout'
-                      ? 'bg-grip-primary text-white'
-                      : 'bg-green-100 text-green-800'
-                  }`}
-                  style={{ minHeight: 48 }}
-                >
-                  {event.type === 'workout' ? 'WORKOUT' : 'SOCIAL EVENT'}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => openModal(event)}
-                  className="w-full px-4 py-3 rounded-full font-semibold text-white transition-all shadow-sm bg-[#C67158] hover:bg-[#b2604b]"
-                  style={{ minHeight: 48 }}
-                >
-                  {noteButtonLabel}
-                </button>
-              </div>
+            <div className="flex justify-center items-start">
+              <button
+                type="button"
+                onClick={() => openModal(event)}
+                className="flex flex-col items-center justify-center"
+              >
+                <div className="w-14 h-14 rounded-full bg-grip-accent flex items-center justify-center mb-1 hover:bg-[#B86450] transition-colors">
+                  <StickyNote className="w-6 h-6 text-white" />
+                </div>
+                <span className="text-xs text-gray-600 font-medium">Notes</span>
+              </button>
             </div>
           </div>
         </div>
