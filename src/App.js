@@ -239,7 +239,9 @@ function App() {
       // Fetch registrations first
       const { data: regData, error: regError } = await supabase
         .from('registrations')
-        .select('*');
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(5000);
       
       if (regError) {
         console.error('Error fetching registrations:', regError);
