@@ -501,6 +501,7 @@ const DayView = ({
         <button
           type="button"
           onClick={() => openNotesModal(eventGroup)}
+          aria-label={noteButtonLabel}
           className="flex flex-col items-center justify-center"
         >
           <div className="w-14 h-14 rounded-full bg-grip-accent flex items-center justify-center mb-1 hover:bg-[#B86450] transition-colors">
@@ -540,6 +541,7 @@ const DayView = ({
       <button
         type="button"
         onClick={() => openNotesModal(eventGroup)}
+        aria-label={noteButtonLabel}
         className="flex flex-col items-center justify-center"
       >
         <div className="w-14 h-14 rounded-full bg-grip-accent flex items-center justify-center mb-1 hover:bg-[#B86450] transition-colors">

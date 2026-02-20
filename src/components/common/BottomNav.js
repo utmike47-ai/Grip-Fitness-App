@@ -3,7 +3,6 @@ import React from 'react';
 const BottomNav = ({ userRole, currentView, onNavigate }) => {
   const isCoach = userRole === 'coach' || userRole === 'admin';
   const isAdmin = userRole === 'admin';
-  const isStudent = userRole === 'student';
   
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-40">

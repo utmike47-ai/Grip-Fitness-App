@@ -67,7 +67,7 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
     if (user) {
       fetchMembers();
     }
-  }, [user]);
+  }, [user, showToast]);
 
   // Filter and sort members based on search
   const filteredMembers = useMemo(() => {

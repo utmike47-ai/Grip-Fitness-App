@@ -749,7 +749,6 @@ function App() {
   // Render based on currentView
   const renderView = () => {
     const userRole = user?.user_metadata?.role || 'student';
-    const isCoach = userRole === 'coach' || userRole === 'admin';
     const isAdmin = userRole === 'admin';
     
     // Protect admin routes - only admins can access

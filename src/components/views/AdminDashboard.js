@@ -237,7 +237,7 @@ const AdminDashboard = ({ user, events, registrations, profiles = [], attendance
       inactive,
       streaks
     };
-  }, [events, registrations, profiles, attendance]);
+  }, [events, registrations, profiles]);
 
   // Helper functions (regular functions, not hooks - can be defined here)
   const formatTime = (time24) => {
