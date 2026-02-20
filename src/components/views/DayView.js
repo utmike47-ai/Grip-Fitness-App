@@ -21,6 +21,7 @@ const DayView = ({
   onAddStudent,
   onCancelTimeSlot
 }) => {
+  console.log('[DayView] registrations prop received:', registrations?.length);
   const NOTE_MAX_LENGTH = 500;
   const dateStr = selectedDate?.toISOString().split('T')[0];
   const dayEvents = events.filter(event => event.date === dateStr);

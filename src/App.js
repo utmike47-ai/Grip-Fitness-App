@@ -275,6 +275,7 @@ function App() {
       
       console.log('[fetchRegistrations] Registrations with names (first 5):', registrationsWithNames?.slice(0, 5));
       setRegistrations(registrationsWithNames);
+      console.log('[fetchRegistrations] setRegistrations called with:', registrationsWithNames.length, 'items');
     } catch (error) {
       console.error('Unexpected error in fetchRegistrations:', error);
       setRegistrations([]);
