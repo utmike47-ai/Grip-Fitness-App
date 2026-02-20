@@ -234,6 +234,7 @@ function App() {
   }, []);
 
   const fetchRegistrations = useCallback(async () => {
+    console.log('[fetchRegistrations] STARTING...');
     try {
       // Fetch registrations first
       const { data: regData, error: regError } = await supabase
@@ -324,6 +325,7 @@ function App() {
 
   // Load data when user logs in
   useEffect(() => {
+    console.log('[App useEffect] user changed, user=', user ? user.id : null);
     if (user) {
       fetchEvents();
       fetchRegistrations();
