@@ -67,9 +67,20 @@ const DayView = ({
   const [expandedTimeSlots, setExpandedTimeSlots] = useState(new Set());
  
   const getRegistrationCount = useCallback((eventId) => {
+    // DEBUG: Log filtering
+    console.log('[getRegistrationCount] First 3 reg event_ids:', registrations.slice(0, 3).map(r => r.event_id));
+    console.log('[getRegistrationCount] Looking for event_id:', eventId);
+    console.log('[getRegistrationCount] Type of reg.event_id:', typeof registrations[0]?.event_id);
+    console.log('[getRegistrationCount] Type of eventId:', typeof eventId);
+
+    const found = registrations.find(r => r.event_id === eventId);
+    console.log('[getRegistrationCount] Direct match found:', found);
+
+    const foundString = registrations.find(r => String(r.event_id) === String(eventId));
+    console.log('[getRegistrationCount] String match found:', foundString);
+
     // Use String() for comparison - fixes type mismatch (e.g. UUID string vs number)
     const matching = registrations.filter(reg => String(reg.event_id) === String(eventId));
-    // DEBUG: Log lookup
     console.log('[DayView getRegistrationCount] event_id:', eventId, 'count:', matching.length);
     return matching.length;
   }, [registrations]);
