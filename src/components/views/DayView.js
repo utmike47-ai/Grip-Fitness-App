@@ -24,6 +24,13 @@ const DayView = ({
   const NOTE_MAX_LENGTH = 500;
   const dateStr = selectedDate?.toISOString().split('T')[0];
   const dayEvents = events.filter(event => event.date === dateStr);
+  // DEBUG: Log day events and their IDs/times for registration matching
+  useEffect(() => {
+    if (dayEvents.length > 0) {
+      console.log('[DayView] selectedDate:', selectedDate, 'dateStr:', dateStr);
+      console.log('[DayView] dayEvents (event.id, event.time, event.date):', dayEvents.map(e => ({ id: e.id, id_type: typeof e.id, time: e.time, date: e.date })));
+    }
+  }, [dayEvents, selectedDate, dateStr]);
   const textareaRef = useRef(null);
   const modalContainerRef = useRef(null);
   const [noteMap, setNoteMap] = useState({});
@@ -58,12 +65,16 @@ const DayView = ({
   const [studentsLoading, setStudentsLoading] = useState(false);
   const [expandedTimeSlots, setExpandedTimeSlots] = useState(new Set());
  
-  const getRegistrationCount = useCallback((eventId) => (
-    registrations.filter(reg => reg.event_id === eventId).length
-  ), [registrations]);
+  const getRegistrationCount = useCallback((eventId) => {
+    // Use String() for comparison - fixes type mismatch (e.g. UUID string vs number)
+    const matching = registrations.filter(reg => String(reg.event_id) === String(eventId));
+    // DEBUG: Log lookup
+    console.log('[DayView getRegistrationCount] event_id:', eventId, 'count:', matching.length);
+    return matching.length;
+  }, [registrations]);
 
   const isUserRegistered = useCallback((eventId) => (
-    registrations.some(reg => reg.event_id === eventId && reg.user_id === user.id)
+    registrations.some(reg => String(reg.event_id) === String(eventId) && reg.user_id === user.id)
   ), [registrations, user?.id]);
 
   const isCoach = user?.user_metadata?.role === 'coach' || user?.user_metadata?.role === 'admin';
@@ -91,12 +102,19 @@ const DayView = ({
       time: event.time,
       registrationCount: getRegistrationCount(event.id),
       userRegistered: isUserRegistered(event.id),
-      registeredUsers: registrations.filter(reg => reg.event_id === event.id)
+      registeredUsers: registrations.filter(reg => String(reg.event_id) === String(event.id))
     });
     return groups;
   }, {}), [dayEvents, registrations, getRegistrationCount, isUserRegistered]);
 
   const eventGroupList = useMemo(() => Object.values(groupedEvents), [groupedEvents]);
+
+  // DEBUG: Log groupedEvents with registration counts
+  useEffect(() => {
+    if (eventGroupList?.length > 0 && registrations?.length > 0) {
+      console.log('[DayView] groupedEvents registration counts:', eventGroupList.map(g => g.times?.map(t => ({ eventId: t.id, time: t.time, registrationCount: t.registrationCount }))));
+    }
+  }, [eventGroupList, registrations]);
 
   useEffect(() => {
     if (!user || eventGroupList.length === 0) {

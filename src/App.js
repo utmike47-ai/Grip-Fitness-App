@@ -246,6 +246,11 @@ function App() {
         return;
       }
       
+      // DEBUG: Log raw registrations from Supabase
+      console.log('[fetchRegistrations] Query: supabase.from("registrations").select("*")');
+      console.log('[fetchRegistrations] Raw registrations returned:', regData?.length ?? 0);
+      console.log('[fetchRegistrations] Registration event_ids:', regData?.map(r => ({ id: r.id, event_id: r.event_id, event_id_type: typeof r.event_id })));
+      
       // Get all unique user IDs from registrations
       const userIds = [...new Set(regData?.map(r => r.user_id) || [])];
       
@@ -267,6 +272,7 @@ function App() {
         user_name: userMap[reg.user_id] || 'Loading...'
       })) || [];
       
+      console.log('[fetchRegistrations] Registrations with names (first 5):', registrationsWithNames?.slice(0, 5));
       setRegistrations(registrationsWithNames);
     } catch (error) {
       console.error('Unexpected error in fetchRegistrations:', error);
