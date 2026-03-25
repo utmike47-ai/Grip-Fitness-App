@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TIME_SLOTS } from '../../utils/constants';
+import { TIME_SLOTS, normalizeTimeSlotValue } from '../../utils/constants';
 
 const CreateEvent = ({ user, onBack, onCreateEvent, editMode = false, existingEvent = null }) => {
     const [eventData, setEventData] = useState(() => {
@@ -9,7 +9,7 @@ const CreateEvent = ({ user, onBack, onCreateEvent, editMode = false, existingEv
           title: existingEvent.title,
           type: existingEvent.type,
           date: existingEvent.date,
-          times: [existingEvent.time],
+          times: existingEvent.time ? [normalizeTimeSlotValue(existingEvent.time)] : [],
           details: existingEvent.details || '',
           maxCapacity: 25
         };
@@ -27,20 +27,32 @@ const CreateEvent = ({ user, onBack, onCreateEvent, editMode = false, existingEv
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!eventData.title || !eventData.date || eventData.times.length === 0) {
+    const times = [...new Set(eventData.times.map(normalizeTimeSlotValue))].filter(Boolean);
+    if (!eventData.title || !eventData.date || times.length === 0) {
       alert('Please fill in all required fields and select at least one time slot');
       return;
     }
-    onCreateEvent(eventData);
+    onCreateEvent({ ...eventData, times });
   };
 
   const toggleTimeSlot = (time) => {
-    setEventData(prev => ({
-      ...prev,
-      times: prev.times.includes(time)
-        ? prev.times.filter(t => t !== time)
-        : [...prev.times, time]
-    }));
+    const t = normalizeTimeSlotValue(time);
+    if (!t) return;
+    setEventData(prev => {
+      const normalized = prev.times.map(normalizeTimeSlotValue);
+      const idx = normalized.indexOf(t);
+      if (idx >= 0) {
+        const next = [...normalized];
+        next.splice(idx, 1);
+        return { ...prev, times: next };
+      }
+      return { ...prev, times: [...normalized, t] };
+    });
+  };
+
+  const isTimeSlotSelected = (slotValue) => {
+    const key = normalizeTimeSlotValue(slotValue);
+    return eventData.times.map(normalizeTimeSlotValue).includes(key);
   };
 
   return (
@@ -120,14 +132,18 @@ const CreateEvent = ({ user, onBack, onCreateEvent, editMode = false, existingEv
             <label className="block text-sm font-semibold text-grip-primary mb-3">
               Class Times * (Select one or more)
             </label>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 items-stretch">
               {TIME_SLOTS.map(slot => (
                 <button
                   key={slot.value}
                   type="button"
-                  onClick={() => toggleTimeSlot(slot.value)}
-                  className={`py-3 px-4 rounded-lg font-semibold transition-all
-                    ${eventData.times.includes(slot.value)
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    toggleTimeSlot(slot.value);
+                  }}
+                  className={`relative z-0 min-h-[3rem] py-3 px-4 rounded-lg font-semibold transition-all flex items-center justify-center text-center
+                    ${isTimeSlotSelected(slot.value)
                       ? 'bg-grip-primary text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
                 >
