@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase } from './utils/supabaseClient';
-import { TIME_SLOTS } from './utils/constants';
+import { TIME_SLOTS, normalizeTimeSlotValue } from './utils/constants';
 import LoginScreen from './components/views/LoginScreen';
 import Dashboard from './components/views/Dashboard';
 import DayView from './components/views/DayView';
@@ -434,44 +434,113 @@ function App() {
   };
 
   const updateEvent = async (eventData) => {
-    // Verify user is a coach or admin
     const userRole = user?.user_metadata?.role;
     if (userRole !== 'coach' && userRole !== 'admin') {
       showToast('Only coaches and admins can update events', 'error');
       return { success: false };
     }
 
+    const details = eventData.details
+      ? eventData.details.replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim()
+      : '';
+    const newTimes = [...new Set(eventData.times.map(normalizeTimeSlotValue))].filter(Boolean);
+
+    console.log('[updateEvent] eventData:', eventData);
+    console.log('[updateEvent] times being saved:', newTimes);
+
     try {
       if (!editingEvent) {
         throw new Error('No event selected for editing');
       }
 
-      // Find all events with the same title and date (they're the same workout, different times)
-      const relatedEvents = events.filter(e => 
-        e.title === editingEvent.title && 
-        e.date === editingEvent.date
+      // Same logical class as when edit was opened (title + date identify the group)
+      const relatedEvents = events.filter(
+        (e) => e.title === editingEvent.title && e.date === editingEvent.date
       );
-      
+
       if (relatedEvents.length === 0) {
         throw new Error('Could not find related events to update');
       }
 
-      // Update each related event
-      for (const event of relatedEvents) {
-        const { error } = await supabase
+      const newTimesSet = new Set(newTimes);
+      const existingByTime = new Map(
+        relatedEvents.map((e) => [normalizeTimeSlotValue(e.time), e])
+      );
+
+      const deleteEventCascade = async (eventId) => {
+        const { error: attError } = await supabase
+          .from('attendance')
+          .delete()
+          .eq('event_id', eventId);
+        if (attError) console.error('Error deleting attendance:', attError);
+
+        const { error: notesError } = await supabase
+          .from('notes')
+          .delete()
+          .eq('event_id', eventId);
+        if (notesError) console.error('Error deleting notes:', notesError);
+
+        const { error: regError } = await supabase
+          .from('registrations')
+          .delete()
+          .eq('event_id', eventId);
+        if (regError) console.error('Error deleting registrations:', regError);
+
+        const { error: eventError } = await supabase
           .from('events')
-          .update({
-            title: eventData.title,
-            details: eventData.details ? eventData.details.replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim() : '',
-            type: eventData.type
-            // Note: we don't update date or time here to preserve the original schedule
-          })
-          .eq('id', event.id);
-        
-        if (error) throw error;
+          .delete()
+          .eq('id', eventId);
+        if (eventError) throw eventError;
+      };
+
+      // 1) Drop time slots removed in the form (delete their event rows)
+      for (const event of relatedEvents) {
+        const t = normalizeTimeSlotValue(event.time);
+        if (!newTimesSet.has(t)) {
+          console.log('[updateEvent] Supabase DELETE cascade for removed slot:', event.id, t);
+          await deleteEventCascade(event.id);
+        }
       }
-      
+
+      // 2) Update rows for times still selected (title, date, details, type, time)
+      for (const time of newTimes) {
+        const existing = existingByTime.get(time);
+        if (existing) {
+          console.log('[updateEvent] Supabase UPDATE row:', existing.id, time);
+          const { error } = await supabase
+            .from('events')
+            .update({
+              title: eventData.title,
+              date: eventData.date,
+              time,
+              details,
+              type: eventData.type
+            })
+            .eq('id', existing.id);
+          if (error) throw error;
+        }
+      }
+
+      // 3) Insert rows for newly added time slots
+      for (const time of newTimes) {
+        if (!existingByTime.has(time)) {
+          console.log('[updateEvent] Supabase INSERT new slot:', time);
+          const { error } = await supabase.from('events').insert([
+            {
+              title: eventData.title,
+              date: eventData.date,
+              time,
+              type: eventData.type,
+              details,
+              created_by: user.id
+            }
+          ]);
+          if (error) throw error;
+        }
+      }
+
       await fetchEvents();
+      await fetchRegistrations();
       showToast('Event updated successfully!');
       setCurrentView('dashboard');
       setEditingEvent(null);
@@ -751,6 +820,15 @@ function App() {
     }
   }, [user, fetchRegistrations]);
 
+  // All time slots for the event being edited (same title + date), normalized for the form
+  const editFormSelectedTimes = useMemo(() => {
+    if (!editingEvent) return [];
+    const raw = events
+      .filter((e) => e.title === editingEvent.title && e.date === editingEvent.date)
+      .map((e) => normalizeTimeSlotValue(e.time));
+    return [...new Set(raw)].filter(Boolean);
+  }, [events, editingEvent]);
+
   // Render based on currentView
   const renderView = () => {
     const userRole = user?.user_metadata?.role || 'student';
@@ -821,20 +899,49 @@ function App() {
         />;
       
       case 'createEvent':
-        return <CreateEvent 
-          user={user}
-          onBack={() => setCurrentView('dashboard')}
-          onCreateEvent={createEvent}
-        />;
+        return (
+          <CreateEvent
+            key="create-event"
+            user={user}
+            onBack={() => setCurrentView('dashboard')}
+            onCreateEvent={createEvent}
+          />
+        );
 
-        case 'editEvent':
-          return <CreateEvent 
+      case 'editEvent':
+        if (!editingEvent) {
+          return (
+            <Dashboard
+              user={user}
+              events={events}
+              registrations={registrations}
+              attendance={attendance}
+              onSignOut={signOut}
+              onViewChange={setCurrentView}
+              onDateSelect={(date) => {
+                setSelectedDate(date);
+                setCurrentView('dayView');
+              }}
+              onEventSelect={(event) => {
+                if (!event?.date) return;
+                const eventDate = new Date(event.date + 'T00:00:00');
+                setSelectedDate(eventDate);
+                setCurrentView('dayView');
+              }}
+            />
+          );
+        }
+        return (
+          <CreateEvent
+            key={`edit-event-${editingEvent.id}`}
             user={user}
             onBack={() => setCurrentView('dashboard')}
             onCreateEvent={updateEvent}
-            editMode={true}
+            editMode
             existingEvent={editingEvent}
-          />;
+            initialSelectedTimes={editFormSelectedTimes}
+          />
+        );
         
       case 'myClasses':
         return <MyClasses 

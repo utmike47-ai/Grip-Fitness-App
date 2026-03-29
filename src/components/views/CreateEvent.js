@@ -1,29 +1,63 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TIME_SLOTS, normalizeTimeSlotValue } from '../../utils/constants';
 
-const CreateEvent = ({ user, onBack, onCreateEvent, editMode = false, existingEvent = null }) => {
-    const [eventData, setEventData] = useState(() => {
-      // If editing, populate with existing data
-      if (editMode && existingEvent) {
-        return {
-          title: existingEvent.title,
-          type: existingEvent.type,
-          date: existingEvent.date,
-          times: existingEvent.time ? [normalizeTimeSlotValue(existingEvent.time)] : [],
-          details: existingEvent.details || '',
-          maxCapacity: 25
-        };
-      }
-      // Otherwise, start with empty form
-      return {
-        title: '',
-        type: 'workout',
-        date: '',
-        times: [],
-        details: '',
-        maxCapacity: 25
-      };
-    });
+function buildEditFormState(existingEvent, initialSelectedTimes) {
+  const normalizedSingle = existingEvent?.time
+    ? normalizeTimeSlotValue(existingEvent.time)
+    : '';
+  const times =
+    initialSelectedTimes?.length > 0
+      ? [...initialSelectedTimes]
+      : normalizedSingle
+        ? [normalizedSingle]
+        : [];
+  const maxCap =
+    existingEvent?.max_capacity ?? existingEvent?.maxCapacity ?? 25;
+  return {
+    title: existingEvent.title,
+    type: existingEvent.type,
+    date: existingEvent.date,
+    times,
+    details: existingEvent.details || '',
+    maxCapacity: maxCap
+  };
+}
+
+const CreateEvent = ({
+  user,
+  onBack,
+  onCreateEvent,
+  editMode = false,
+  existingEvent = null,
+  initialSelectedTimes = null
+}) => {
+  const [eventData, setEventData] = useState(() => {
+    if (editMode && existingEvent) {
+      return buildEditFormState(existingEvent, initialSelectedTimes);
+    }
+    return {
+      title: '',
+      type: 'workout',
+      date: '',
+      times: [],
+      details: '',
+      maxCapacity: 25
+    };
+  });
+
+  useEffect(() => {
+    if (!editMode || !existingEvent) return;
+    console.log('[Edit mode] existingEvent.time:', existingEvent?.time);
+    console.log('[Edit mode] normalized:', normalizeTimeSlotValue(existingEvent?.time));
+    console.log('[Edit mode] initialSelectedTimes:', initialSelectedTimes);
+    const nextTimes =
+      initialSelectedTimes?.length > 0
+        ? [...initialSelectedTimes]
+        : existingEvent.time
+          ? [normalizeTimeSlotValue(existingEvent.time)]
+          : [];
+    setEventData((prev) => ({ ...prev, times: nextTimes }));
+  }, [editMode, existingEvent, initialSelectedTimes]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -31,6 +65,10 @@ const CreateEvent = ({ user, onBack, onCreateEvent, editMode = false, existingEv
     if (!eventData.title || !eventData.date || times.length === 0) {
       alert('Please fill in all required fields and select at least one time slot');
       return;
+    }
+    if (editMode) {
+      console.log('[Edit Submit] eventData:', eventData);
+      console.log('[Edit Submit] times being saved:', times);
     }
     onCreateEvent({ ...eventData, times });
   };

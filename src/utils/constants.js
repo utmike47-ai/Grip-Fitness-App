@@ -1,15 +1,17 @@
 /**
- * Normalize DB or UI time strings to HH:mm so slot keys and comparisons stay consistent
- * (e.g. "12:00:00" and "12:00" both become "12:00").
+ * Normalize DB or UI time strings to HH:mm so slot keys and comparisons stay consistent.
+ * Handles: "12:00", "12:00:00", ISO datetimes like "1970-01-01T12:00:00+00:00".
  */
 export function normalizeTimeSlotValue(time) {
   if (time == null || time === '') return '';
   const s = String(time).trim();
-  const parts = s.split(':');
-  if (parts.length >= 2) {
-    const h = parts[0].padStart(2, '0');
-    const m = parts[1].padStart(2, '0');
-    return `${h}:${m}`;
+  const iso = s.match(/T(\d{1,2}):(\d{2})/);
+  if (iso) {
+    return `${iso[1].padStart(2, '0')}:${iso[2].padStart(2, '0')}`;
+  }
+  const plain = s.match(/^(\d{1,2}):(\d{2})/);
+  if (plain) {
+    return `${plain[1].padStart(2, '0')}:${plain[2].padStart(2, '0')}`;
   }
   return s;
 }
