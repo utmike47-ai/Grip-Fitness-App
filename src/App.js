@@ -409,15 +409,35 @@ function App() {
     }
 
     try {
-      const eventsToCreate = eventData.times.map(time => ({
-        title: eventData.title,
-        date: eventData.date,
-        time: time,
-        type: eventData.type,
-        details: eventData.details ? eventData.details.replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim() : '',
-        created_by: user.id,
-      }));
-  
+      const uniqueTimes = [...new Set(eventData.times.map(normalizeTimeSlotValue))].filter(Boolean);
+
+      const eventsToCreate = [];
+      for (const time of uniqueTimes) {
+        const alreadyExists = events.some(
+          (e) =>
+            e.date === eventData.date &&
+            e.title === eventData.title &&
+            normalizeTimeSlotValue(e.time) === time
+        );
+        if (alreadyExists) {
+          console.warn('[createEvent] Skipping insert; date/title/time already exists:', eventData.date, eventData.title, time);
+          continue;
+        }
+        eventsToCreate.push({
+          title: eventData.title,
+          date: eventData.date,
+          time,
+          type: eventData.type,
+          details: eventData.details ? eventData.details.replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim() : '',
+          created_by: user.id
+        });
+      }
+
+      if (eventsToCreate.length === 0) {
+        showToast('No new time slots to add (all selected times already exist for this class and date).', 'error');
+        return;
+      }
+
       const { error } = await supabase
         .from('events')
         .insert(eventsToCreate);
@@ -463,9 +483,6 @@ function App() {
       }
 
       const newTimesSet = new Set(newTimes);
-      const existingByTime = new Map(
-        relatedEvents.map((e) => [normalizeTimeSlotValue(e.time), e])
-      );
 
       const deleteEventCascade = async (eventId) => {
         const { error: attError } = await supabase
@@ -493,8 +510,34 @@ function App() {
         if (eventError) throw eventError;
       };
 
+      // Dedupe duplicate DB rows for the same normalized time (keep first, remove extras)
+      const timeBuckets = new Map();
+      for (const e of relatedEvents) {
+        const t = normalizeTimeSlotValue(e.time);
+        if (!timeBuckets.has(t)) timeBuckets.set(t, []);
+        timeBuckets.get(t).push(e);
+      }
+      for (const [, rows] of timeBuckets) {
+        if (rows.length > 1) {
+          for (let i = 1; i < rows.length; i++) {
+            console.warn('[updateEvent] Removing duplicate row for same time:', rows[i].id, rows[i].time);
+            await deleteEventCascade(rows[i].id);
+          }
+        }
+      }
+
+      const relatedAfterDedupe = relatedEvents.filter((e) => {
+        const t = normalizeTimeSlotValue(e.time);
+        const rows = timeBuckets.get(t);
+        return rows && rows[0].id === e.id;
+      });
+
+      const existingByTime = new Map(
+        relatedAfterDedupe.map((e) => [normalizeTimeSlotValue(e.time), e])
+      );
+
       // 1) Drop time slots removed in the form (delete their event rows)
-      for (const event of relatedEvents) {
+      for (const event of relatedAfterDedupe) {
         const t = normalizeTimeSlotValue(event.time);
         if (!newTimesSet.has(t)) {
           console.log('[updateEvent] Supabase DELETE cascade for removed slot:', event.id, t);
@@ -521,22 +564,31 @@ function App() {
         }
       }
 
-      // 3) Insert rows for newly added time slots
+      // 3) Insert rows for newly added time slots (skip if date/title/time already exists)
       for (const time of newTimes) {
-        if (!existingByTime.has(time)) {
-          console.log('[updateEvent] Supabase INSERT new slot:', time);
-          const { error } = await supabase.from('events').insert([
-            {
-              title: eventData.title,
-              date: eventData.date,
-              time,
-              type: eventData.type,
-              details,
-              created_by: user.id
-            }
-          ]);
-          if (error) throw error;
+        if (existingByTime.has(time)) continue;
+        const dupInState = events.some(
+          (e) =>
+            e.date === eventData.date &&
+            e.title === eventData.title &&
+            normalizeTimeSlotValue(e.time) === time
+        );
+        if (dupInState) {
+          console.warn('[updateEvent] Skip insert; event already exists for date/title/time:', time);
+          continue;
         }
+        console.log('[updateEvent] Supabase INSERT new slot:', time);
+        const { error } = await supabase.from('events').insert([
+          {
+            title: eventData.title,
+            date: eventData.date,
+            time,
+            type: eventData.type,
+            details,
+            created_by: user.id
+          }
+        ]);
+        if (error) throw error;
       }
 
       await fetchEvents();

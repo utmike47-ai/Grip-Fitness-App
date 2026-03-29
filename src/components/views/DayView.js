@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
-import { TIME_SLOTS } from '../../utils/constants';
+import { TIME_SLOTS, normalizeTimeSlotValue } from '../../utils/constants';
 import { useSwipeable } from 'react-swipeable';
 import { fetchNoteForEvent, saveNote, deleteNote } from '../../utils/notesService';
 import { supabase } from '../../utils/supabaseClient';
@@ -21,17 +21,9 @@ const DayView = ({
   onAddStudent,
   onCancelTimeSlot
 }) => {
-  console.log('[DayView] registrations prop received:', registrations?.length);
   const NOTE_MAX_LENGTH = 500;
   const dateStr = selectedDate?.toISOString().split('T')[0];
   const dayEvents = events.filter(event => event.date === dateStr);
-  // DEBUG: Log day events and their IDs/times for registration matching
-  useEffect(() => {
-    if (dayEvents.length > 0) {
-      console.log('[DayView] selectedDate:', selectedDate, 'dateStr:', dateStr);
-      console.log('[DayView] dayEvents (event.id, event.time, event.date):', dayEvents.map(e => ({ id: e.id, id_type: typeof e.id, time: e.time, date: e.date })));
-    }
-  }, [dayEvents, selectedDate, dateStr]);
   const textareaRef = useRef(null);
   const modalContainerRef = useRef(null);
   const [noteMap, setNoteMap] = useState({});
@@ -67,22 +59,7 @@ const DayView = ({
   const [expandedTimeSlots, setExpandedTimeSlots] = useState(new Set());
  
   const getRegistrationCount = useCallback((eventId) => {
-    // DEBUG: Log filtering
-    console.log('[getRegistrationCount] First 3 reg event_ids:', registrations.slice(0, 3).map(r => r.event_id));
-    console.log('[getRegistrationCount] Looking for event_id:', eventId);
-    console.log('[getRegistrationCount] Type of reg.event_id:', typeof registrations[0]?.event_id);
-    console.log('[getRegistrationCount] Type of eventId:', typeof eventId);
-
-    const found = registrations.find(r => r.event_id === eventId);
-    console.log('[getRegistrationCount] Direct match found:', found);
-
-    const foundString = registrations.find(r => String(r.event_id) === String(eventId));
-    console.log('[getRegistrationCount] String match found:', foundString);
-
-    // Use String() for comparison - fixes type mismatch (e.g. UUID string vs number)
-    const matching = registrations.filter(reg => String(reg.event_id) === String(eventId));
-    console.log('[DayView getRegistrationCount] event_id:', eventId, 'count:', matching.length);
-    return matching.length;
+    return registrations.filter(reg => String(reg.event_id) === String(eventId)).length;
   }, [registrations]);
 
   const isUserRegistered = useCallback((eventId) => (
@@ -98,35 +75,70 @@ const DayView = ({
     return timeSlot ? timeSlot.display : time24;
   };
 
-  // Group events by title
-  const groupedEvents = useMemo(() => dayEvents.reduce((groups, event) => {
-    const key = `${event.title}-${event.type}`;
-    if (!groups[key]) {
-      groups[key] = {
-        title: event.title,
-        type: event.type,
-        details: event.details,
-        times: []
-      };
-    }
-    groups[key].times.push({
-      id: event.id,
-      time: event.time,
-      registrationCount: getRegistrationCount(event.id),
-      userRegistered: isUserRegistered(event.id),
-      registeredUsers: registrations.filter(reg => String(reg.event_id) === String(event.id))
+  // Group events by normalized title+type; dedupe by event id; merge slots by normalized time
+  const groupedEvents = useMemo(() => {
+    const uniqueDayEvents = [...new Map(dayEvents.map((e) => [String(e.id), e])).values()];
+
+    const raw = uniqueDayEvents.reduce((groups, event) => {
+      const groupKey = `${(event.title || '').trim().toLowerCase()}|${String(event.type || 'workout').toLowerCase()}`;
+      if (!groups[groupKey]) {
+        groups[groupKey] = {
+          groupKey,
+          title: (event.title || '').trim() || 'Workout',
+          type: event.type,
+          details: event.details,
+          times: []
+        };
+      }
+      groups[groupKey].times.push({
+        id: event.id,
+        time: event.time,
+        registrationCount: getRegistrationCount(event.id),
+        userRegistered: isUserRegistered(event.id),
+        registeredUsers: registrations.filter(reg => String(reg.event_id) === String(event.id))
+      });
+      return groups;
+    }, {});
+
+    Object.keys(raw).forEach((key) => {
+      const slots = raw[key].times;
+      const byNormTime = new Map();
+      for (const slot of slots) {
+        const k = normalizeTimeSlotValue(slot.time) || String(slot.time || '');
+        const prev = byNormTime.get(k);
+        if (!prev) {
+          byNormTime.set(k, { ...slot });
+        } else {
+          const mergedRegs = [...prev.registeredUsers, ...slot.registeredUsers];
+          const seen = new Set();
+          const uniqueRegs = mergedRegs.filter((r) => {
+            const uid = r.user_id;
+            if (seen.has(uid)) return false;
+            seen.add(uid);
+            return true;
+          });
+          byNormTime.set(k, {
+            id: prev.id,
+            time: prev.time,
+            registrationCount: uniqueRegs.length,
+            userRegistered: prev.userRegistered || slot.userRegistered,
+            registeredUsers: uniqueRegs
+          });
+        }
+      }
+      raw[key].times = [...byNormTime.values()];
     });
-    return groups;
-  }, {}), [dayEvents, registrations, getRegistrationCount, isUserRegistered]);
+
+    return raw;
+  }, [dayEvents, registrations, getRegistrationCount, isUserRegistered]);
 
   const eventGroupList = useMemo(() => Object.values(groupedEvents), [groupedEvents]);
 
-  // DEBUG: Log groupedEvents with registration counts
   useEffect(() => {
-    if (eventGroupList?.length > 0 && registrations?.length > 0) {
-      console.log('[DayView] groupedEvents registration counts:', eventGroupList.map(g => g.times?.map(t => ({ eventId: t.id, time: t.time, registrationCount: t.registrationCount }))));
-    }
-  }, [eventGroupList, registrations]);
+    if (eventGroupList.length === 0) return;
+    const timeSlots = eventGroupList.flatMap((g) => g.times || []);
+    console.log('[DayView] timeSlots before render:', timeSlots);
+  }, [eventGroupList]);
 
   useEffect(() => {
     if (!user || eventGroupList.length === 0) {
@@ -316,8 +328,10 @@ const DayView = ({
 
   const openAddStudentModal = useCallback((group) => {
     if (!group) return;
-    // Sort times chronologically and select the first one
-    const sortedTimes = (group.times || []).slice().sort((a, b) => {
+    const uniqueTimes = [...new Map(
+      (group.times || []).map((s) => [normalizeTimeSlotValue(s.time) || String(s.time), s])
+    ).values()];
+    const sortedTimes = uniqueTimes.slice().sort((a, b) => {
       const dateA = new Date(`${selectedDate?.toISOString().split('T')[0]}T${a.time}`);
       const dateB = new Date(`${selectedDate?.toISOString().split('T')[0]}T${b.time}`);
       return dateA - dateB;
@@ -498,7 +512,7 @@ const DayView = ({
               const noteButtonLabel = hasNote ? 'VIEW/EDIT NOTES' : 'WORKOUT NOTES';
 
               return (
-              <div key={index} className="bg-white rounded-2xl shadow-lg p-6">
+              <div key={eventGroup.groupKey || `group-${index}`} className="bg-white rounded-2xl shadow-lg p-6">
                 <div className="mb-4">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 gap-3">
   <h2 className="text-2xl font-montserrat font-bold text-grip-primary">
@@ -599,7 +613,12 @@ const DayView = ({
                     </button>
                   )}
                   <div className="flex flex-col gap-2">
-                    {eventGroup.times
+                    {[...new Map(
+                      eventGroup.times.map((s) => [
+                        normalizeTimeSlotValue(s.time) || String(s.time),
+                        s
+                      ])
+                    ).values()]
                       .slice()
                       .sort((a, b) => {
                         const dateA = new Date(`${selectedDate?.toISOString().split('T')[0]}T${a.time}`);
@@ -951,7 +970,12 @@ const DayView = ({
                 onChange={(e) => setAddStudentModal(prev => ({ ...prev, selectedTimeId: e.target.value }))}
                 className="w-full border border-grip-secondary rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-grip-primary text-gray-800"
               >
-                {(addStudentModal.group?.times || [])
+                {[...new Map(
+                  (addStudentModal.group?.times || []).map((s) => [
+                    normalizeTimeSlotValue(s.time) || String(s.time),
+                    s
+                  ])
+                ).values()]
                   .slice()
                   .sort((a, b) => {
                     const dateA = new Date(`${selectedDate?.toISOString().split('T')[0]}T${a.time}`);
