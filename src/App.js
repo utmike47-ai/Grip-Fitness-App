@@ -254,14 +254,16 @@ function App() {
       console.log('[fetchRegistrations] Raw registrations returned:', regData?.length ?? 0);
       console.log('[fetchRegistrations] Registration event_ids:', regData?.map(r => ({ id: r.id, event_id: r.event_id, event_id_type: typeof r.event_id })));
       
-      // Get all unique user IDs from registrations
-      const userIds = [...new Set(regData?.map(r => r.user_id) || [])];
+      // Get all unique member user IDs from registrations (drop-ins have no user_id)
+      const userIds = [...new Set(regData?.map(r => r.user_id).filter(Boolean) || [])];
       
       // Fetch profile names for those users
-      const { data: profileData } = await supabase
-        .from('profiles')
-        .select('id, first_name, last_name')
-        .in('id', userIds);
+      const { data: profileData } = userIds.length > 0
+        ? await supabase
+            .from('profiles')
+            .select('id, first_name, last_name')
+            .in('id', userIds)
+        : { data: [] };
       
       // Create a map of user ID to full name
       const userMap = {};
@@ -269,10 +271,12 @@ function App() {
         userMap[p.id] = `${p.first_name || 'User'} ${p.last_name || ''}`.trim();
       });
       
-      // Add names to registrations
+      // Add names to registrations (members from profiles, drop-ins from stored name fields)
       const registrationsWithNames = regData?.map(reg => ({
         ...reg,
-        user_name: userMap[reg.user_id] || 'Loading...'
+        user_name: reg.is_drop_in
+          ? `${reg.drop_in_first_name || ''} ${reg.drop_in_last_name || ''}`.trim() || 'Drop-In Guest'
+          : userMap[reg.user_id] || 'Loading...'
       })) || [];
       
       console.log('[fetchRegistrations] Registrations with names (first 5):', registrationsWithNames?.slice(0, 5));
@@ -815,7 +819,10 @@ function App() {
     }
   };
 
-  const removeStudentFromClass = useCallback(async (registrationId) => {
+  const removeStudentFromClass = useCallback(async (registrationId, options = {}) => {
+    const { isDropIn = false } = options;
+    const attendeeLabel = isDropIn ? 'drop-in' : 'student';
+
     // Verify user is a coach or admin
     const userRole = user?.user_metadata?.role;
     if (userRole !== 'coach' && userRole !== 'admin') {
@@ -824,19 +831,31 @@ function App() {
     }
 
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('registrations')
         .delete()
-        .eq('id', registrationId);
+        .eq('id', registrationId)
+        .select();
 
-      if (error) throw error;
+      if (error) {
+        showToast(`Failed to remove ${attendeeLabel}: ${error.message}`, 'error');
+        return { success: false, error };
+      }
+
+      if (!data?.length) {
+        showToast(
+          `Failed to remove ${attendeeLabel} from class. You may not have permission.`,
+          'error'
+        );
+        return { success: false };
+      }
 
       await fetchRegistrations();
-      showToast('Student removed from class');
+      showToast(isDropIn ? 'Drop-in removed from class' : 'Student removed from class');
       return { success: true };
     } catch (error) {
-      console.error('Failed to remove student:', error);
-      showToast('Failed to remove student: ' + error.message);
+      console.error(`Failed to remove ${attendeeLabel}:`, error);
+      showToast(`Failed to remove ${attendeeLabel}: ${error.message}`, 'error');
       return { success: false, error };
     }
   }, [user, fetchRegistrations]);
@@ -871,6 +890,54 @@ function App() {
       return { success: false, error };
     }
   }, [user, fetchRegistrations]);
+
+  const addDropInToClass = useCallback(async (eventId, dropInData) => {
+    const userRole = user?.user_metadata?.role;
+    if (userRole !== 'coach' && userRole !== 'admin') {
+      showToast('Only coaches and admins can add drop-ins', 'error');
+      return { success: false };
+    }
+
+    const firstName = dropInData?.firstName?.trim();
+    const lastName = dropInData?.lastName?.trim();
+    if (!firstName || !lastName) {
+      showToast('First and last name are required', 'error');
+      return { success: false };
+    }
+
+    const currentCount = registrations.filter(
+      (reg) => String(reg.event_id) === String(eventId)
+    ).length;
+    if (currentCount >= 15) {
+      showToast('This class is full (15/15)', 'error');
+      return { success: false };
+    }
+
+    try {
+      const { error } = await supabase
+        .from('registrations')
+        .insert([{
+          event_id: eventId,
+          is_drop_in: true,
+          drop_in_first_name: firstName,
+          drop_in_last_name: lastName,
+          drop_in_email: dropInData?.email?.trim() || null,
+          drop_in_phone: dropInData?.phone?.trim() || null,
+          drop_in_notes: dropInData?.notes?.trim() || null,
+          created_by: user.id,
+        }]);
+
+      if (error) throw error;
+
+      await fetchRegistrations();
+      showToast(`${firstName} ${lastName} added as drop-in!`);
+      return { success: true };
+    } catch (error) {
+      console.error('Failed to add drop-in:', error);
+      showToast('Failed to add drop-in: ' + error.message, 'error');
+      return { success: false, error };
+    }
+  }, [user, registrations, fetchRegistrations]);
 
   // All time slots for the event being edited (same title + date), normalized for the form
   const editFormSelectedTimes = useMemo(() => {
@@ -947,6 +1014,7 @@ function App() {
           onDateChange={setSelectedDate}
           onRemoveStudent={removeStudentFromClass}
           onAddStudent={addStudentToClass}
+          onAddDropIn={addDropInToClass}
           onCancelTimeSlot={cancelTimeSlot}
         />;
       

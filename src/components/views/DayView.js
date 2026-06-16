@@ -3,7 +3,7 @@ import { TIME_SLOTS, normalizeTimeSlotValue } from '../../utils/constants';
 import { useSwipeable } from 'react-swipeable';
 import { fetchNoteForEvent, saveNote, deleteNote } from '../../utils/notesService';
 import { supabase } from '../../utils/supabaseClient';
-import { ChevronDown, ChevronUp, X, StickyNote, Pencil, Trash2 } from 'lucide-react';
+import { ChevronDown, ChevronUp, X, StickyNote, Pencil, Trash2, UserPlus } from 'lucide-react';
 
 const DayView = ({ 
   selectedDate, 
@@ -19,8 +19,10 @@ const DayView = ({
   onDateChange,
   onRemoveStudent,
   onAddStudent,
+  onAddDropIn,
   onCancelTimeSlot
 }) => {
+  const CLASS_CAPACITY = 15;
   const NOTE_MAX_LENGTH = 500;
   const dateStr = selectedDate?.toISOString().split('T')[0];
   const dayEvents = events.filter(event => event.date === dateStr);
@@ -39,6 +41,7 @@ const DayView = ({
     isOpen: false,
     studentName: '',
     registrationId: null,
+    isDropIn: false,
   });
   const [addStudentModal, setAddStudentModal] = useState({
     isOpen: false,
@@ -56,6 +59,20 @@ const DayView = ({
   const [studentSearch, setStudentSearch] = useState('');
   const [selectedStudentId, setSelectedStudentId] = useState(null);
   const [studentsLoading, setStudentsLoading] = useState(false);
+  const [dropInModal, setDropInModal] = useState({
+    isOpen: false,
+    group: null,
+    selectedTimeId: null,
+  });
+  const [dropInForm, setDropInForm] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    notes: '',
+  });
+  const [dropInSaving, setDropInSaving] = useState(false);
+  const dropInModalContainerRef = useRef(null);
   const [expandedTimeSlots, setExpandedTimeSlots] = useState(new Set());
  
   const getRegistrationCount = useCallback((eventId) => {
@@ -112,9 +129,9 @@ const DayView = ({
           const mergedRegs = [...prev.registeredUsers, ...slot.registeredUsers];
           const seen = new Set();
           const uniqueRegs = mergedRegs.filter((r) => {
-            const uid = r.user_id;
-            if (seen.has(uid)) return false;
-            seen.add(uid);
+            const key = r.id || `${r.user_id}-${r.event_id}`;
+            if (seen.has(key)) return false;
+            seen.add(key);
             return true;
           });
           byNormTime.set(k, {
@@ -311,20 +328,25 @@ const DayView = ({
     if (!registration) return;
     setRemoveModal({
       isOpen: true,
-      studentName: registration.user_name || 'this student',
+      studentName: registration.user_name || (registration.is_drop_in ? 'this drop-in' : 'this student'),
       registrationId: registration.id,
+      isDropIn: Boolean(registration.is_drop_in),
     });
   }, []);
 
   const closeRemoveModal = useCallback(() => {
-    setRemoveModal({ isOpen: false, studentName: '', registrationId: null });
+    setRemoveModal({ isOpen: false, studentName: '', registrationId: null, isDropIn: false });
   }, []);
 
   const handleConfirmRemove = useCallback(async () => {
     if (!removeModal.registrationId) return;
-    await onRemoveStudent?.(removeModal.registrationId);
-    closeRemoveModal();
-  }, [removeModal.registrationId, onRemoveStudent, closeRemoveModal]);
+    const result = await onRemoveStudent?.(removeModal.registrationId, {
+      isDropIn: removeModal.isDropIn,
+    });
+    if (result?.success) {
+      closeRemoveModal();
+    }
+  }, [removeModal.registrationId, removeModal.isDropIn, onRemoveStudent, closeRemoveModal]);
 
   const openAddStudentModal = useCallback((group) => {
     if (!group) return;
@@ -390,6 +412,32 @@ const DayView = ({
     setAddStudentModal({ isOpen: false, group: null, selectedTimeId: null });
   }, []);
 
+  const openDropInModal = useCallback((group) => {
+    if (!group) return;
+    const uniqueTimes = [...new Map(
+      (group.times || []).map((s) => [normalizeTimeSlotValue(s.time) || String(s.time), s])
+    ).values()];
+    const sortedTimes = uniqueTimes.slice().sort((a, b) => {
+      const dateA = new Date(`${selectedDate?.toISOString().split('T')[0]}T${a.time}`);
+      const dateB = new Date(`${selectedDate?.toISOString().split('T')[0]}T${b.time}`);
+      return dateA - dateB;
+    });
+    const firstTime = sortedTimes[0];
+    setDropInModal({
+      isOpen: true,
+      group,
+      selectedTimeId: firstTime?.id || null,
+    });
+    setDropInForm({ firstName: '', lastName: '', email: '', phone: '', notes: '' });
+    setDropInSaving(false);
+  }, [selectedDate]);
+
+  const closeDropInModal = useCallback(() => {
+    setDropInModal({ isOpen: false, group: null, selectedTimeId: null });
+    setDropInForm({ firstName: '', lastName: '', email: '', phone: '', notes: '' });
+    setDropInSaving(false);
+  }, []);
+
   const openCancelClassModal = useCallback((timeSlot) => {
     if (!timeSlot) return;
     setIsCancelingClass(false);
@@ -429,6 +477,32 @@ const DayView = ({
       };
     }
   }, [addStudentModal.isOpen, closeAddStudentModal]);
+
+  useEffect(() => {
+    if (dropInModal.isOpen) {
+      const handleKeyDown = (event) => {
+        if (event.key === 'Escape' && !dropInSaving) {
+          closeDropInModal();
+        }
+      };
+
+      const handleClickOutside = (event) => {
+        if (dropInModalContainerRef.current && event.target === dropInModalContainerRef.current && !dropInSaving) {
+          closeDropInModal();
+        }
+      };
+
+      window.addEventListener('keydown', handleKeyDown);
+      window.addEventListener('mousedown', handleClickOutside);
+      window.addEventListener('touchstart', handleClickOutside);
+
+      return () => {
+        window.removeEventListener('keydown', handleKeyDown);
+        window.removeEventListener('mousedown', handleClickOutside);
+        window.removeEventListener('touchstart', handleClickOutside);
+      };
+    }
+  }, [dropInModal.isOpen, dropInSaving, closeDropInModal]);
 
   useEffect(() => {
     if (cancelClassModal.isOpen) {
@@ -603,14 +677,25 @@ const DayView = ({
                 <div className="border-t border-grip-secondary pt-4">
                   <h3 className="font-semibold text-grip-primary mb-4">Available Times:</h3>
                   {isCoach && (
-                    <button
-                      type="button"
-                      onClick={() => openAddStudentModal(eventGroup)}
-                      className="w-full px-4 py-3 mb-4 rounded-full font-semibold text-white transition-all shadow-sm bg-[#C67158] hover:bg-[#b2604b]"
-                      style={{ minHeight: 48 }}
-                    >
-                      + Add Student to Class
-                    </button>
+                    <div className="flex flex-col sm:flex-row gap-2 mb-4">
+                      <button
+                        type="button"
+                        onClick={() => openAddStudentModal(eventGroup)}
+                        className="flex-1 px-4 py-3 rounded-full font-semibold text-white transition-all shadow-sm bg-[#C67158] hover:bg-[#b2604b]"
+                        style={{ minHeight: 48 }}
+                      >
+                        + Add Member
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => openDropInModal(eventGroup)}
+                        className="flex-1 px-4 py-3 rounded-full font-semibold text-white transition-all shadow-sm bg-cyan-600 hover:bg-cyan-700 flex items-center justify-center gap-2"
+                        style={{ minHeight: 48 }}
+                      >
+                        <UserPlus className="w-5 h-5" />
+                        Add Drop-In
+                      </button>
+                    </div>
                   )}
                   <div className="flex flex-col gap-2">
                     {[...new Map(
@@ -626,10 +711,10 @@ const DayView = ({
                         return dateA - dateB;
                       })
                       .map(timeSlot => {
-                      const isFull = timeSlot.registrationCount >= 15;
+                      const isFull = timeSlot.registrationCount >= CLASS_CAPACITY;
                       const isExpanded = expandedTimeSlots.has(timeSlot.id);
                       const capacity = timeSlot.registrationCount;
-                      const capacityPercent = (capacity / 15) * 100;
+                      const capacityPercent = (capacity / CLASS_CAPACITY) * 100;
                       
                       // Get progress bar color - color-coded by capacity
                       let progressColor = 'bg-gray-400'; // 0%
@@ -681,7 +766,7 @@ const DayView = ({
                                 </p>
                                 <div className="flex items-center gap-3">
                                   <span className="text-sm font-semibold text-grip-primary">
-                                    {capacity}/15
+                                    {capacity}/{CLASS_CAPACITY}
                                   </span>
                                   <ChevronDown className="w-5 h-5 text-gray-400" />
                                 </div>
@@ -711,7 +796,7 @@ const DayView = ({
                                     {formatTimeDisplay(timeSlot.time)}
                                   </p>
                                   <span className="text-sm font-semibold text-grip-primary">
-                                    {capacity}/15 registered
+                                    {capacity}/{CLASS_CAPACITY} registered
                                   </span>
                                 </div>
                                 <button
@@ -738,9 +823,18 @@ const DayView = ({
                                     {timeSlot.registeredUsers.map(reg => (
                                       <div
                                         key={reg.id}
-                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-grip-secondary rounded-full text-sm text-grip-primary"
+                                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm ${
+                                          reg.is_drop_in
+                                            ? 'bg-cyan-50 border border-cyan-300 text-cyan-900'
+                                            : 'bg-white border border-grip-secondary text-grip-primary'
+                                        }`}
                                       >
                                         <span>{reg.user_name}</span>
+                                        {reg.is_drop_in && (
+                                          <span className="text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded bg-cyan-600 text-white">
+                                            Drop-In
+                                          </span>
+                                        )}
                                         {isCoach && (
                                           <button
                                             type="button"
@@ -914,7 +1008,7 @@ const DayView = ({
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6 bg-black/60">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 transition-all">
             <h2 className="text-xl font-montserrat font-bold text-grip-primary mb-2">
-              Remove Student
+              {removeModal.isDropIn ? 'Remove Drop-In' : 'Remove Student'}
             </h2>
             <p className="text-gray-700 mb-6">
               Remove {removeModal.studentName} from this class?
@@ -948,7 +1042,7 @@ const DayView = ({
         >
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 sm:p-8 max-h-[90vh] overflow-y-auto">
             <div className="flex items-start justify-between mb-4">
-              <h2 className="text-2xl font-montserrat font-bold text-grip-primary">Add Student to Class</h2>
+              <h2 className="text-2xl font-montserrat font-bold text-grip-primary">Add Member to Class</h2>
               <button
                 type="button"
                 onClick={closeAddStudentModal}
@@ -984,7 +1078,7 @@ const DayView = ({
                   })
                   .map((timeSlot) => (
                     <option key={timeSlot.id} value={timeSlot.id}>
-                      {formatTimeDisplay(timeSlot.time)} ({timeSlot.registrationCount}/15)
+                      {formatTimeDisplay(timeSlot.time)} ({timeSlot.registrationCount}/{CLASS_CAPACITY})
                     </option>
                   ))}
               </select>
@@ -1059,6 +1153,185 @@ const DayView = ({
                 type="button"
                 onClick={closeAddStudentModal}
                 className="flex-1 px-4 py-3 rounded-xl font-semibold border border-grip-secondary text-grip-primary hover:bg-grip-secondary/30 transition-colors"
+                style={{ minHeight: 48 }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {dropInModal.isOpen && (
+        <div
+          ref={dropInModalContainerRef}
+          className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6 bg-black/60"
+        >
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 sm:p-8 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <div className="w-10 h-10 rounded-full bg-cyan-100 flex items-center justify-center">
+                  <UserPlus className="w-5 h-5 text-cyan-700" />
+                </div>
+                <h2 className="text-2xl font-montserrat font-bold text-grip-primary">Add Drop-In</h2>
+              </div>
+              <button
+                type="button"
+                onClick={closeDropInModal}
+                disabled={dropInSaving}
+                className="text-gray-500 hover:text-grip-primary text-sm font-semibold disabled:opacity-50"
+                aria-label="Close add drop-in modal"
+                style={{ minWidth: 44, minHeight: 44 }}
+              >
+                ×
+              </button>
+            </div>
+
+            <p className="text-sm text-gray-600 mb-6">
+              Add a walk-in or visitor who isn&apos;t a gym member. No account needed.
+            </p>
+
+            <div className="mb-4">
+              <label className="block text-sm font-semibold text-grip-primary mb-2" htmlFor="drop-in-time">
+                Select Time:
+              </label>
+              <select
+                id="drop-in-time"
+                value={dropInModal.selectedTimeId || ''}
+                onChange={(e) => setDropInModal(prev => ({ ...prev, selectedTimeId: e.target.value }))}
+                disabled={dropInSaving}
+                className="w-full border border-grip-secondary rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-gray-800 disabled:opacity-50"
+              >
+                {[...new Map(
+                  (dropInModal.group?.times || []).map((s) => [
+                    normalizeTimeSlotValue(s.time) || String(s.time),
+                    s
+                  ])
+                ).values()]
+                  .slice()
+                  .sort((a, b) => {
+                    const dateA = new Date(`${selectedDate?.toISOString().split('T')[0]}T${a.time}`);
+                    const dateB = new Date(`${selectedDate?.toISOString().split('T')[0]}T${b.time}`);
+                    return dateA - dateB;
+                  })
+                  .map((timeSlot) => (
+                    <option key={timeSlot.id} value={timeSlot.id}>
+                      {formatTimeDisplay(timeSlot.time)} ({timeSlot.registrationCount}/{CLASS_CAPACITY})
+                    </option>
+                  ))}
+              </select>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+              <div>
+                <label className="block text-sm font-semibold text-grip-primary mb-2" htmlFor="drop-in-first-name">
+                  First Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  id="drop-in-first-name"
+                  type="text"
+                  placeholder="John"
+                  value={dropInForm.firstName}
+                  onChange={(e) => setDropInForm(prev => ({ ...prev, firstName: e.target.value }))}
+                  disabled={dropInSaving}
+                  className="w-full border border-grip-secondary rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-gray-800 disabled:opacity-50"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-grip-primary mb-2" htmlFor="drop-in-last-name">
+                  Last Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  id="drop-in-last-name"
+                  type="text"
+                  placeholder="Smith"
+                  value={dropInForm.lastName}
+                  onChange={(e) => setDropInForm(prev => ({ ...prev, lastName: e.target.value }))}
+                  disabled={dropInSaving}
+                  className="w-full border border-grip-secondary rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-gray-800 disabled:opacity-50"
+                />
+              </div>
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-sm font-semibold text-grip-primary mb-2" htmlFor="drop-in-email">
+                Email <span className="text-gray-400 font-normal">(optional)</span>
+              </label>
+              <input
+                id="drop-in-email"
+                type="email"
+                placeholder="john@example.com"
+                value={dropInForm.email}
+                onChange={(e) => setDropInForm(prev => ({ ...prev, email: e.target.value }))}
+                disabled={dropInSaving}
+                className="w-full border border-grip-secondary rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-gray-800 disabled:opacity-50"
+              />
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-sm font-semibold text-grip-primary mb-2" htmlFor="drop-in-phone">
+                Phone <span className="text-gray-400 font-normal">(optional)</span>
+              </label>
+              <input
+                id="drop-in-phone"
+                type="tel"
+                placeholder="(555) 123-4567"
+                value={dropInForm.phone}
+                onChange={(e) => setDropInForm(prev => ({ ...prev, phone: e.target.value }))}
+                disabled={dropInSaving}
+                className="w-full border border-grip-secondary rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-gray-800 disabled:opacity-50"
+              />
+            </div>
+
+            <div className="mb-6">
+              <label className="block text-sm font-semibold text-grip-primary mb-2" htmlFor="drop-in-notes">
+                Notes <span className="text-gray-400 font-normal">(optional)</span>
+              </label>
+              <input
+                id="drop-in-notes"
+                type="text"
+                placeholder="Friend of Mike, trial class..."
+                value={dropInForm.notes}
+                onChange={(e) => setDropInForm(prev => ({ ...prev, notes: e.target.value }))}
+                disabled={dropInSaving}
+                className="w-full border border-grip-secondary rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-gray-800 disabled:opacity-50"
+              />
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                type="button"
+                onClick={async () => {
+                  if (!dropInModal.selectedTimeId || dropInSaving) return;
+                  setDropInSaving(true);
+                  const result = await onAddDropIn?.(dropInModal.selectedTimeId, dropInForm);
+                  setDropInSaving(false);
+                  if (result?.success) {
+                    closeDropInModal();
+                  }
+                }}
+                disabled={!dropInModal.selectedTimeId || !dropInForm.firstName.trim() || !dropInForm.lastName.trim() || dropInSaving}
+                className={`flex-1 px-4 py-3 rounded-xl font-semibold text-white transition-colors flex items-center justify-center gap-2 ${
+                  !dropInModal.selectedTimeId || !dropInForm.firstName.trim() || !dropInForm.lastName.trim() || dropInSaving
+                    ? 'bg-cyan-600/60 cursor-not-allowed'
+                    : 'bg-cyan-600 hover:bg-cyan-700'
+                }`}
+                style={{ minHeight: 48 }}
+              >
+                {dropInSaving ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Adding...
+                  </>
+                ) : (
+                  'Add to Class'
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={closeDropInModal}
+                disabled={dropInSaving}
+                className="flex-1 px-4 py-3 rounded-xl font-semibold border border-grip-secondary text-grip-primary hover:bg-grip-secondary/30 transition-colors disabled:opacity-50"
                 style={{ minHeight: 48 }}
               >
                 Cancel
