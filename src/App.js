@@ -939,6 +939,67 @@ function App() {
     }
   }, [user, registrations, fetchRegistrations]);
 
+  const addCustomTimeSlot = useCallback(async ({ title, date, type, details, time }) => {
+    const userRole = user?.user_metadata?.role;
+    if (userRole !== 'coach' && userRole !== 'admin') {
+      showToast('Only coaches and admins can add time slots', 'error');
+      return { success: false };
+    }
+
+    const normalizedTime = normalizeTimeSlotValue(time);
+    if (!normalizedTime || !/^\d{2}:\d{2}$/.test(normalizedTime)) {
+      showToast('Please enter a valid time in HH:MM format', 'error');
+      return { success: false };
+    }
+
+    const alreadyExists = events.some(
+      (e) =>
+        e.date === date &&
+        e.title === title &&
+        normalizeTimeSlotValue(e.time) === normalizedTime
+    );
+    if (alreadyExists) {
+      showToast('This time slot already exists for this class', 'error');
+      return { success: false };
+    }
+
+    const detailsNormalized = details
+      ? details.replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim()
+      : '';
+
+    try {
+      const { data, error } = await supabase
+        .from('events')
+        .insert([{
+          title,
+          date,
+          time: normalizedTime,
+          type: type || 'workout',
+          details: detailsNormalized,
+          created_by: user.id,
+        }])
+        .select();
+
+      if (error) {
+        showToast(`Failed to add time slot: ${error.message}`, 'error');
+        return { success: false, error };
+      }
+
+      if (!data?.length) {
+        showToast('Failed to add time slot. You may not have permission.', 'error');
+        return { success: false };
+      }
+
+      await fetchEvents();
+      showToast('Custom time slot added!');
+      return { success: true };
+    } catch (error) {
+      console.error('Failed to add custom time slot:', error);
+      showToast(`Failed to add time slot: ${error.message}`, 'error');
+      return { success: false, error };
+    }
+  }, [user, events, fetchEvents]);
+
   // All time slots for the event being edited (same title + date), normalized for the form
   const editFormSelectedTimes = useMemo(() => {
     if (!editingEvent) return [];
@@ -1015,6 +1076,7 @@ function App() {
           onRemoveStudent={removeStudentFromClass}
           onAddStudent={addStudentToClass}
           onAddDropIn={addDropInToClass}
+          onAddCustomTime={addCustomTimeSlot}
           onCancelTimeSlot={cancelTimeSlot}
         />;
       

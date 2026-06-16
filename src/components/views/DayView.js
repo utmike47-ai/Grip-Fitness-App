@@ -20,6 +20,7 @@ const DayView = ({
   onRemoveStudent,
   onAddStudent,
   onAddDropIn,
+  onAddCustomTime,
   onCancelTimeSlot
 }) => {
   const CLASS_CAPACITY = 15;
@@ -73,6 +74,11 @@ const DayView = ({
   });
   const [dropInSaving, setDropInSaving] = useState(false);
   const dropInModalContainerRef = useRef(null);
+  const [customTimeForm, setCustomTimeForm] = useState({
+    groupKey: null,
+    time: '',
+    saving: false,
+  });
   const [expandedTimeSlots, setExpandedTimeSlots] = useState(new Set());
  
   const getRegistrationCount = useCallback((eventId) => {
@@ -86,11 +92,58 @@ const DayView = ({
   const isCoach = user?.user_metadata?.role === 'coach' || user?.user_metadata?.role === 'admin';
 
   const formatTimeDisplay = (time24) => {
-    // Remove seconds if present (e.g., "16:30:00" becomes "16:30")
     const timeWithoutSeconds = time24.split(':').slice(0, 2).join(':');
     const timeSlot = TIME_SLOTS.find(slot => slot.value === timeWithoutSeconds);
-    return timeSlot ? timeSlot.display : time24;
+    if (timeSlot) return timeSlot.display;
+    const [hourStr, minuteStr] = timeWithoutSeconds.split(':');
+    const hour = Number(hourStr);
+    const minute = Number(minuteStr);
+    if (Number.isNaN(hour) || Number.isNaN(minute)) return time24;
+    const period = hour >= 12 ? 'PM' : 'AM';
+    const hour12 = hour % 12 || 12;
+    return `${hour12}:${String(minute).padStart(2, '0')} ${period}`;
   };
+
+  const sortTimeSlots = useCallback((slots) => (
+    [...slots]
+      .sort((a, b) => {
+        const dateA = new Date(`${dateStr}T${normalizeTimeSlotValue(a.time) || a.time}`);
+        const dateB = new Date(`${dateStr}T${normalizeTimeSlotValue(b.time) || b.time}`);
+        return dateA - dateB;
+      })
+  ), [dateStr]);
+
+  const getUniqueTimeSlots = useCallback((slots) => (
+    [...new Map(
+      slots.map((s) => [normalizeTimeSlotValue(s.time) || String(s.time), s])
+    ).values()]
+  ), []);
+
+  const openCustomTimeForm = useCallback((groupKey) => {
+    setCustomTimeForm({ groupKey, time: '', saving: false });
+  }, []);
+
+  const closeCustomTimeForm = useCallback(() => {
+    setCustomTimeForm({ groupKey: null, time: '', saving: false });
+  }, []);
+
+  const handleAddCustomTime = useCallback(async (eventGroup) => {
+    if (!customTimeForm.time?.trim() || customTimeForm.saving) return;
+
+    setCustomTimeForm((prev) => ({ ...prev, saving: true }));
+    const result = await onAddCustomTime?.({
+      title: eventGroup.title,
+      date: dateStr,
+      type: eventGroup.type,
+      details: eventGroup.details,
+      time: customTimeForm.time,
+    });
+    setCustomTimeForm((prev) => ({ ...prev, saving: false }));
+
+    if (result?.success) {
+      closeCustomTimeForm();
+    }
+  }, [customTimeForm.time, customTimeForm.saving, dateStr, onAddCustomTime, closeCustomTimeForm]);
 
   // Group events by normalized title+type; dedupe by event id; merge slots by normalized time
   const groupedEvents = useMemo(() => {
@@ -698,19 +751,7 @@ const DayView = ({
                     </div>
                   )}
                   <div className="flex flex-col gap-2">
-                    {[...new Map(
-                      eventGroup.times.map((s) => [
-                        normalizeTimeSlotValue(s.time) || String(s.time),
-                        s
-                      ])
-                    ).values()]
-                      .slice()
-                      .sort((a, b) => {
-                        const dateA = new Date(`${selectedDate?.toISOString().split('T')[0]}T${a.time}`);
-                        const dateB = new Date(`${selectedDate?.toISOString().split('T')[0]}T${b.time}`);
-                        return dateA - dateB;
-                      })
-                      .map(timeSlot => {
+                    {sortTimeSlots(getUniqueTimeSlots(eventGroup.times)).map(timeSlot => {
                       const isFull = timeSlot.registrationCount >= CLASS_CAPACITY;
                       const isExpanded = expandedTimeSlots.has(timeSlot.id);
                       const capacity = timeSlot.registrationCount;
@@ -886,6 +927,54 @@ const DayView = ({
                         </div>
                       );
                     })}
+
+                    {isCoach && (
+                      <div>
+                        <button
+                          type="button"
+                          onClick={() => openCustomTimeForm(eventGroup.groupKey)}
+                          className="w-full px-3 py-2 rounded-lg border border-dashed border-cyan-400 text-cyan-700 text-sm font-semibold hover:bg-cyan-50 transition-colors"
+                        >
+                          + Add custom time
+                        </button>
+                        {customTimeForm.groupKey === eventGroup.groupKey && (
+                          <div className="mt-2 p-3 rounded-lg border border-dashed border-cyan-300 bg-cyan-50/40">
+                            <label
+                              className="block text-xs font-semibold text-cyan-800 mb-1"
+                              htmlFor={`custom-time-${eventGroup.groupKey}`}
+                            >
+                              Custom time
+                            </label>
+                            <input
+                              id={`custom-time-${eventGroup.groupKey}`}
+                              type="time"
+                              value={customTimeForm.time}
+                              onChange={(e) => setCustomTimeForm((prev) => ({ ...prev, time: e.target.value }))}
+                              disabled={customTimeForm.saving}
+                              className="w-full border border-grip-secondary rounded-lg px-3 py-2 text-gray-800 disabled:opacity-50"
+                            />
+                            <div className="flex items-center gap-3 mt-3">
+                              <button
+                                type="button"
+                                onClick={() => handleAddCustomTime(eventGroup)}
+                                disabled={!customTimeForm.time || customTimeForm.saving}
+                                className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-cyan-600 hover:bg-cyan-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
+                                {customTimeForm.saving ? 'Adding...' : 'Add'}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={closeCustomTimeForm}
+                                disabled={customTimeForm.saving}
+                                className="text-sm text-gray-500 hover:text-grip-primary disabled:opacity-50"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
