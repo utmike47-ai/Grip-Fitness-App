@@ -3,7 +3,6 @@ import { supabase } from './utils/supabaseClient';
 import { TIME_SLOTS, normalizeTimeSlotValue } from './utils/constants';
 import LoginScreen from './components/views/LoginScreen';
 import Dashboard from './components/views/Dashboard';
-import DayView from './components/views/DayView';
 import CreateEvent from './components/views/CreateEvent';
 import MyClasses from './components/views/MyClasses';
 import NotesView from './components/views/NotesView';
@@ -13,12 +12,16 @@ import MemberManagement from './components/views/MemberManagement';
 import Toast from './components/common/Toast';
 import BookingModal from './components/common/BookingModal';
 import BottomNav from './components/common/BottomNav';
+import SplashScreen from './components/SplashScreen';
+import { startOfDay } from './utils/dates';
+import './App.css';
 
 function App() {
   // State management
   const [user, setUser] = useState(null);
+  const [authReady, setAuthReady] = useState(false);
   const [currentView, setCurrentView] = useState('login');
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(() => startOfDay(new Date()));
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [events, setEvents] = useState([]);
   const [registrations, setRegistrations] = useState([]);
@@ -92,15 +95,25 @@ function App() {
   }, []);
 
   const checkSession = useCallback(async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session) {
-      setUser(session.user);
-      setCurrentView('dashboard');
-      await fetchUserProfile(session.user.id);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        setUser(session.user);
+        setCurrentView('dashboard');
+        fetchUserProfile(session.user.id);
+      } else {
+        setUser(null);
+        setCurrentView('login');
+      }
+    } catch (error) {
+      console.error('Session check error:', error);
+      setUser(null);
+      setCurrentView('login');
+    } finally {
+      setAuthReady(true);
     }
   }, [fetchUserProfile]);
 
-  // Check session on mount
   useEffect(() => {
     checkSession();
   }, [checkSession]);
@@ -206,7 +219,7 @@ function App() {
     await supabase.auth.signOut();
     setUser(null);
     setCurrentView('login');
-    setSelectedDate(null);
+    setSelectedDate(startOfDay(new Date()));
     setSelectedEvent(null);
     setEvents([]);
     setRegistrations([]);
@@ -1009,6 +1022,31 @@ function App() {
     return [...new Set(raw)].filter(Boolean);
   }, [events, editingEvent]);
 
+  const dashboardProps = {
+    user,
+    events,
+    registrations,
+    attendance,
+    selectedDate,
+    onSignOut: signOut,
+    onViewChange: setCurrentView,
+    onDateSelect: setSelectedDate,
+    onRegister: registerForEvent,
+    onCancelRegistration: cancelRegistration,
+    onEditEvent: handleEditEvent,
+    onDeleteEvent: deleteEvent,
+    onRemoveStudent: removeStudentFromClass,
+    onAddStudent: addStudentToClass,
+    onAddDropIn: addDropInToClass,
+    onAddCustomTime: addCustomTimeSlot,
+    onCancelTimeSlot: cancelTimeSlot,
+    onToggleAttendance: toggleAttendance,
+    onEventSelect: (event) => {
+      if (!event?.date) return;
+      setSelectedDate(new Date(`${event.date}T00:00:00`));
+    },
+  };
+
   // Render based on currentView
   const renderView = () => {
     const userRole = user?.user_metadata?.role || 'student';
@@ -1016,24 +1054,7 @@ function App() {
     
     // Protect admin routes - only admins can access
     if ((currentView === 'adminDashboard' || currentView === 'manageMembers') && !isAdmin) {
-      return <Dashboard 
-        user={user}
-        events={events}
-        registrations={registrations}
-        attendance={attendance}
-        onSignOut={signOut}
-        onViewChange={setCurrentView}
-        onDateSelect={(date) => {
-          setSelectedDate(date);
-          setCurrentView('dayView');
-        }}
-        onEventSelect={(event) => {
-          if (!event?.date) return;
-          const eventDate = new Date(event.date + 'T00:00:00');
-          setSelectedDate(eventDate);
-          setCurrentView('dayView');
-        }}
-      />;
+      return <Dashboard {...dashboardProps} />;
     }
     
     switch(currentView) {
@@ -1041,44 +1062,10 @@ function App() {
         return <LoginScreen onLogin={signIn} loading={loading} />;
       
         case 'dashboard':
-          return <Dashboard 
-            user={user}
-            events={events}
-            registrations={registrations}
-            attendance={attendance}
-            onSignOut={signOut}
-            onViewChange={setCurrentView}
-            onDateSelect={(date) => {
-              setSelectedDate(date);
-              setCurrentView('dayView');
-            }}
-            onEventSelect={(event) => {
-              if (!event?.date) return;
-              const eventDate = new Date(event.date + 'T00:00:00');
-              setSelectedDate(eventDate);
-              setCurrentView('dayView');
-            }}
-          />;
+          return <Dashboard {...dashboardProps} />;
       
       case 'dayView':
-        return <DayView 
-          selectedDate={selectedDate}
-          events={events}
-          registrations={registrations}
-          user={user}
-          onBack={() => setCurrentView('dashboard')}
-          onRegister={registerForEvent}
-          onCancelRegistration={cancelRegistration}
-          onToggleAttendance={toggleAttendance}
-          onEditEvent={handleEditEvent}
-          onDeleteEvent={deleteEvent}
-          onDateChange={setSelectedDate}
-          onRemoveStudent={removeStudentFromClass}
-          onAddStudent={addStudentToClass}
-          onAddDropIn={addDropInToClass}
-          onAddCustomTime={addCustomTimeSlot}
-          onCancelTimeSlot={cancelTimeSlot}
-        />;
+        return <Dashboard {...dashboardProps} />;
       
       case 'createEvent':
         return (
@@ -1092,26 +1079,7 @@ function App() {
 
       case 'editEvent':
         if (!editingEvent) {
-          return (
-            <Dashboard
-              user={user}
-              events={events}
-              registrations={registrations}
-              attendance={attendance}
-              onSignOut={signOut}
-              onViewChange={setCurrentView}
-              onDateSelect={(date) => {
-                setSelectedDate(date);
-                setCurrentView('dayView');
-              }}
-              onEventSelect={(event) => {
-                if (!event?.date) return;
-                const eventDate = new Date(event.date + 'T00:00:00');
-                setSelectedDate(eventDate);
-                setCurrentView('dayView');
-              }}
-            />
-          );
+          return <Dashboard {...dashboardProps} />;
         }
         return (
           <CreateEvent
@@ -1192,44 +1160,40 @@ function App() {
           />;
       
       default:
-        return <Dashboard 
-          user={user}
-          events={events}
-          registrations={registrations}
-          onSignOut={signOut}
-          onViewChange={setCurrentView}
-          onDateSelect={(date) => {
-            setSelectedDate(date);
-            setCurrentView('dayView');
-          }}
-        />;
+        return <Dashboard {...dashboardProps} />;
     }
   };
 
   return (
     <>
-      {renderView()}
-      {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast(null)}
-        />
-      )}
-      <BookingModal 
-        isOpen={bookingModal.isOpen}
-        eventDetails={bookingModal.details}
-        onClose={() => {
-          setBookingModal({ isOpen: false, details: null });
-          setCurrentView('dashboard');
-        }}
-      />
-      {currentView !== 'login' && (
-        <BottomNav 
-          userRole={user?.user_metadata?.role}
-          currentView={currentView}
-          onNavigate={setCurrentView}
-        />
+      {!authReady ? (
+        <SplashScreen />
+      ) : (
+        <>
+          {renderView()}
+          {toast && (
+            <Toast
+              message={toast.message}
+              type={toast.type}
+              onClose={() => setToast(null)}
+            />
+          )}
+          <BookingModal 
+            isOpen={bookingModal.isOpen}
+            eventDetails={bookingModal.details}
+            onClose={() => {
+              setBookingModal({ isOpen: false, details: null });
+              setCurrentView('dashboard');
+            }}
+          />
+          {currentView !== 'login' && (
+            <BottomNav 
+              userRole={user?.user_metadata?.role}
+              currentView={currentView}
+              onNavigate={setCurrentView}
+            />
+          )}
+        </>
       )}
     </>
   );

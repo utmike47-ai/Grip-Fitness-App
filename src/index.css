@@ -3,34 +3,62 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --bg-primary: #0D1F1F;
+  --bg-card: #152C2C;
+  --accent: #B86450;
+  --text-primary: #FFFFFF;
+  --text-secondary: rgba(255, 255, 255, 0.5);
+  --text-muted: rgba(255, 255, 255, 0.3);
+  --border-subtle: rgba(255, 255, 255, 0.1);
+  --success: #4CAF50;
+}
+
 @layer base {
-  body {
-    @apply bg-grip-light text-grip-dark font-inter;
+  html,
+  body,
+  #root {
+    min-height: 100%;
+    background-color: var(--bg-primary);
   }
-  
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-montserrat font-bold text-grip-primary;
+
+  body {
+    color: #1a1a1a;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
 }
 
 @layer components {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
   .btn-primary {
-    @apply bg-grip-primary text-white px-6 py-3 rounded-lg font-semibold 
+    @apply bg-grip-accent text-white px-6 py-3 rounded-lg font-semibold
            hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200;
   }
-  
+
   .btn-secondary {
-    @apply bg-grip-secondary text-grip-primary px-6 py-3 rounded-lg font-semibold
+    @apply bg-grip-card text-white px-6 py-3 rounded-lg font-semibold
            hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200;
   }
-  
+
   .card {
-    @apply bg-white rounded-2xl shadow-sm p-6;
+    background-color: var(--bg-card);
+    @apply rounded-2xl shadow-sm p-6;
   }
-  
-  .input-field {
-    @apply w-full px-4 py-3 border border-grip-secondary rounded-lg
-           focus:outline-none focus:border-grip-primary transition-colors;
+
+  .app-shell .input-field {
+    @apply w-full px-4 py-3 border rounded-lg
+           focus:outline-none transition-colors;
+    border-color: var(--border-subtle);
+    background-color: var(--bg-card);
+    color: var(--text-primary);
   }
 
   @keyframes slide-in {
@@ -43,7 +71,7 @@
       opacity: 1;
     }
   }
-  
+
   .animate-slide-in {
     animation: slide-in 0.3s ease-out;
   }

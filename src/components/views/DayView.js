@@ -1,15 +1,21 @@
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { TIME_SLOTS, normalizeTimeSlotValue } from '../../utils/constants';
-import { useSwipeable } from 'react-swipeable';
 import { fetchNoteForEvent, saveNote, deleteNote } from '../../utils/notesService';
 import { supabase } from '../../utils/supabaseClient';
-import { ChevronDown, ChevronUp, X, StickyNote, Pencil, Trash2, UserPlus } from 'lucide-react';
+import { formatDateKey, getDayStatus } from '../../utils/dates';
+import { getWeekStartMonday, withMemberStreaks } from '../../utils/streakCalculation';
+import { UserPlus } from 'lucide-react';
+import WorkoutCard from '../WorkoutCard';
+import TimeSlot from '../TimeSlot';
+import RestDay from '../RestDay';
 
 const DayView = ({ 
   selectedDate, 
   events, 
   registrations, 
+  attendance = [],
   user,
+  embedded = false,
   onBack,
   onRegister,
   onCancelRegistration,
@@ -25,7 +31,7 @@ const DayView = ({
 }) => {
   const CLASS_CAPACITY = 15;
   const NOTE_MAX_LENGTH = 500;
-  const dateStr = selectedDate?.toISOString().split('T')[0];
+  const dateStr = selectedDate ? formatDateKey(selectedDate) : '';
   const dayEvents = events.filter(event => event.date === dateStr);
   const textareaRef = useRef(null);
   const modalContainerRef = useRef(null);
@@ -79,7 +85,6 @@ const DayView = ({
     time: '',
     saving: false,
   });
-  const [expandedTimeSlots, setExpandedTimeSlots] = useState(new Set());
  
   const getRegistrationCount = useCallback((eventId) => {
     return registrations.filter(reg => String(reg.event_id) === String(eventId)).length;
@@ -407,8 +412,8 @@ const DayView = ({
       (group.times || []).map((s) => [normalizeTimeSlotValue(s.time) || String(s.time), s])
     ).values()];
     const sortedTimes = uniqueTimes.slice().sort((a, b) => {
-      const dateA = new Date(`${selectedDate?.toISOString().split('T')[0]}T${a.time}`);
-      const dateB = new Date(`${selectedDate?.toISOString().split('T')[0]}T${b.time}`);
+      const dateA = new Date(`${dateStr}T${a.time}`);
+      const dateB = new Date(`${dateStr}T${b.time}`);
       return dateA - dateB;
     });
     const firstTime = sortedTimes[0];
@@ -419,7 +424,7 @@ const DayView = ({
     });
     setStudentSearch('');
     setSelectedStudentId(null);
-  }, [selectedDate]);
+  }, [dateStr]);
 
   useEffect(() => {
     const fetchStudents = async () => {
@@ -471,8 +476,8 @@ const DayView = ({
       (group.times || []).map((s) => [normalizeTimeSlotValue(s.time) || String(s.time), s])
     ).values()];
     const sortedTimes = uniqueTimes.slice().sort((a, b) => {
-      const dateA = new Date(`${selectedDate?.toISOString().split('T')[0]}T${a.time}`);
-      const dateB = new Date(`${selectedDate?.toISOString().split('T')[0]}T${b.time}`);
+      const dateA = new Date(`${dateStr}T${a.time}`);
+      const dateB = new Date(`${dateStr}T${b.time}`);
       return dateA - dateB;
     });
     const firstTime = sortedTimes[0];
@@ -483,7 +488,7 @@ const DayView = ({
     });
     setDropInForm({ firstName: '', lastName: '', email: '', phone: '', notes: '' });
     setDropInSaving(false);
-  }, [selectedDate]);
+  }, [dateStr]);
 
   const closeDropInModal = useCallback(() => {
     setDropInModal({ isOpen: false, group: null, selectedTimeId: null });
@@ -583,406 +588,120 @@ const DayView = ({
     }
   }, [cancelClassModal.isOpen, isCancelingClass, closeCancelClassModal]);
 
-  // Swipe handlers for date navigation
-  const handlers = useSwipeable({
-    onSwipedLeft: () => {
-      // Swipe left = next day
-      const nextDate = new Date(selectedDate);
-      nextDate.setDate(nextDate.getDate() + 1);
-      onDateChange(nextDate);
-    },
-    onSwipedRight: () => {
-      // Swipe right = previous day
-      const prevDate = new Date(selectedDate);
-      prevDate.setDate(prevDate.getDate() - 1);
-      onDateChange(prevDate);
-    },
-    preventScrollOnSwipe: true,
-    trackMouse: false,
-    trackTouch: true,
-    delta: 50, // Min distance for swipe
-  });
+  const dayName = selectedDate
+    ? selectedDate.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase()
+    : '';
+  const status = selectedDate ? getDayStatus(selectedDate) : 'UPCOMING';
+  const weekStart = getWeekStartMonday(selectedDate || new Date());
 
   return (
-    <div {...handlers} className="min-h-screen bg-grip-light pb-20">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b border-grip-secondary">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-center gap-2">
-            <span className="text-gray-400 text-sm">←</span>
-            <h1 className="text-2xl font-montserrat font-bold text-grip-primary">
-              {selectedDate?.toLocaleDateString('en-US', { 
-                weekday: 'long', 
-                month: 'long', 
-                day: 'numeric',
-                timeZone: 'UTC'
-              })}
-            </h1>
-            <span className="text-gray-400 text-sm">→</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Events */}
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        {Object.keys(groupedEvents).length === 0 ? (
-          <div className="text-center py-16 bg-white rounded-2xl shadow-lg">
-            <span className="text-6xl block mb-4">📅</span>
-            <p className="text-xl font-semibold text-grip-primary">No events scheduled</p>
-            <p className="text-gray-500 mt-2">Check back later for new workouts!</p>
-          </div>
+    <div className={embedded ? 'day-view' : 'app-shell'}>
+      <div className={embedded ? undefined : 'app-shell__inner'}>
+        <div key={dateStr} className="day-view">
+        {eventGroupList.length === 0 ? (
+          <RestDay />
         ) : (
-          <div className="space-y-6">
-            {eventGroupList.map((eventGroup, index) => {
+          eventGroupList.map((eventGroup, index) => {
               const primary = eventGroup.times[0];
               const hasNote = primary ? noteMap[primary.id]?.hasNote : false;
-              const noteButtonLabel = hasNote ? 'VIEW/EDIT NOTES' : 'WORKOUT NOTES';
+              const slots = sortTimeSlots(getUniqueTimeSlots(eventGroup.times));
 
               return (
-              <div key={eventGroup.groupKey || `group-${index}`} className="bg-white rounded-2xl shadow-lg p-6">
-                <div className="mb-4">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 gap-3">
-  <h2 className="text-2xl font-montserrat font-bold text-grip-primary">
-    {eventGroup.title}
-  </h2>
-  
-  {isCoach ? (
-    // Coach/Admin view: Circular icon buttons (Notes, Edit, Delete) - no WORKOUT badge
-    <div className="bg-gray-50 rounded-lg p-4">
-      <div className="flex justify-center items-center gap-3 flex-wrap">
-        {/* Notes Icon */}
-        <button
-          type="button"
-          onClick={() => openNotesModal(eventGroup)}
-          aria-label={noteButtonLabel}
-          className="flex flex-col items-center justify-center"
-        >
-          <div className="w-14 h-14 rounded-full bg-grip-accent flex items-center justify-center mb-1 hover:bg-[#B86450] transition-colors">
-            <StickyNote className="w-6 h-6 text-white" />
-          </div>
-          <span className="text-xs text-gray-600 font-medium">Notes</span>
-        </button>
-
-        {/* Edit Icon */}
-        <button
-          type="button"
-          onClick={() => onEditEvent(eventGroup.times[0].id)}
-          className="flex flex-col items-center justify-center"
-        >
-          <div className="w-14 h-14 rounded-full bg-grip-accent flex items-center justify-center mb-1 hover:bg-[#B86450] transition-colors">
-            <Pencil className="w-6 h-6 text-white" />
-          </div>
-          <span className="text-xs text-gray-600 font-medium">Edit</span>
-        </button>
-
-        {/* Delete Icon */}
-        <button
-          type="button"
-          onClick={() => onDeleteEvent(eventGroup.times[0].id)}
-          className="flex flex-col items-center justify-center"
-        >
-          <div className="w-14 h-14 rounded-full bg-grip-accent flex items-center justify-center mb-1 hover:bg-[#B86450] transition-colors">
-            <Trash2 className="w-6 h-6 text-white" />
-          </div>
-          <span className="text-xs text-gray-600 font-medium">Delete</span>
-        </button>
-      </div>
-    </div>
-  ) : (
-    // Student view: Only circular Notes icon button (no WORKOUT button)
-    <div className="flex justify-center items-start">
-      <button
-        type="button"
-        onClick={() => openNotesModal(eventGroup)}
-        aria-label={noteButtonLabel}
-        className="flex flex-col items-center justify-center"
-      >
-        <div className="w-14 h-14 rounded-full bg-grip-accent flex items-center justify-center mb-1 hover:bg-[#B86450] transition-colors">
-          <StickyNote className="w-6 h-6 text-white" />
-        </div>
-        <span className="text-xs text-gray-600 font-medium">Notes</span>
-      </button>
-    </div>
-  )}
-</div>
-{eventGroup.details && (
-  <div className="text-gray-700 leading-relaxed">
-    {eventGroup.details
-      .split('\n')
-      .filter(line => line.trim())
-      .map((line, index) => (
-        <div 
-          key={index} 
-          style={{ 
-            display: 'block', 
-            width: '100%',
-            marginBottom: '8px',
-            lineHeight: '1.5'
-          }}
-        >
-          {line.trim()}
-        </div>
-      ))}
-  </div>
-)}
-                </div>
-
-                <div className="border-t border-grip-secondary pt-4">
-                  <h3 className="font-semibold text-grip-primary mb-4">Available Times:</h3>
-                  {isCoach && (
-                    <div className="flex flex-col sm:flex-row gap-2 mb-4">
+              <div key={eventGroup.groupKey || `group-${index}`} className="day-view__group">
+                <WorkoutCard
+                  dayName={dayName}
+                  status={status}
+                  title={eventGroup.title}
+                  type={eventGroup.type}
+                  details={eventGroup.details}
+                  hasNote={hasNote}
+                  onNotes={() => openNotesModal(eventGroup)}
+                  isCoach={isCoach}
+                  onEdit={() => onEditEvent(eventGroup.times[0].id)}
+                  onDelete={() => onDeleteEvent(eventGroup.times[0].id)}
+                />
+                {isCoach && (
+                  <div className="coach-actions">
+                    <button type="button" onClick={() => openAddStudentModal(eventGroup)}>
+                      + Add Member
+                    </button>
+                    <button
+                      type="button"
+                      className="coach-actions__secondary"
+                      onClick={() => openDropInModal(eventGroup)}
+                    >
+                      Add Drop-In
+                    </button>
+                  </div>
+                )}
+                {slots.map((timeSlot) => (
+                  <TimeSlot
+                    key={timeSlot.id}
+                    timeLabel={formatTimeDisplay(timeSlot.time)}
+                    capacity={timeSlot.registrationCount}
+                    maxCapacity={CLASS_CAPACITY}
+                    members={withMemberStreaks(
+                      timeSlot.registeredUsers,
+                      weekStart,
+                      attendance,
+                      events
+                    )}
+                    userRegistered={timeSlot.userRegistered}
+                    isCoach={isCoach}
+                    onRegister={() => onRegister(timeSlot.id)}
+                    onCancelRegistration={() => onCancelRegistration(timeSlot.id)}
+                    onRemoveMember={openRemoveModal}
+                    onCancelClass={() => openCancelClassModal(timeSlot)}
+                  />
+                ))}
+                {isCoach && (
+                  <div className="custom-time">
+                    {customTimeForm.groupKey !== eventGroup.groupKey ? (
                       <button
                         type="button"
-                        onClick={() => openAddStudentModal(eventGroup)}
-                        className="flex-1 px-4 py-3 rounded-full font-semibold text-white transition-all shadow-sm bg-[#C67158] hover:bg-[#b2604b]"
-                        style={{ minHeight: 48 }}
+                        className="custom-time__toggle"
+                        onClick={() => openCustomTimeForm(eventGroup.groupKey)}
                       >
-                        + Add Member
+                        + Add custom time
                       </button>
-                      <button
-                        type="button"
-                        onClick={() => openDropInModal(eventGroup)}
-                        className="flex-1 px-4 py-3 rounded-full font-semibold text-white transition-all shadow-sm bg-cyan-600 hover:bg-cyan-700 flex items-center justify-center gap-2"
-                        style={{ minHeight: 48 }}
-                      >
-                        <UserPlus className="w-5 h-5" />
-                        Add Drop-In
-                      </button>
-                    </div>
-                  )}
-                  <div className="flex flex-col gap-2">
-                    {sortTimeSlots(getUniqueTimeSlots(eventGroup.times)).map(timeSlot => {
-                      const isFull = timeSlot.registrationCount >= CLASS_CAPACITY;
-                      const isExpanded = expandedTimeSlots.has(timeSlot.id);
-                      const capacity = timeSlot.registrationCount;
-                      const capacityPercent = (capacity / CLASS_CAPACITY) * 100;
-                      
-                      // Get progress bar color - color-coded by capacity
-                      let progressColor = 'bg-gray-400'; // 0%
-                      if (capacityPercent >= 100) {
-                        progressColor = 'bg-red-500'; // 100%
-                      } else if (capacityPercent >= 75) {
-                        progressColor = 'bg-orange-500'; // 75-99%
-                      } else if (capacityPercent >= 50) {
-                        progressColor = 'bg-amber-400'; // 50-74%
-                      } else if (capacityPercent >= 1) {
-                        progressColor = 'bg-emerald-500'; // 1-49%
-                      }
-                      
-                      // Get member preview text
-                      const getMemberPreview = () => {
-                        if (timeSlot.registeredUsers.length === 0) return 'No one registered yet';
-                        const first3 = timeSlot.registeredUsers.slice(0, 3).map(u => u.user_name);
-                        const remaining = timeSlot.registeredUsers.length - 3;
-                        if (remaining > 0) {
-                          return `${first3.join(', ')} +${remaining} more`;
-                        }
-                        return first3.join(', ');
-                      };
-                      
-                      const toggleExpand = () => {
-                        setExpandedTimeSlots(prev => {
-                          const newSet = new Set(prev);
-                          if (newSet.has(timeSlot.id)) {
-                            newSet.delete(timeSlot.id);
-                          } else {
-                            newSet.add(timeSlot.id);
-                          }
-                          return newSet;
-                        });
-                      };
-                      
-                      return (
-                        <div key={timeSlot.id} className="border border-grip-secondary rounded-lg overflow-hidden bg-white">
-                          {/* Collapsed State */}
-                          {!isExpanded && (
-                            <button
-                              type="button"
-                              onClick={toggleExpand}
-                              className="w-full p-4 text-left hover:bg-grip-light transition-colors"
-                            >
-                              <div className="flex items-center justify-between mb-3">
-                                <p className="text-2xl font-extrabold text-grip-primary">
-                                  {formatTimeDisplay(timeSlot.time)}
-                                </p>
-                                <div className="flex items-center gap-3">
-                                  <span className="text-sm font-semibold text-grip-primary">
-                                    {capacity}/{CLASS_CAPACITY}
-                                  </span>
-                                  <ChevronDown className="w-5 h-5 text-gray-400" />
-                                </div>
-                              </div>
-                              
-                              {/* Progress Bar */}
-                              <div className="w-full h-2 bg-gray-200 rounded-full mb-2">
-                                <div
-                                  className={`h-full rounded-full transition-all ${progressColor}`}
-                                  style={{ width: `${Math.min(capacityPercent, 100)}%` }}
-                                />
-                              </div>
-                              
-                              {/* Member Preview */}
-                              <p className="text-sm text-gray-600 truncate">
-                                {getMemberPreview()}
-                              </p>
-                            </button>
-                          )}
-                          
-                          {/* Expanded State */}
-                          {isExpanded && (
-                            <div className="p-4">
-                              <div className="flex items-center justify-between mb-4">
-                                <div>
-                                  <p className="text-2xl font-extrabold text-grip-primary">
-                                    {formatTimeDisplay(timeSlot.time)}
-                                  </p>
-                                  <span className="text-sm font-semibold text-grip-primary">
-                                    {capacity}/{CLASS_CAPACITY} registered
-                                  </span>
-                                </div>
-                                <button
-                                  type="button"
-                                  onClick={toggleExpand}
-                                  className="text-gray-400 hover:text-grip-primary"
-                                >
-                                  <ChevronUp className="w-5 h-5" />
-                                </button>
-                              </div>
-                              
-                              {/* Progress Bar */}
-                              <div className="w-full h-2 bg-gray-200 rounded-full mb-4">
-                                <div
-                                  className={`h-full rounded-full transition-all ${progressColor}`}
-                                  style={{ width: `${Math.min(capacityPercent, 100)}%` }}
-                                />
-                              </div>
-                              
-                              {/* Member Pills */}
-                              {timeSlot.registeredUsers.length > 0 && (
-                                <div className="mb-4">
-                                  <div className="flex flex-wrap gap-2">
-                                    {timeSlot.registeredUsers.map(reg => (
-                                      <div
-                                        key={reg.id}
-                                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm ${
-                                          reg.is_drop_in
-                                            ? 'bg-cyan-50 border border-cyan-300 text-cyan-900'
-                                            : 'bg-white border border-grip-secondary text-grip-primary'
-                                        }`}
-                                      >
-                                        <span>{reg.user_name}</span>
-                                        {reg.is_drop_in && (
-                                          <span className="text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded bg-cyan-600 text-white">
-                                            Drop-In
-                                          </span>
-                                        )}
-                                        {isCoach && (
-                                          <button
-                                            type="button"
-                                            onClick={(e) => {
-                                              e.stopPropagation();
-                                              openRemoveModal(reg);
-                                            }}
-                                            className="text-gray-400 hover:text-red-500 transition-colors"
-                                          >
-                                            <X className="w-4 h-4" />
-                                          </button>
-                                        )}
-                                      </div>
-                                    ))}
-                                  </div>
-                                </div>
-                              )}
-                              
-                              {/* Action Buttons */}
-                              <div className="flex flex-col gap-2 mt-4">
-                                {!isFull && !timeSlot.userRegistered && (
-                                  <button
-                                    onClick={() => onRegister(timeSlot.id)}
-                                    className="w-full px-4 py-2.5 rounded-lg text-sm font-semibold text-white bg-grip-accent hover:bg-[#B86450] hover:shadow-lg transition-all"
-                                  >
-                                    Register
-                                  </button>
-                                )}
-                                {timeSlot.userRegistered && (
-                                  <button
-                                    onClick={() => onCancelRegistration(timeSlot.id)}
-                                    className="w-full px-4 py-2.5 rounded-lg text-sm font-semibold text-white bg-grip-accent hover:bg-[#B86450] hover:shadow-lg transition-all"
-                                  >
-                                    Cancel Registration
-                                  </button>
-                                )}
-                                {isCoach && (
-                                  <button
-                                    type="button"
-                                    onClick={() => openCancelClassModal(timeSlot)}
-                                    className="w-full px-4 py-2.5 rounded-lg text-sm font-semibold text-red-600 border-2 border-red-600 hover:bg-red-50 transition-all"
-                                  >
-                                    Cancel Class
-                                  </button>
-                                )}
-                              </div>
-                            </div>
-                          )}
+                    ) : (
+                      <>
+                        <label htmlFor={`custom-time-${eventGroup.groupKey}`}>Custom time</label>
+                        <input
+                          id={`custom-time-${eventGroup.groupKey}`}
+                          type="time"
+                          value={customTimeForm.time}
+                          onChange={(e) => setCustomTimeForm((prev) => ({ ...prev, time: e.target.value }))}
+                          disabled={customTimeForm.saving}
+                        />
+                        <div className="flex items-center gap-3">
+                          <button
+                            type="button"
+                            className="custom-time__add"
+                            onClick={() => handleAddCustomTime(eventGroup)}
+                            disabled={!customTimeForm.time || customTimeForm.saving}
+                          >
+                            {customTimeForm.saving ? 'Adding...' : 'Add'}
+                          </button>
+                          <button
+                            type="button"
+                            className="custom-time__cancel"
+                            onClick={closeCustomTimeForm}
+                            disabled={customTimeForm.saving}
+                          >
+                            Cancel
+                          </button>
                         </div>
-                      );
-                    })}
-
-                    {isCoach && (
-                      <div>
-                        <button
-                          type="button"
-                          onClick={() => openCustomTimeForm(eventGroup.groupKey)}
-                          className="w-full px-3 py-2 rounded-lg border border-dashed border-cyan-400 text-cyan-700 text-sm font-semibold hover:bg-cyan-50 transition-colors"
-                        >
-                          + Add custom time
-                        </button>
-                        {customTimeForm.groupKey === eventGroup.groupKey && (
-                          <div className="mt-2 p-3 rounded-lg border border-dashed border-cyan-300 bg-cyan-50/40">
-                            <label
-                              className="block text-xs font-semibold text-cyan-800 mb-1"
-                              htmlFor={`custom-time-${eventGroup.groupKey}`}
-                            >
-                              Custom time
-                            </label>
-                            <input
-                              id={`custom-time-${eventGroup.groupKey}`}
-                              type="time"
-                              value={customTimeForm.time}
-                              onChange={(e) => setCustomTimeForm((prev) => ({ ...prev, time: e.target.value }))}
-                              disabled={customTimeForm.saving}
-                              className="w-full border border-grip-secondary rounded-lg px-3 py-2 text-gray-800 disabled:opacity-50"
-                            />
-                            <div className="flex items-center gap-3 mt-3">
-                              <button
-                                type="button"
-                                onClick={() => handleAddCustomTime(eventGroup)}
-                                disabled={!customTimeForm.time || customTimeForm.saving}
-                                className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-cyan-600 hover:bg-cyan-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                              >
-                                {customTimeForm.saving ? 'Adding...' : 'Add'}
-                              </button>
-                              <button
-                                type="button"
-                                onClick={closeCustomTimeForm}
-                                disabled={customTimeForm.saving}
-                                className="text-sm text-gray-500 hover:text-grip-primary disabled:opacity-50"
-                              >
-                                Cancel
-                              </button>
-                            </div>
-                          </div>
-                        )}
-                      </div>
+                      </>
                     )}
                   </div>
-                </div>
+                )}
               </div>
             );
-          })}
-          </div>
+          })
         )}
-      </div>
+        </div>
+
 
       {modalVisible && (
         <div
@@ -1161,8 +880,8 @@ const DayView = ({
                 ).values()]
                   .slice()
                   .sort((a, b) => {
-                    const dateA = new Date(`${selectedDate?.toISOString().split('T')[0]}T${a.time}`);
-                    const dateB = new Date(`${selectedDate?.toISOString().split('T')[0]}T${b.time}`);
+                    const dateA = new Date(`${dateStr}T${a.time}`);
+                    const dateB = new Date(`${dateStr}T${b.time}`);
                     return dateA - dateB;
                   })
                   .map((timeSlot) => (
@@ -1299,8 +1018,8 @@ const DayView = ({
                 ).values()]
                   .slice()
                   .sort((a, b) => {
-                    const dateA = new Date(`${selectedDate?.toISOString().split('T')[0]}T${a.time}`);
-                    const dateB = new Date(`${selectedDate?.toISOString().split('T')[0]}T${b.time}`);
+                    const dateA = new Date(`${dateStr}T${a.time}`);
+                    const dateB = new Date(`${dateStr}T${b.time}`);
                     return dateA - dateB;
                   })
                   .map((timeSlot) => (
@@ -1502,6 +1221,7 @@ const DayView = ({
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 };

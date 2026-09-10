@@ -7,10 +7,12 @@ module.exports = {
       extend: {
         colors: {
           'grip-primary': '#0F3B37',
-          'grip-secondary': '#e3d8c5', 
+          'grip-secondary': '#e3d8c5',
           'grip-accent': '#B86450',
           'grip-dark': '#2d2d2d',
           'grip-light': '#F5F0E8',
+          'grip-bg': '#0D1F1F',
+          'grip-card': '#152C2C',
         },
         fontFamily: {
           'montserrat': ['Montserrat', 'sans-serif'],
