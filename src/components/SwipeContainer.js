@@ -75,13 +75,13 @@ const SwipeContainer = ({
     }, ANIMATION_MS);
   }, [onDateChange]);
 
-  const applyDrag = (dx) => {
+  const applyDrag = useCallback((dx) => {
     let next = dx;
     if ((dx > 0 && !canGoPrevRef.current) || (dx < 0 && !canGoNextRef.current)) {
       next = dx * 0.18;
     }
     setOffset(next, false);
-  };
+  }, []);
 
   useEffect(() => {
     const node = surfaceRef.current;
@@ -174,7 +174,7 @@ const SwipeContainer = ({
       node.removeEventListener('touchcancel', onTouchEnd);
       node.removeEventListener('mousedown', onMouseDown);
     };
-  }, [navigate]);
+  }, [navigate, applyDrag]);
 
   const hintOpacity = Math.min(1, Math.abs(dragX) / SWIPE_THRESHOLD);
   const showLeft = dragX > 12 && canGoPrev;
