@@ -46,20 +46,8 @@ const BottomNav = ({ userRole, currentView, onNavigate }) => {
         ) : (
           <button
             onClick={() => {
-              if (currentView === 'dashboard') {
-                const myClassesSection = document.getElementById('my-classes-section');
-                if (myClassesSection) {
-                  myClassesSection.scrollIntoView({ behavior: 'smooth' });
-                }
-              } else {
-                onNavigate('dashboard');
-                setTimeout(() => {
-                  const myClassesSection = document.getElementById('my-classes-section');
-                  if (myClassesSection) {
-                    myClassesSection.scrollIntoView({ behavior: 'smooth' });
-                  }
-                }, 100);
-              }
+              onNavigate('myClasses');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
             className="flex flex-col items-center justify-center flex-1 py-2"
             style={navColor(currentView === 'myClasses')}

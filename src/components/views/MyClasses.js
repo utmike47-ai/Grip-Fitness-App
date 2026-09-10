@@ -1,325 +1,222 @@
-import React, { useMemo } from 'react';
-import { TIME_SLOTS } from '../../utils/constants';
+import React, { useMemo, useState } from 'react';
+import { Check, ChevronDown } from 'lucide-react';
+import Header from '../Header';
+import { TIME_SLOTS, normalizeTimeSlotValue } from '../../utils/constants';
+import { getWorkoutMeta, startOfDay } from '../../utils/dates';
+import { calculateStreak, getWeekStartMonday, isOnFire } from '../../utils/streakCalculation';
 
-const MyClasses = ({ user, events, registrations, onBack, onSelectEvent, onCancelRegistration }) => {
-    const formatTimeDisplay = (time24) => {
-        // Remove seconds if present
-        const timeWithoutSeconds = time24?.split(':').slice(0, 2).join(':');
-        const timeSlot = TIME_SLOTS.find(slot => slot.value === timeWithoutSeconds);
-        return timeSlot ? timeSlot.display : time24;
-      };
-      
-      const getUserRegistrations = () => {
-    if (!user) return [];
-    return registrations
-      .filter(reg => reg.user_id === user.id)
-      .map(reg => {
-        const event = events.find(e => e.id === reg.event_id);
-        return { ...reg, event };
-      })
-      .filter(reg => reg.event)
-      .sort((a, b) => new Date(a.event.date + ' ' + a.event.time) - new Date(b.event.date + ' ' + b.event.time));
-  };
+const WEEK_TARGET = 5;
+const eventDateKey = (event) => String(event?.date || '').slice(0, 10);
 
-  
+const formatTimeDisplay = (time24) => {
+  const normalized = normalizeTimeSlotValue(time24);
+  const timeSlot = TIME_SLOTS.find((slot) => slot.value === normalized);
+  return timeSlot ? timeSlot.display : (normalized || time24);
+};
 
-  const userRegs = getUserRegistrations();
-  const upcomingRegs = userRegs.filter(reg => new Date(reg.event.date) >= new Date());
-  const pastRegs = userRegs.filter(reg => new Date(reg.event.date) < new Date());
+const eventDateTime = (event) => {
+  const dateKey = eventDateKey(event);
+  const time = normalizeTimeSlotValue(event?.time) || '00:00';
+  if (!dateKey) return null;
+  return new Date(`${dateKey}T${time}:00`);
+};
 
-  // Calculate Quick Stats - memoized to recalculate when registrations or events change
-  // Only counts PAST events (date <= today) for the logged-in user
-  const stats = useMemo(() => {
-    if (!user || !registrations || !events) {
-      return {
-        classesThisWeek: 0,
-        classesThisMonth: 0,
-        streak: 0
-      };
-    }
+const formatDayDate = (event) => {
+  const dateKey = eventDateKey(event);
+  if (!dateKey) return '';
+  return new Date(`${dateKey}T12:00:00`).toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'short',
+    day: 'numeric',
+  }).replace(',', ' ·');
+};
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    // Step 1: Filter registrations by current user
-    const userRegistrations = registrations.filter(reg => reg.user_id === user.id);
-    
-    if (userRegistrations.length === 0) {
-      return {
-        classesThisWeek: 0,
-        classesThisMonth: 0,
-        streak: 0
-      };
-    }
-
-    // Step 2: Map to events and filter out invalid/missing events
-    const userRegsWithEvents = userRegistrations
-      .map(reg => {
-        const event = events.find(e => e.id === reg.event_id);
-        return event ? { ...reg, event } : null;
-      })
-      .filter(reg => reg !== null && reg.event);
-
-    // Step 3: Filter to only PAST events (date <= today)
-    const pastRegistrations = userRegsWithEvents.filter(reg => {
-      const eventDate = new Date(reg.event.date + 'T00:00:00'); // Parse date string properly
-      eventDate.setHours(0, 0, 0, 0);
-      return eventDate <= today;
-    });
-
-    if (pastRegistrations.length === 0) {
-      return {
-        classesThisWeek: 0,
-        classesThisMonth: 0,
-        streak: 0
-      };
-    }
-
-    // 1. My Classes This Week (Monday-Sunday, past only)
-    const getWeekStart = (date) => {
-      const d = new Date(date);
-      const day = d.getDay();
-      const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Monday = start of week
-      const weekStart = new Date(d);
-      weekStart.setDate(diff);
-      return weekStart;
-    };
-    
-    const weekStart = getWeekStart(today);
-    weekStart.setHours(0, 0, 0, 0);
-    const weekEnd = new Date(weekStart);
-    weekEnd.setDate(weekEnd.getDate() + 6);
-    weekEnd.setHours(23, 59, 59, 999);
-    
-    const classesThisWeek = pastRegistrations.filter(reg => {
-      const eventDate = new Date(reg.event.date + 'T00:00:00');
-      eventDate.setHours(0, 0, 0, 0);
-      return eventDate >= weekStart && eventDate <= weekEnd && eventDate <= today;
-    }).length;
-
-    // 2. My Classes This Month (past only)
-    const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
-    monthStart.setHours(0, 0, 0, 0);
-    const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-    monthEnd.setHours(23, 59, 59, 999);
-    
-    const classesThisMonth = pastRegistrations.filter(reg => {
-      const eventDate = new Date(reg.event.date + 'T00:00:00');
-      eventDate.setHours(0, 0, 0, 0);
-      return eventDate >= monthStart && eventDate <= monthEnd && eventDate <= today;
-    }).length;
-
-    // 3. Current Streak - consecutive days going backwards from today
-    // Get unique dates (YYYY-MM-DD format) when user had registrations
-    const registrationDates = new Set(
-      pastRegistrations.map(reg => {
-        const eventDate = new Date(reg.event.date + 'T00:00:00');
-        eventDate.setHours(0, 0, 0, 0);
-        return eventDate.toISOString().split('T')[0]; // Use YYYY-MM-DD format
-      })
-    );
-
-    let streak = 0;
-    let checkDate = new Date(today);
-    checkDate.setHours(0, 0, 0, 0);
-    
-    // Check backwards from today, counting consecutive days with registrations
-    // Streak breaks if we hit a day with no registration
-    while (true) {
-      const dateString = checkDate.toISOString().split('T')[0];
-      if (registrationDates.has(dateString)) {
-        streak++;
-        checkDate.setDate(checkDate.getDate() - 1);
-      } else {
-        // No registration for this day - streak breaks
-        break;
-      }
-      
-      // Safety check to prevent infinite loop (max 365 days back)
-      const daysAgo = Math.floor((today.getTime() - checkDate.getTime()) / (1000 * 60 * 60 * 24));
-      if (daysAgo > 365) {
-        break;
-      }
-    }
-
-    return {
-      classesThisWeek,
-      classesThisMonth,
-      streak
-    };
-  }, [user, registrations, events]);
+const ClassCard = ({ registration, variant, onCancel }) => {
+  const event = registration.event;
+  const timeLabel = formatTimeDisplay(event.time);
+  const meta = getWorkoutMeta(event.details, event.type);
+  const isPast = variant === 'past';
 
   return (
-    <div className="min-h-screen bg-grip-light pb-20">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b border-grip-secondary">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center">
-            <button
-              onClick={onBack}
-              className="mr-4 text-grip-accent hover:text-grip-primary transition-colors"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-            <h1 className="text-2xl font-montserrat font-bold text-grip-primary">
-              My Classes
-            </h1>
+    <article className={`my-class-card ${isPast ? 'my-class-card--past' : ''}`}>
+      {isPast && (
+        <span className="my-class-card__badge" aria-hidden="true">
+          <Check size={14} strokeWidth={3} />
+        </span>
+      )}
+      <p className="my-class-card__when">{formatDayDate(event)}</p>
+      <h3 className="my-class-card__title">{event.title}</h3>
+      <p className="my-class-card__meta">
+        {timeLabel} · {meta}
+      </p>
+      {!isPast && (
+        <button
+          type="button"
+          className="my-class-card__cancel"
+          onClick={() => onCancel?.(event.id)}
+        >
+          Cancel Registration
+        </button>
+      )}
+    </article>
+  );
+};
+
+const MyClasses = ({
+  user,
+  events,
+  registrations,
+  onBack,
+  onViewChange,
+  onCancelRegistration,
+  showToast,
+}) => {
+  const [historyOpen, setHistoryOpen] = useState(false);
+
+  const userRegs = useMemo(() => {
+    if (!user) return [];
+    return (registrations || [])
+      .filter((reg) => String(reg.user_id) === String(user.id) && !reg.is_drop_in)
+      .map((reg) => {
+        const event = (events || []).find((item) => String(item.id) === String(reg.event_id));
+        return { ...reg, event };
+      })
+      .filter((reg) => reg.event)
+      .sort((a, b) => {
+        const aKey = `${eventDateKey(a.event)} ${normalizeTimeSlotValue(a.event.time)}`;
+        const bKey = `${eventDateKey(b.event)} ${normalizeTimeSlotValue(b.event.time)}`;
+        return aKey.localeCompare(bKey);
+      });
+  }, [user, events, registrations]);
+
+  const { upcomingRegs, pastRegs } = useMemo(() => {
+    const now = new Date();
+    const upcoming = [];
+    const past = [];
+
+    userRegs.forEach((reg) => {
+      const when = eventDateTime(reg.event);
+      if (when && when >= now) {
+        upcoming.push(reg);
+      } else {
+        past.push(reg);
+      }
+    });
+
+    return {
+      upcomingRegs: upcoming,
+      pastRegs: [...past].reverse(),
+    };
+  }, [userRegs]);
+
+  const streak = useMemo(
+    () => calculateStreak(user?.id, getWeekStartMonday(startOfDay(new Date())), registrations, events),
+    [user, registrations, events]
+  );
+  const remaining = Math.max(0, WEEK_TARGET - streak);
+  const onFire = isOnFire(streak);
+
+  const handleAllTimeStats = () => {
+    showToast?.('All Time Stats coming soon', 'success');
+  };
+
+  return (
+    <div className="app-shell">
+      <div className="app-shell__inner">
+        <Header
+          user={user}
+          title="My Classes"
+          onAvatarClick={() => onViewChange?.('profileEdit')}
+        />
+
+        <section className="my-classes-streak" aria-label="This week streak">
+          {onFire && <span className="my-classes-streak__fire" aria-hidden="true">🔥</span>}
+          <p className="my-classes-streak__label">This Week</p>
+          <p className="my-classes-streak__count">{streak}/{WEEK_TARGET}</p>
+          <div className="my-classes-streak__bar" aria-hidden="true">
+            <span
+              className="my-classes-streak__fill"
+              style={{ width: `${(Math.min(streak, WEEK_TARGET) / WEEK_TARGET) * 100}%` }}
+            />
           </div>
+          <p className="my-classes-streak__sub">
+            {remaining} {remaining === 1 ? 'class' : 'classes'} remaining this week
+          </p>
+        </section>
+
+        <div className="my-classes-actions">
+          <button
+            type="button"
+            className="my-classes-actions__btn my-classes-actions__btn--primary"
+            onClick={onBack}
+          >
+            View Schedule
+          </button>
+          <button
+            type="button"
+            className="my-classes-actions__btn"
+            onClick={handleAllTimeStats}
+          >
+            All Time Stats
+          </button>
         </div>
-      </div>
 
-      {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        {/* Quick Stats Section */}
-        {userRegs.length > 0 && (
-          <div className="mb-8 bg-white rounded-2xl shadow-lg p-6">
-            <h2 className="text-xl font-montserrat font-bold text-grip-primary mb-4">
-              Quick Stats
-            </h2>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                <span className="text-gray-700 font-semibold">My Classes This Week</span>
-                <span className="text-2xl font-bold text-grip-primary">{stats.classesThisWeek}</span>
-              </div>
-              <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                <span className="text-gray-700 font-semibold">My Classes This Month</span>
-                <span className="text-2xl font-bold text-grip-primary">{stats.classesThisMonth}</span>
-              </div>
-              <div className="flex justify-between items-center py-2">
-                <span className="text-gray-700 font-semibold">Current Streak</span>
-                <span className="text-2xl font-bold text-grip-primary">
-                  🔥 {stats.streak} {stats.streak === 1 ? 'day' : 'days'}
-                </span>
-              </div>
+        <section className="my-classes-section">
+          <h2 className="my-classes-section__title">Upcoming</h2>
+          {upcomingRegs.length === 0 ? (
+            <div className="my-classes-empty">
+              <p className="my-classes-empty__title">No upcoming classes</p>
+              <p className="my-classes-empty__copy">Jump back to the schedule to register.</p>
+              <button type="button" className="my-classes-empty__btn" onClick={onBack}>
+                Browse Classes
+              </button>
             </div>
-          </div>
-        )}
+          ) : (
+            <div className="my-classes-list">
+              {upcomingRegs.map((reg) => (
+                <ClassCard
+                  key={reg.id}
+                  registration={reg}
+                  variant="upcoming"
+                  onCancel={onCancelRegistration}
+                />
+              ))}
+            </div>
+          )}
+        </section>
 
-        {userRegs.length === 0 ? (
-          <div className="text-center py-16 bg-white rounded-2xl shadow-lg">
-            <span className="text-6xl block mb-4">💪</span>
-            <p className="text-xl font-semibold text-grip-primary">No classes registered yet!</p>
-            <p className="text-gray-500 mt-2">Head back to find and register for workouts</p>
+        {pastRegs.length > 0 && (
+          <section className="my-classes-section">
             <button
-              onClick={onBack}
-              className="mt-6 bg-grip-primary text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-all"
+              type="button"
+              className="my-classes-history-toggle"
+              onClick={() => setHistoryOpen((open) => !open)}
+              aria-expanded={historyOpen}
             >
-              Browse Classes
+              <h2 className="my-classes-section__title">History</h2>
+              <span className="my-classes-history-toggle__meta">
+                {pastRegs.length}
+                <ChevronDown
+                  className={`my-classes-history-toggle__chevron ${historyOpen ? 'is-open' : ''}`}
+                  size={18}
+                  aria-hidden="true"
+                />
+              </span>
             </button>
-          </div>
-        ) : (
-          <div className="space-y-8">
-            {/* Upcoming Classes */}
-            {upcomingRegs.length > 0 && (
-              <div>
-                <h2 className="text-xl font-montserrat font-bold text-grip-primary mb-4">
-                  Upcoming Classes ({upcomingRegs.length})
-                </h2>
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {upcomingRegs.map(reg => (
-                    <div key={reg.id} className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all">
-                      <div className="flex justify-between items-start mb-3">
-                        <h3 className="font-bold text-lg text-grip-primary">
-                          {reg.event.title}
-                        </h3>
-                        <span className={`px-3 py-1 rounded-full text-xs font-semibold
-                          ${reg.event.type === 'workout' 
-                            ? 'bg-grip-primary text-white' 
-                            : 'bg-green-100 text-green-800'}`}
-                        >
-                          {reg.event.type.toUpperCase()}
-                        </span>
-                      </div>
-                      
-                      <div className="space-y-2 mb-4">
-                        <p className="text-sm text-gray-600">
-                          📅 {new Date(reg.event.date + 'T12:00:00').toLocaleDateString('en-US', { 
-                            weekday: 'short', 
-                            month: 'short', 
-                            day: 'numeric' 
-                          })}
-                        </p>
-                        <p className="text-sm text-gray-600">
-                          ⏰ {formatTimeDisplay(reg.event.time)}
-                        </p>
-                      </div>
-                      
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => onSelectEvent(reg.event)}
-                          className="flex-1 bg-grip-secondary text-grip-primary py-2 rounded-lg text-sm font-semibold hover:bg-grip-secondary/70 transition-all"
-                        >
-                          Notes
-                        </button>
-                        <button
-                          onClick={() => onCancelRegistration?.(reg.event.id)}
-                          className="flex-1 bg-grip-accent text-white py-2 rounded-lg text-sm font-semibold hover:shadow-lg transition-all"
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+            {historyOpen && (
+              <div className="my-classes-list">
+                {pastRegs.map((reg) => (
+                  <ClassCard
+                    key={reg.id}
+                    registration={reg}
+                    variant="past"
+                  />
+                ))}
               </div>
             )}
-
-            {/* Past Classes */}
-            {pastRegs.length > 0 && (
-              <div>
-                <h2 className="text-xl font-montserrat font-bold text-grip-primary mb-4">
-                  Past Classes ({pastRegs.length})
-                </h2>
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {pastRegs.map(reg => (
-                    <div key={reg.id} className="bg-white rounded-xl shadow-lg p-6 opacity-75">
-                      <h3 className="font-bold text-lg text-gray-600 mb-2">
-                        {reg.event.title}
-                      </h3>
-                      <p className="text-sm text-gray-500">
-                        {new Date(reg.event.date + 'T12:00:00').toLocaleDateString('en-US', { 
-                          month: 'short', 
-                          day: 'numeric',
-                          year: 'numeric'
-                        })}
-                      </p>
-                      <button
-                        onClick={() => onSelectEvent(reg.event)}
-                        className="mt-3 w-full bg-gray-200 text-gray-700 py-2 rounded-lg text-sm font-semibold hover:bg-gray-300 transition-all"
-                      >
-                        View Notes
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
+          </section>
         )}
       </div>
-      {/* Bottom Navigation */}
-<div className="fixed bottom-0 left-0 right-0 bg-white border-t border-grip-secondary">
-  <div className="max-w-md mx-auto px-4 py-2">
-    <div className="flex justify-around">
-      <button
-        onClick={onBack}
-        className="flex flex-col items-center py-2 px-4 text-gray-600 hover:text-grip-primary"
-      >
-        <span className="text-xl mb-1">🏠</span>
-        <span className="text-xs font-semibold">Home</span>
-      </button>
-      
-      <button
-        className="flex flex-col items-center py-2 px-4 text-grip-primary"
-      >
-        <span className="text-xl mb-1">💪</span>
-        <span className="text-xs font-semibold">My Classes</span>
-      </button>
-    </div>
-  </div>
-</div>
     </div>
   );
 };

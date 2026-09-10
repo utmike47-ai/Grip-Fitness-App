@@ -1,7 +1,7 @@
 import React from 'react';
 import { getGreeting } from '../utils/dates';
 
-const Header = ({ user, onAvatarClick }) => {
+const Header = ({ user, title, onAvatarClick }) => {
   const firstName = (
     user?.user_metadata?.first_name ||
     user?.email?.split('@')[0] ||
@@ -19,7 +19,11 @@ const Header = ({ user, onAvatarClick }) => {
         <div className="app-header__copy">
           <p className="app-header__logo">Grip Fitness</p>
           <h1 className="app-header__greeting">
-            {getGreeting()}, <span className="app-header__name">{firstName}</span>
+            {title || (
+              <>
+                {getGreeting()}, <span className="app-header__name">{firstName}</span>
+              </>
+            )}
           </h1>
         </div>
         <button

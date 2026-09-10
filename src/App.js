@@ -237,7 +237,8 @@ function App() {
       const { data, error } = await supabase
         .from('events')
         .select('*')
-        .order('date', { ascending: true });
+        .order('date', { ascending: true })
+        .limit(5000);
       
       if (error) throw error;
       setEvents(data || []);
@@ -357,7 +358,7 @@ function App() {
 
   // Backup refresh to ensure registrations display
   useEffect(() => {
-    if (currentView === 'dashboard' || currentView === 'dayView') {
+    if (currentView === 'dashboard' || currentView === 'dayView' || currentView === 'myClasses') {
       const timer = setTimeout(() => {
         fetchRegistrations();
       }, 2000);
@@ -1099,11 +1100,9 @@ function App() {
           events={events}
           registrations={registrations}
           onBack={() => setCurrentView('dashboard')}
-          onSelectEvent={(event) => {
-            setSelectedEvent(event);
-            setCurrentView('notes');
-          }}
+          onViewChange={setCurrentView}
           onCancelRegistration={cancelRegistration}
+          showToast={showToast}
         />;
       
       case 'notes':
@@ -1111,7 +1110,7 @@ function App() {
           selectedEvent={selectedEvent}
           userNotes={userNotes}
           user={user}
-          onBack={() => setCurrentView('dashboard')}
+          onBack={() => setCurrentView('myClasses')}
           onSaveNote={saveNote}
         />;
 
