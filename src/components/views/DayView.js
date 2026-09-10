@@ -426,44 +426,51 @@ const DayView = ({
   }, [dateStr]);
 
   useEffect(() => {
-    const fetchStudents = async () => {
+    if (!isCoach || !addStudentModal.isOpen) return undefined;
+
+    let cancelled = false;
+    const handle = setTimeout(async () => {
+      setStudentsLoading(true);
+      const query = studentSearch.trim().replace(/[%_,.()]/g, '');
+
       try {
-        setStudentsLoading(true);
-        const { data, error } = await supabase
+        let request = supabase
           .from('profiles')
           .select('id, first_name, last_name')
-          .eq('role', 'student');
+          .order('last_name', { ascending: true })
+          .limit(25);
+
+        if (query) {
+          request = request.or(`first_name.ilike.%${query}%,last_name.ilike.%${query}%`);
+        }
+
+        const { data, error } = await request;
+        if (cancelled) return;
 
         if (error) {
           console.error('Failed to load students:', error);
+          setAllStudents([]);
           return;
         }
 
         setAllStudents(data || []);
       } catch (error) {
-        console.error('Unexpected error fetching students:', error);
+        if (!cancelled) {
+          console.error('Unexpected error fetching students:', error);
+          setAllStudents([]);
+        }
       } finally {
-        setStudentsLoading(false);
+        if (!cancelled) setStudentsLoading(false);
       }
+    }, 250);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(handle);
     };
+  }, [isCoach, addStudentModal.isOpen, studentSearch]);
 
-    if (isCoach && addStudentModal.isOpen && allStudents.length === 0) {
-      fetchStudents();
-    }
-  }, [isCoach, addStudentModal.isOpen, allStudents.length]);
-
-  const filteredStudents = useMemo(() => {
-    const query = studentSearch.trim().toLowerCase();
-    if (!query) {
-      return allStudents.slice(0, 10);
-    }
-    return allStudents
-      .filter((student) => {
-        const name = `${student.first_name || ''} ${student.last_name || ''}`.trim().toLowerCase();
-        return name.includes(query);
-      })
-      .slice(0, 10);
-  }, [allStudents, studentSearch]);
+  const filteredStudents = allStudents;
 
   const closeAddStudentModal = useCallback(() => {
     setAddStudentModal({ isOpen: false, group: null, selectedTimeId: null });
