@@ -13,7 +13,6 @@ const DayView = ({
   selectedDate, 
   events, 
   registrations, 
-  attendance = [],
   user,
   embedded = false,
   onBack,
@@ -643,7 +642,7 @@ const DayView = ({
                     members={withMemberStreaks(
                       timeSlot.registeredUsers,
                       weekStart,
-                      attendance,
+                      registrations,
                       events
                     )}
                     userRegistered={timeSlot.userRegistered}
