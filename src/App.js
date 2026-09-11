@@ -5,6 +5,7 @@ import LoginScreen from './components/views/LoginScreen';
 import Dashboard from './components/views/Dashboard';
 import CreateEvent from './components/views/CreateEvent';
 import MyClasses from './components/views/MyClasses';
+import AllTimeStats from './components/views/AllTimeStats';
 import NotesView from './components/views/NotesView';
 import ProfileEdit from './components/views/ProfileEdit';
 import AdminDashboard from './components/views/AdminDashboard';
@@ -334,7 +335,7 @@ function App() {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, first_name, last_name, role')
+        .select('id, first_name, last_name, role, created_at')
         .order('last_name', { ascending: true });
       
       if (error) throw error;
@@ -358,7 +359,7 @@ function App() {
 
   // Backup refresh to ensure registrations display
   useEffect(() => {
-    if (currentView === 'dashboard' || currentView === 'dayView' || currentView === 'myClasses') {
+    if (currentView === 'dashboard' || currentView === 'dayView' || currentView === 'myClasses' || currentView === 'allTimeStats') {
       const timer = setTimeout(() => {
         fetchRegistrations();
       }, 2000);
@@ -1102,8 +1103,19 @@ function App() {
           onBack={() => setCurrentView('dashboard')}
           onViewChange={setCurrentView}
           onCancelRegistration={cancelRegistration}
-          showToast={showToast}
         />;
+
+      case 'allTimeStats':
+        return (
+          <AllTimeStats
+            user={user}
+            events={events}
+            registrations={registrations}
+            profiles={profiles}
+            onBack={() => setCurrentView('myClasses')}
+            onViewChange={setCurrentView}
+          />
+        );
       
       case 'notes':
         return <NotesView 

@@ -69,7 +69,6 @@ const MyClasses = ({
   onBack,
   onViewChange,
   onCancelRegistration,
-  showToast,
 }) => {
   const [historyOpen, setHistoryOpen] = useState(false);
 
@@ -117,7 +116,7 @@ const MyClasses = ({
   const onFire = isOnFire(streak);
 
   const handleAllTimeStats = () => {
-    showToast?.('All Time Stats coming soon', 'success');
+    onViewChange?.('allTimeStats');
   };
 
   return (

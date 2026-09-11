@@ -25,8 +25,24 @@
   gap: 16px;
 }
 
+.app-header__back {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  margin-left: -8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
 .app-header__copy {
   min-width: 0;
+  flex: 1;
 }
 
 .app-header__logo {
@@ -1063,4 +1079,296 @@
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
+}
+
+.stats-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  min-height: 36px;
+  margin-bottom: 22px;
+}
+
+.stats-topbar__back {
+  position: absolute;
+  left: -8px;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: transparent;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.stats-topbar__title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+}
+
+.stats-hero-row {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.stats-hero-row__value {
+  margin: 0;
+  font-size: 36px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.stats-hero-row__label {
+  margin: 6px 0 0;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.stats-rank {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  margin-bottom: 22px;
+  border-radius: 16px;
+  background: var(--bg-card);
+}
+
+.stats-rank__badge {
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.stats-rank__title {
+  margin: 0 0 4px;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.stats-rank__copy {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--text-secondary);
+}
+
+.stats-section-title {
+  margin: 0 0 12px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.stats-activity {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.stats-activity__card {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.stats-activity__card svg {
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.stats-activity__value {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.stats-activity__value--text {
+  font-size: 22px;
+}
+
+.stats-activity__label {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.stats-activity__meta {
+  margin: 8px 0 0;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.stats-activity__meta.is-up {
+  color: #4CAF50;
+}
+
+.stats-records {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 22px;
+}
+
+.stats-record {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: var(--bg-card);
+}
+
+.stats-record__icon {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(184, 100, 80, 0.18);
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.stats-record__copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.stats-record__copy p {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.stats-record__copy span {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.stats-record strong {
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.stats-weeks {
+  margin-bottom: 28px;
+}
+
+.stats-weeks__sub {
+  display: flex;
+  justify-content: space-between;
+  margin: -4px 0 12px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.stats-weeks__row {
+  display: grid;
+  grid-template-columns: 64px repeat(5, 1fr) 42px;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.stats-weeks__row--labels {
+  margin-bottom: 8px;
+}
+
+.stats-weeks__row--labels span {
+  text-align: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.stats-weeks__label,
+.stats-weeks__score {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.stats-weeks__score {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.stats-weeks__dot {
+  width: 22px;
+  height: 22px;
+  margin: 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.16);
+  background: transparent;
+  color: #fff;
+}
+
+.stats-weeks__dot.is-active {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+.stats-weeks__dot.is-future {
+  opacity: 0.35;
+}
+
+.stats-since {
+  text-align: center;
+  padding-bottom: 8px;
+}
+
+.stats-since__label {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.stats-since__date {
+  margin: 8px 0 0;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.stats-since__tenure {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: var(--text-secondary);
 }

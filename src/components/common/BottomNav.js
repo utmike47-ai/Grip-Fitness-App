@@ -8,6 +8,11 @@ const BottomNav = ({ userRole, currentView, onNavigate }) => {
   const isCoach = userRole === 'coach' || userRole === 'admin';
   const isAdmin = userRole === 'admin';
 
+  const go = (view) => {
+    onNavigate(view);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <div
       className="fixed bottom-0 left-0 right-0 z-40 border-t"
@@ -18,10 +23,7 @@ const BottomNav = ({ userRole, currentView, onNavigate }) => {
     >
       <div className="flex justify-around items-center h-16 max-w-lg mx-auto">
         <button
-          onClick={() => {
-            onNavigate('dashboard');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }}
+          onClick={() => go('dashboard')}
           className="flex flex-col items-center justify-center flex-1 py-2"
           style={navColor(currentView === 'dashboard')}
         >
@@ -32,9 +34,21 @@ const BottomNav = ({ userRole, currentView, onNavigate }) => {
           <span className="text-xs">Home</span>
         </button>
 
-        {isCoach ? (
+        <button
+          onClick={() => go('myClasses')}
+          className="flex flex-col items-center justify-center flex-1 py-2"
+          style={navColor(currentView === 'myClasses' || currentView === 'allTimeStats')}
+        >
+          <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+              d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+          </svg>
+          <span className="text-xs">My Classes</span>
+        </button>
+
+        {isCoach && (
           <button
-            onClick={() => onNavigate('createEvent')}
+            onClick={() => go('createEvent')}
             className="flex flex-col items-center justify-center flex-1 py-2"
             style={navColor(currentView === 'createEvent')}
           >
@@ -43,29 +57,11 @@ const BottomNav = ({ userRole, currentView, onNavigate }) => {
             </svg>
             <span className="text-xs">Create</span>
           </button>
-        ) : (
-          <button
-            onClick={() => {
-              onNavigate('myClasses');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
-            className="flex flex-col items-center justify-center flex-1 py-2"
-            style={navColor(currentView === 'myClasses')}
-          >
-            <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-            </svg>
-            <span className="text-xs">My Classes</span>
-          </button>
         )}
 
         {isAdmin && (
           <button
-            onClick={() => {
-              onNavigate('adminDashboard');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
+            onClick={() => go('adminDashboard')}
             className="flex flex-col items-center justify-center flex-1 py-2"
             style={navColor(currentView === 'adminDashboard')}
           >
