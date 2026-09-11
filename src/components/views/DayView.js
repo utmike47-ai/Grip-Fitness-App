@@ -445,6 +445,13 @@ const DayView = ({
         }
 
         const { data, error } = await request;
+        console.log('[Add Member search]', {
+          query,
+          orFilter: query ? `first_name.ilike.%${query}%,last_name.ilike.%${query}%` : null,
+          error,
+          count: data?.length ?? 0,
+          rows: data,
+        });
         if (cancelled) return;
 
         if (error) {
@@ -720,7 +727,7 @@ const DayView = ({
             role="dialog"
             aria-modal="true"
             aria-labelledby="day-view-notes-title"
-            className={`bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 sm:p-8 transition-all duration-200 transform ${
+            className={`bg-white text-gray-800 rounded-2xl shadow-2xl w-full max-w-lg p-6 sm:p-8 transition-all duration-200 transform ${
               modalActive ? 'scale-100 translate-y-0' : 'scale-95 -translate-y-4'
             } max-h-[90vh] overflow-y-auto flex flex-col`}
           >
@@ -820,7 +827,7 @@ const DayView = ({
 
       {removeModal.isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6 bg-black/60">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 transition-all">
+          <div className="bg-white text-gray-800 rounded-2xl shadow-2xl w-full max-w-md p-6 transition-all">
             <h2 className="text-xl font-montserrat font-bold text-grip-primary mb-2">
               {removeModal.isDropIn ? 'Remove Drop-In' : 'Remove Student'}
             </h2>
@@ -854,7 +861,7 @@ const DayView = ({
           ref={addModalContainerRef}
           className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6 bg-black/60"
         >
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 sm:p-8 max-h-[90vh] overflow-y-auto">
+          <div className="bg-white text-gray-800 rounded-2xl shadow-2xl w-full max-w-lg p-6 sm:p-8 max-h-[90vh] overflow-y-auto">
             <div className="flex items-start justify-between mb-4">
               <h2 className="text-2xl font-montserrat font-bold text-grip-primary">Add Member to Class</h2>
               <button
@@ -930,7 +937,7 @@ const DayView = ({
                             type="button"
                             onClick={() => setSelectedStudentId(studentId)}
                             className={`w-full text-left px-4 py-3 text-sm ${
-                              isSelected ? 'bg-grip-primary text-white' : 'hover:bg-grip-secondary/20'
+                              isSelected ? 'bg-grip-primary text-white' : 'text-gray-800 hover:bg-grip-secondary/20'
                             }`}
                           >
                             {name || 'Unnamed Student'}
@@ -981,7 +988,7 @@ const DayView = ({
           ref={dropInModalContainerRef}
           className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6 bg-black/60"
         >
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 sm:p-8 max-h-[90vh] overflow-y-auto">
+          <div className="bg-white text-gray-800 rounded-2xl shadow-2xl w-full max-w-lg p-6 sm:p-8 max-h-[90vh] overflow-y-auto">
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center gap-2">
                 <div className="w-10 h-10 rounded-full bg-cyan-100 flex items-center justify-center">
@@ -1160,7 +1167,7 @@ const DayView = ({
           ref={cancelClassModalRef}
           className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6 bg-black/60"
         >
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 sm:p-8">
+          <div className="bg-white text-gray-800 rounded-2xl shadow-2xl w-full max-w-md p-6 sm:p-8">
             <h2 className="text-2xl font-montserrat font-bold text-grip-primary mb-4">
               Cancel {formatTimeDisplay(cancelClassModal.timeSlot.time)} Class?
             </h2>
