@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Header from '../Header';
 import { TIME_SLOTS, normalizeTimeSlotValue } from '../../utils/constants';
 
 function buildEditFormState(existingEvent, initialSelectedTimes) {
@@ -27,6 +28,7 @@ const CreateEvent = ({
   user,
   onBack,
   onCreateEvent,
+  onViewChange,
   editMode = false,
   existingEvent = null,
   initialSelectedTimes = null
@@ -94,96 +96,76 @@ const CreateEvent = ({
   };
 
   return (
-    <div className="min-h-screen bg-grip-light pb-20">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b border-grip-secondary">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <h1 className="text-2xl font-montserrat font-bold text-grip-primary">
-            {editMode ? 'Edit Event' : 'Create Event'}
-          </h1>
-        </div>
-      </div>
+    <div className="app-shell">
+      <div className="app-shell__inner">
+        <Header
+          user={user}
+          title={(
+            <>
+              {editMode ? 'EDIT' : 'CREATE'} <span className="app-header__name">EVENT</span>
+            </>
+          )}
+          onAvatarClick={() => onViewChange?.('profileEdit')}
+        />
 
-      {/* Form */}
-      <div className="max-w-3xl mx-auto px-4 py-6">
-        <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-lg p-8">
-          {/* Event Type */}
-          <div className="mb-6">
-            <label className="block text-sm font-semibold text-grip-primary mb-3">
-              Event Type
-            </label>
-            <div className="flex gap-4">
+        <form className="create-event" onSubmit={handleSubmit}>
+          <div className="create-event__field">
+            <p className="create-event__label">Event Type</p>
+            <div className="create-event__types">
               <button
                 type="button"
-                onClick={() => setEventData(prev => ({ ...prev, type: 'workout' }))}
-                className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-all
-                  ${eventData.type === 'workout'
-                    ? 'bg-grip-primary text-white'
-                    : 'bg-grip-secondary text-grip-primary hover:bg-grip-secondary/70'}`}
+                className={`create-event__choice${eventData.type === 'workout' ? ' is-selected' : ''}`}
+                onClick={() => setEventData((prev) => ({ ...prev, type: 'workout' }))}
               >
                 💪 Workout
               </button>
               <button
                 type="button"
-                onClick={() => setEventData(prev => ({ ...prev, type: 'social' }))}
-                className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-all
-                  ${eventData.type === 'social'
-                    ? 'bg-green-600 text-white'
-                    : 'bg-green-100 text-green-800 hover:bg-green-200'}`}
+                className={`create-event__choice${eventData.type === 'social' ? ' is-selected' : ''}`}
+                onClick={() => setEventData((prev) => ({ ...prev, type: 'social' }))}
               >
                 🎉 Social Event
               </button>
             </div>
           </div>
 
-          {/* Title */}
-          <div className="mb-6">
-            <label className="block text-sm font-semibold text-grip-primary mb-2">
-              Event Title *
-            </label>
+          <label className="create-event__field">
+            <span className="create-event__label">Event Title *</span>
             <input
               type="text"
+              className="create-event__input"
               value={eventData.title}
-              onChange={(e) => setEventData(prev => ({ ...prev, title: e.target.value }))}
+              onChange={(e) => setEventData((prev) => ({ ...prev, title: e.target.value }))}
               placeholder="e.g., Monday Morning HIIT"
-              className="w-full px-4 py-3 border border-grip-secondary rounded-lg focus:outline-none focus:border-grip-primary transition-colors"
               required
             />
-          </div>
+          </label>
 
-          {/* Date */}
-          <div className="mb-6">
-            <label className="block text-sm font-semibold text-grip-primary mb-2">
-              Date *
-            </label>
+          <label className="create-event__field">
+            <span className="create-event__label">Date *</span>
             <input
               type="date"
+              className="create-event__input create-event__date"
               value={eventData.date}
-              onChange={(e) => setEventData(prev => ({ ...prev, date: e.target.value }))}
-              className="w-full px-4 py-3 border border-grip-secondary rounded-lg focus:outline-none focus:border-grip-primary transition-colors"
+              onChange={(e) => setEventData((prev) => ({ ...prev, date: e.target.value }))}
               required
             />
-          </div>
+          </label>
 
-          {/* Time Slots */}
-          <div className="mb-6">
-            <label className="block text-sm font-semibold text-grip-primary mb-3">
-              Class Times * (Select one or more)
-            </label>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 items-stretch">
-              {TIME_SLOTS.map(slot => (
+          <div className="create-event__field">
+            <p className="create-event__label">Class Times *</p>
+            <p className="create-event__hint">Select one or more</p>
+            <div className="create-event__times">
+              {TIME_SLOTS.map((slot) => (
                 <button
                   key={slot.value}
                   type="button"
+                  className={`create-event__time${isTimeSlotSelected(slot.value) ? ' is-selected' : ''}`}
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
                     toggleTimeSlot(slot.value);
                   }}
-                  className={`relative z-0 min-h-[3rem] py-3 px-4 rounded-lg font-semibold transition-all flex items-center justify-center text-center
-                    ${isTimeSlotSelected(slot.value)
-                      ? 'bg-grip-primary text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
                 >
                   {slot.display}
                 </button>
@@ -191,58 +173,37 @@ const CreateEvent = ({
             </div>
           </div>
 
-          {/* Details */}
-          <div className="mb-6">
-            <label className="block text-sm font-semibold text-grip-primary mb-2">
-              Details (Optional)
-            </label>
+          <label className="create-event__field">
+            <span className="create-event__label">Details (Optional)</span>
             <textarea
+              className="create-event__input create-event__textarea"
               value={eventData.details}
-              onChange={(e) => setEventData(prev => ({ ...prev, details: e.target.value }))}
-              placeholder="Enter workout details (one exercise per line):
-20 min EMOM
-12-15 Heel Raised Goblet Squats
-12 Bike Cals
-12-15 DB Bench press
-20 Sit ups"
-              rows="4"
-              className="w-full px-4 py-3 border border-grip-secondary rounded-lg focus:outline-none focus:border-grip-primary transition-colors resize-none"
+              onChange={(e) => setEventData((prev) => ({ ...prev, details: e.target.value }))}
+              placeholder={`Enter workout details (one exercise per line):\n20 min EMOM\n12-15 Heel Raised Goblet Squats\n12 Bike Cals\n12-15 DB Bench Press`}
+              rows="5"
             />
-          </div>
+          </label>
 
-          {/* Social Event Capacity */}
           {eventData.type === 'social' && (
-            <div className="mb-6">
-              <label className="block text-sm font-semibold text-grip-primary mb-2">
-                Maximum Capacity
-              </label>
+            <label className="create-event__field">
+              <span className="create-event__label">Maximum Capacity</span>
               <input
                 type="number"
+                className="create-event__input"
                 value={eventData.maxCapacity}
-                onChange={(e) => setEventData(prev => ({ ...prev, maxCapacity: parseInt(e.target.value) }))}
+                onChange={(e) => setEventData((prev) => ({ ...prev, maxCapacity: parseInt(e.target.value, 10) }))}
                 min="1"
                 max="100"
-                className="w-full px-4 py-3 border border-grip-secondary rounded-lg focus:outline-none focus:border-grip-primary transition-colors"
               />
-              <p className="text-xs text-gray-500 mt-1">
-                Workouts are automatically limited to 15 participants
-              </p>
-            </div>
+              <span className="create-event__hint">Workouts are automatically limited to 15 participants</span>
+            </label>
           )}
 
-          {/* Submit Buttons */}
-          <div className="flex gap-4">
-            <button
-              type="button"
-              onClick={onBack}
-              className="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-all"
-            >
+          <div className="create-event__actions">
+            <button type="button" className="create-event__btn create-event__btn--ghost" onClick={onBack}>
               Cancel
             </button>
-            <button
-              type="submit"
-              className="flex-1 bg-grip-primary text-white py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all"
-            >
+            <button type="submit" className="create-event__btn create-event__btn--primary">
               {editMode ? 'Update Event' : 'Create Event'}
             </button>
           </div>

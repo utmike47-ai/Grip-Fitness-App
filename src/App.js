@@ -1076,6 +1076,7 @@ function App() {
             user={user}
             onBack={() => setCurrentView('dashboard')}
             onCreateEvent={createEvent}
+            onViewChange={setCurrentView}
           />
         );
 
@@ -1089,6 +1090,7 @@ function App() {
             user={user}
             onBack={() => setCurrentView('dashboard')}
             onCreateEvent={updateEvent}
+            onViewChange={setCurrentView}
             editMode
             existingEvent={editingEvent}
             initialSelectedTimes={editFormSelectedTimes}
