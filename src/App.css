@@ -1296,7 +1296,7 @@
 
 .stats-weeks__row {
   display: grid;
-  grid-template-columns: 64px repeat(5, 1fr) 42px;
+  grid-template-columns: 64px repeat(6, 1fr) 42px;
   align-items: center;
   gap: 6px;
   margin-bottom: 10px;

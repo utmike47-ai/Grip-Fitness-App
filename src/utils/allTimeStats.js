@@ -1,9 +1,9 @@
 import { TIME_SLOTS, normalizeTimeSlotValue } from './constants';
 import { addDays, formatDateKey, startOfDay } from './dates';
-import { getWeekStartMonday } from './streakCalculation';
+import { getWeekStartMonday, WEEK_DAYS } from './streakCalculation';
 
 const WEEK_HIT = 3;
-const PERFECT_WEEK = 5;
+const PERFECT_WEEK = WEEK_DAYS;
 const PERFECT_MONTH = 20;
 const CLASS_MILESTONE = 50;
 const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -72,7 +72,7 @@ function uniqueWeekdayCounts(records) {
   records.forEach((record) => {
     const date = new Date(`${record.date}T12:00:00`);
     const weekday = date.getDay();
-    if (weekday === 0 || weekday === 6) return;
+    if (weekday === 0) return;
     const week = weekStartKey(record.date);
     if (!days[week]) days[week] = new Set();
     days[week].add(record.date);
@@ -155,7 +155,7 @@ export function buildCalendarGrid(records, today = new Date(), weekCount = 6) {
   return Array.from({ length: weekCount }, (_, weekIndex) => {
     const weekStart = addDays(start, weekIndex * 7);
     const weekStartKey = formatDateKey(weekStart);
-    const days = Array.from({ length: 5 }, (_, dayIndex) => {
+    const days = Array.from({ length: WEEK_DAYS }, (_, dayIndex) => {
       const date = addDays(weekStart, dayIndex);
       const key = formatDateKey(date);
       return {

@@ -657,7 +657,8 @@ const DayView = ({
                       timeSlot.registeredUsers,
                       weekStart,
                       registrations,
-                      events
+                      events,
+                      new Date()
                     )}
                     userRegistered={timeSlot.userRegistered}
                     isCoach={isCoach}

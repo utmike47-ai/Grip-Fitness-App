@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { ChevronDown, X } from 'lucide-react';
-import { isOnFire } from '../utils/streakCalculation';
+import { isOnFire, WEEK_DAYS } from '../utils/streakCalculation';
 
 const CLASS_CAPACITY = 15;
 
@@ -17,7 +17,7 @@ const StreakBadge = ({ streak, isDropIn }) => {
   const onFire = isOnFire(value);
   return (
     <span className={`streak-badge ${onFire ? 'is-fire' : ''}`}>
-      {value}/5{onFire ? ' 🔥' : ''}
+      {value}/{WEEK_DAYS}{onFire ? ' 🔥' : ''}
     </span>
   );
 };

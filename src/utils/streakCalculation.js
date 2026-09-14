@@ -1,5 +1,7 @@
 import { addDays, formatDateKey, startOfDay } from './dates';
 
+export const WEEK_DAYS = 6;
+
 export function getWeekStartMonday(date = new Date()) {
   const day = startOfDay(date);
   const weekday = day.getDay();
@@ -14,11 +16,15 @@ export function getRegistrationDate(record, events = []) {
   return event?.date ? String(event.date).slice(0, 10) : null;
 }
 
-export function calculateStreak(userId, weekStartDate, registrations = [], events = []) {
+export function calculateStreak(userId, weekStartDate, registrations = [], events = [], today = new Date()) {
   if (!userId) return 0;
 
   const weekStart = formatDateKey(weekStartDate);
-  const weekEnd = formatDateKey(addDays(weekStartDate, 4));
+  const todayKey = formatDateKey(startOfDay(today));
+  const weekNaturalEnd = formatDateKey(addDays(weekStartDate, WEEK_DAYS - 1));
+  const weekEnd = weekNaturalEnd < todayKey ? weekNaturalEnd : todayKey;
+  if (weekEnd < weekStart) return 0;
+
   const uniqueDays = new Set();
 
   registrations.forEach((record) => {
@@ -31,19 +37,19 @@ export function calculateStreak(userId, weekStartDate, registrations = [], event
     }
   });
 
-  return Math.min(uniqueDays.size, 5);
+  return Math.min(uniqueDays.size, WEEK_DAYS);
 }
 
 export function isOnFire(streak) {
   return Number(streak) >= 3;
 }
 
-export function withMemberStreaks(members = [], weekStartDate, registrations = [], events = []) {
+export function withMemberStreaks(members = [], weekStartDate, registrations = [], events = [], today = new Date()) {
   return members
     .map((member) => {
       const streak = member.is_drop_in || !member.user_id
         ? 0
-        : calculateStreak(member.user_id, weekStartDate, registrations, events);
+        : calculateStreak(member.user_id, weekStartDate, registrations, events, today);
       return { ...member, streak };
     })
     .sort((a, b) => {

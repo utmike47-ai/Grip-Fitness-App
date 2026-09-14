@@ -3,9 +3,9 @@ import { Check, ChevronDown } from 'lucide-react';
 import Header from '../Header';
 import { TIME_SLOTS, normalizeTimeSlotValue } from '../../utils/constants';
 import { getWorkoutMeta, startOfDay } from '../../utils/dates';
-import { calculateStreak, getWeekStartMonday, isOnFire } from '../../utils/streakCalculation';
+import { calculateStreak, getWeekStartMonday, isOnFire, WEEK_DAYS } from '../../utils/streakCalculation';
 
-const WEEK_TARGET = 5;
+const WEEK_TARGET = WEEK_DAYS;
 const eventDateKey = (event) => String(event?.date || '').slice(0, 10);
 
 const formatTimeDisplay = (time24) => {
@@ -108,10 +108,10 @@ const MyClasses = ({
     };
   }, [userRegs]);
 
-  const streak = useMemo(
-    () => calculateStreak(user?.id, getWeekStartMonday(startOfDay(new Date())), registrations, events),
-    [user, registrations, events]
-  );
+  const streak = useMemo(() => {
+    const today = startOfDay(new Date());
+    return calculateStreak(user?.id, getWeekStartMonday(today), registrations, events, today);
+  }, [user, registrations, events]);
   const remaining = Math.max(0, WEEK_TARGET - streak);
   const onFire = isOnFire(streak);
 

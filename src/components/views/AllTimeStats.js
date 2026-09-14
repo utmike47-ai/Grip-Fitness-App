@@ -7,8 +7,9 @@ import {
   formatMonthLabel,
   formatWeekMonth,
 } from '../../utils/allTimeStats';
+import { WEEK_DAYS } from '../../utils/streakCalculation';
 
-const WEEKDAY_LABELS = ['M', 'T', 'W', 'T', 'F'];
+const WEEKDAY_LABELS = ['M', 'T', 'W', 'T', 'F', 'S'];
 
 const AllTimeStats = ({
   user,
@@ -144,8 +145,8 @@ const AllTimeStats = ({
               <p>Longest Streak</p>
               <span>
                 {stats.longestPerfectStreak
-                  ? `${stats.longestPerfectStreak} consecutive 5/5 weeks${stats.longestPerfectEnd ? ` · ${formatWeekMonth(stats.longestPerfectEnd)}` : ''}`
-                  : 'Hit 5/5 for a full week to start this'}
+                  ? `${stats.longestPerfectStreak} consecutive ${WEEK_DAYS}/${WEEK_DAYS} weeks${stats.longestPerfectEnd ? ` · ${formatWeekMonth(stats.longestPerfectEnd)}` : ''}`
+                  : `Hit ${WEEK_DAYS}/${WEEK_DAYS} for a full week to start this`}
               </span>
             </div>
             <strong>{stats.longestPerfectStreak ? `${stats.longestPerfectStreak} WKS` : '—'}</strong>
@@ -194,7 +195,7 @@ const AllTimeStats = ({
           </div>
           <div className="stats-weeks__sub">
             <span>Attendance</span>
-            <span>Mon – Fri</span>
+            <span>Mon – Sat</span>
           </div>
           <div className="stats-weeks__grid" aria-label="Class calendar">
             <div className="stats-weeks__row stats-weeks__row--labels">
@@ -221,7 +222,7 @@ const AllTimeStats = ({
                   </span>
                 ))}
                 <span className="stats-weeks__score">
-                  {week.attended}/5{week.perfect ? ' 🔥' : ''}
+                  {week.attended}/{WEEK_DAYS}{week.perfect ? ' 🔥' : ''}
                 </span>
               </div>
             ))}
