@@ -42,40 +42,17 @@ function App() {
         .single();
       
       if (error && error.code === 'PGRST116') {
-        // Profile doesn't exist - get role from auth metadata
         const { data: userData } = await supabase.auth.getUser();
-        const userRole = userData?.user?.user_metadata?.role || 'student';
-        
-        // Create profile with correct role from metadata
-        const { error: createError } = await supabase
-          .from('profiles')
-          .insert([{ 
-            id: userId,
-            first_name: userData?.user?.user_metadata?.first_name || userData?.user?.email?.split('@')[0] || 'User',
-            last_name: userData?.user?.user_metadata?.last_name || 'User',
-            role: userRole
-          }]);
-        
-        if (!createError) {
-          // Fetch the newly created profile
-          const { data: newProfile } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', userId)
-            .single();
-          
-          if (newProfile) {
-            setUser(prev => ({
-              ...prev,
-              user_metadata: {
-                ...prev.user_metadata,
-                role: newProfile.role,
-                first_name: newProfile.first_name,
-                last_name: newProfile.last_name
-              }
-            }));
+        const authUser = userData?.user;
+        setUser((prev) => ({
+          ...prev,
+          user_metadata: {
+            ...prev.user_metadata,
+            role: 'student',
+            first_name: authUser?.user_metadata?.first_name || authUser?.email?.split('@')[0] || 'User',
+            last_name: authUser?.user_metadata?.last_name || 'User',
           }
-        }
+        }));
         return;
       }
 
@@ -134,8 +111,7 @@ function App() {
           options: {
             data: {
               first_name: signupData.firstName,
-              last_name: signupData.lastName,
-              role: signupData.role  // Store role in user metadata
+              last_name: signupData.lastName
             }
           }
         });
@@ -151,50 +127,18 @@ function App() {
         }
         
         if (data.user) {
-          // Always use the role from signupData, not default
-          const userRole = signupData.role || 'student';
-          
-          // Create profile with correct role
-          let profileCreated = false;
-          let retries = 0;
-          
-          while (!profileCreated && retries < 3) {
-            try {
-              const { error: profileError } = await supabase
-                .from('profiles')
-                .insert([{
-                  id: data.user.id,
-                  first_name: signupData.firstName || 'New',
-                  last_name: signupData.lastName || 'User',
-                  role: userRole  // Use the actual selected role
-                }]);
-              
-              if (!profileError || profileError.code === '23505') {
-                profileCreated = true;
-              } else {
-                retries++;
-                if (retries < 3) {
-                  await new Promise(resolve => setTimeout(resolve, 1000));
-                }
-              }
-            } catch (err) {
-              console.error(`Profile creation attempt ${retries + 1} failed:`, err);
-              retries++;
-            }
-          }
-          
-          // Set user data with correct role
           setUser({
             ...data.user,
             user_metadata: {
               first_name: signupData.firstName || 'New',
               last_name: signupData.lastName || 'User',
-              role: userRole
+              role: 'student'
             }
           });
-          
+
+          await fetchUserProfile(data.user.id);
           setCurrentView('dashboard');
-          showToast(`Account created as ${userRole}! Please check your email to confirm.`);
+          showToast('Account created! Please check your email to confirm.');
         }
       } else {
         // Regular login

@@ -19,7 +19,6 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
     lastName: '',
     email: '',
     password: '',
-    role: 'student'
   });
   const [addFormErrors, setAddFormErrors] = useState({});
   const [addFormLoading, setAddFormLoading] = useState(false);
@@ -128,8 +127,7 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
         options: {
           data: {
             first_name: addFormData.firstName.trim(),
-            last_name: addFormData.lastName.trim(),
-            role: addFormData.role
+            last_name: addFormData.lastName.trim()
           }
         }
       });
@@ -145,22 +143,6 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
       }
 
       if (authData.user) {
-        // Create profile entry
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert([{
-            id: authData.user.id,
-            first_name: addFormData.firstName.trim(),
-            last_name: addFormData.lastName.trim(),
-            role: addFormData.role
-          }]);
-
-        if (profileError && profileError.code !== '23505') {
-          // If profile creation fails, we should still have the auth user
-          // but log the error
-          console.error('Profile creation error:', profileError);
-        }
-
         // Refresh members list
         if (onRefreshProfiles) {
           await onRefreshProfiles();
@@ -189,7 +171,6 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
           lastName: '',
           email: '',
           password: '',
-          role: 'student'
         });
         setAddModalOpen(false);
         showToast('Member added successfully!');
@@ -214,12 +195,19 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
         .from('profiles')
         .update({
           first_name: editFormData.firstName.trim(),
-          last_name: editFormData.lastName.trim(),
-          role: editFormData.role
+          last_name: editFormData.lastName.trim()
         })
         .eq('id', selectedMember.id);
 
       if (error) throw error;
+
+      if (editFormData.role !== selectedMember.role) {
+        const { error: roleError } = await supabase.rpc('admin_set_member_role', {
+          target_id: selectedMember.id,
+          new_role: editFormData.role,
+        });
+        if (roleError) throw roleError;
+      }
 
       // Refresh members list
       if (onRefreshProfiles) {
@@ -359,7 +347,6 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
                   lastName: '',
                   email: '',
                   password: '',
-                  role: 'student'
                 });
                 setAddFormErrors({});
                 setAddModalOpen(true);
@@ -598,19 +585,9 @@ const MemberManagement = ({ user, profiles = [], onBack, showToast, onRefreshPro
                   )}
                 </div>
 
-                <div>
-                  <label className="block text-sm font-semibold text-grip-primary mb-2">
-                    Role *
-                  </label>
-                  <select
-                    value={addFormData.role}
-                    onChange={(e) => setAddFormData({ ...addFormData, role: e.target.value })}
-                    className="w-full px-4 py-3 border border-grip-secondary rounded-lg focus:outline-none focus:border-grip-primary transition-colors"
-                  >
-                    <option value="student">Student</option>
-                    <option value="coach">Coach</option>
-                  </select>
-                </div>
+                <p className="text-sm text-gray-600">
+                  New accounts are created as members. You can change their role from the member list afterwards.
+                </p>
               </div>
 
               <div className="flex gap-4 mt-6">

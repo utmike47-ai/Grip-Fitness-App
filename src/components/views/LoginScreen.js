@@ -21,7 +21,6 @@ const LoginScreen = ({ onLogin, loading }) => {
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
-  const [role, setRole] = useState('student');
   const [isSignUp, setIsSignUp] = useState(false);
   const [accessCode, setAccessCode] = useState('');
   const [passwordError, setPasswordError] = useState('');
@@ -42,21 +41,14 @@ const LoginScreen = ({ onLogin, loading }) => {
         return;
       }
       
-      // Define your codes here - change these!
-      const STUDENT_CODE = 'GRIPMEMBER2024';
-      const COACH_CODE = 'GRIPCOACH2024';
-      
-      if (role === 'coach' && accessCode !== COACH_CODE) {
-        alert('Invalid coach access code');
-        return;
-      }
-      
-      if (role === 'student' && accessCode !== STUDENT_CODE) {
+      const MEMBER_CODE = 'GRIPMEMBER2024';
+
+      if (accessCode !== MEMBER_CODE) {
         alert('Invalid member access code');
         return;
       }
-      
-      onLogin(email, password, { firstName, lastName, role, isSignUp: true });
+
+      onLogin(email, password, { firstName, lastName, isSignUp: true });
     } else {
       onLogin(email, password);
     }
@@ -164,32 +156,6 @@ const LoginScreen = ({ onLogin, loading }) => {
                   />
                 </div>
               </div>
-
-              <div>
-                <label className="block text-sm font-medium text-grip-primary mb-2">
-                  I am a...
-                </label>
-                <div className="flex gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setRole('student')}
-                    className={`flex-1 py-2 rounded-lg font-semibold transition-all ${
-                      role === 'student' ? 'bg-grip-secondary text-grip-primary' : 'bg-gray-100 text-gray-600'
-                    }`}
-                  >
-                    Student
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setRole('coach')}
-                    className={`flex-1 py-2 rounded-lg font-semibold transition-all ${
-                      role === 'coach' ? 'bg-grip-secondary text-grip-primary' : 'bg-gray-100 text-gray-600'
-                    }`}
-                  >
-                    Coach
-                  </button>
-                </div>
-              </div>
             </>
           )}
 
@@ -207,7 +173,7 @@ const LoginScreen = ({ onLogin, loading }) => {
                 required
               />
               <p className="text-xs text-gray-500 mt-1">
-                {role === 'coach' ? 'Enter coach access code' : 'Enter member access code'}
+                Enter the member access code from Grip Fitness
               </p>
             </div>
           )}
